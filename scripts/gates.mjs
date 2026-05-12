@@ -40,6 +40,11 @@ const testFoundation = 'packages/passport-tests/daml/Aevelum/Passport/Test/Found
 const testPrivacy = 'packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml';
 const testReservation = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml';
 const testRevocation = 'packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml';
+const cdmConformanceDoc = 'docs/06_cdm_conformance.md';
+const cdmFixtureSpec = 'fixtures/cdm/6.0/eligible-collateral-specification.us-treasury.json';
+const cdmFixtureQuery = 'fixtures/cdm/6.0/eligibility-query.us-treasury.json';
+const cdmFixtureResult = 'fixtures/cdm/6.0/check-eligibility-result.us-treasury.json';
+const cdmNegativeFixture = 'fixtures/cdm/6.0/negative/invalid-eligibility-query.missing-required.json';
 const damlSourceRoots = [
   'packages/passport-core/daml',
   'packages/passport-tests/daml'
@@ -61,10 +66,21 @@ const requiredFiles = [
   'docs/03_collateral_capacity_credential.md',
   'docs/04_repo_pretrade_workflow.md',
   'docs/05_privacy_model.md',
-  'docs/06_cdm_mapping_draft.md',
+  cdmConformanceDoc,
   'docs/07_non_goals.md',
+  'schemas/cdm/6.0/SOURCE.md',
+  'schemas/cdm/6.0/cdm-product-collateral-EligibleCollateralSpecification.schema.json',
+  'schemas/cdm/6.0/cdm-product-collateral-EligibilityQuery.schema.json',
+  'schemas/cdm/6.0/cdm-product-collateral-CheckEligibilityResult.schema.json',
+  cdmFixtureSpec,
+  cdmFixtureQuery,
+  cdmFixtureResult,
+  cdmNegativeFixture,
   'artifacts/demo_transcript.json',
-  'artifacts/cdm_mapping_draft.json'
+  'artifacts/cdm_conformance_report.json',
+  'scripts/vendor-cdm-schemas.mjs',
+  'scripts/validate-cdm-conformance.mjs',
+  'scripts/canton-smoke.sh'
 ];
 
 for (const rel of requiredFiles) exists(rel);
@@ -119,6 +135,14 @@ checkContains(testRevocation, [
   't022_supersede_credential'
 ]);
 
+checkContains(cdmConformanceDoc, [
+  'Formal FINOS CDM 6.0 JSON-schema conformance',
+  'EligibleCollateralSpecification',
+  'EligibilityQuery',
+  'CheckEligibilityResult',
+  'not FINOS certification'
+]);
+
 // Forbidden implementation concepts: these names should not appear in Daml code.
 const damlFiles = damlSourceRoots.flatMap(dir => walk(dir)).filter(f => f.endsWith('.daml'));
 const forbiddenDaml = [
@@ -164,14 +188,19 @@ try {
 }
 
 try {
-  const cdm = JSON.parse(read('artifacts/cdm_mapping_draft.json'));
-  const names = new Set(cdm.mappings?.map(m => m.passportObject));
-  for (const obj of ['CollateralPolicy', 'CapacityCredential', 'CredentialPresentation', 'CapacityReservation', 'CredentialRevocation', 'AuditDisclosureGrant']) {
-    if (!names.has(obj)) fail.push(`cdm_mapping_draft missing ${obj}`);
-    else pass.push(`cdm_mapping_draft maps ${obj}`);
+  const cdm = JSON.parse(read('artifacts/cdm_conformance_report.json'));
+  if (cdm.status !== 'passed') fail.push(`cdm_conformance_report status is ${cdm.status}`);
+  else pass.push('cdm_conformance_report passed');
+  if (cdm.cdmVersion !== '6.0') fail.push(`cdm_conformance_report cdmVersion is ${cdm.cdmVersion}`);
+  else pass.push('cdm_conformance_report pins CDM 6.0');
+  const results = new Map(cdm.results?.map(r => [r.name, r]));
+  for (const name of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result', 'negative-invalid-eligibility-query']) {
+    const result = results.get(name);
+    if (!result?.pass) fail.push(`cdm_conformance_report missing passing result ${name}`);
+    else pass.push(`cdm_conformance_report validates ${name}`);
   }
 } catch (e) {
-  fail.push(`cdm_mapping JSON parse failed: ${e.message}`);
+  fail.push(`cdm_conformance_report JSON parse failed: ${e.message}`);
 }
 
 const report = {

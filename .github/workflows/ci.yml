@@ -18,5 +18,7 @@ jobs:
           echo "$HOME/.dpm/bin" >> "$GITHUB_PATH"
       - name: Install pinned Daml SDK
         run: dpm install 3.5.1-rc3
+      - name: Install Node dependencies
+        run: npm ci
       - name: Run local CI gates
         run: npm run ci

@@ -1,0 +1,26 @@
+{
+  "maturity": 7,
+  "collateralAssetType": {
+    "assetType": "Security",
+    "securityType": "Debt"
+  },
+  "assetCountryOfOrigin": "US",
+  "denominatedCurrency": "USD",
+  "agencyRating": {
+    "creditNotation": {
+      "agency": "StandardAndPoors",
+      "notation": {
+        "value": "AA+"
+      }
+    },
+    "boundary": "Minimum"
+  },
+  "issuerType": {
+    "issuerType": "SovereignCentralBank"
+  },
+  "issuerName": {
+    "name": {
+      "value": "United States Treasury"
+    }
+  }
+}

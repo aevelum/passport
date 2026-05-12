@@ -1,0 +1,101 @@
+{
+  "isEligible": true,
+  "matchingEligibleCriteria": [
+    {
+      "collateralCriteria": {
+        "AllCriteria": {
+          "allCriteria": [
+            {
+              "AssetType": {
+                "assetType": "Security",
+                "securityType": "Debt"
+              }
+            },
+            {
+              "CollateralIssuerType": {
+                "issuerType": "SovereignCentralBank"
+              }
+            },
+            {
+              "AssetCountryOfOrigin": {
+                "assetCountryOfOrigin": "US"
+              }
+            },
+            {
+              "CurrencyCodeEnum": "USD"
+            }
+          ]
+        }
+      },
+      "treatment": {
+        "valuationTreatment": {
+          "haircutPercentage": 0.02
+        },
+        "isIncluded": true
+      }
+    }
+  ],
+  "eligibilityQuery": {
+    "maturity": 7,
+    "collateralAssetType": {
+      "assetType": "Security",
+      "securityType": "Debt"
+    },
+    "assetCountryOfOrigin": "US",
+    "denominatedCurrency": "USD",
+    "agencyRating": {
+      "creditNotation": {
+        "agency": "StandardAndPoors",
+        "notation": {
+          "value": "AA+"
+        }
+      },
+      "boundary": "Minimum"
+    },
+    "issuerType": {
+      "issuerType": "SovereignCentralBank"
+    },
+    "issuerName": {
+      "name": {
+        "value": "United States Treasury"
+      }
+    }
+  },
+  "specification": {
+    "criteria": [
+      {
+        "collateralCriteria": {
+          "AllCriteria": {
+            "allCriteria": [
+              {
+                "AssetType": {
+                  "assetType": "Security",
+                  "securityType": "Debt"
+                }
+              },
+              {
+                "CollateralIssuerType": {
+                  "issuerType": "SovereignCentralBank"
+                }
+              },
+              {
+                "AssetCountryOfOrigin": {
+                  "assetCountryOfOrigin": "US"
+                }
+              },
+              {
+                "CurrencyCodeEnum": "USD"
+              }
+            ]
+          }
+        },
+        "treatment": {
+          "valuationTreatment": {
+            "haircutPercentage": 0.02
+          },
+          "isIncluded": true
+        }
+      }
+    ]
+  }
+}
