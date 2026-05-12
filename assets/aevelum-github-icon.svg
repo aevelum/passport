@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="128" y1="96" x2="896" y2="928" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F766E"/>
+      <stop offset="58%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="275" y1="215" x2="749" y2="784" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#CCFBF1"/>
+    </linearGradient>
+    <filter id="softShadow" x="140" y="128" width="744" height="784" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="32" flood-color="#06131F" flood-opacity="0.22" stdDeviation="28"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="#08111A"/>
+  <rect x="64" y="64" width="896" height="896" rx="184" fill="url(#bg)"/>
+  <path d="M167 801C299 850 725 850 857 801" stroke="#08111A" stroke-opacity="0.16" stroke-width="56" stroke-linecap="round"/>
+
+  <g filter="url(#softShadow)">
+    <path d="M275 735C356 515 440 339 512 223C584 339 668 515 749 735" stroke="url(#mark)" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M356 581C451 513 573 513 668 581" stroke="url(#mark)" stroke-width="70" stroke-linecap="round"/>
+    <path d="M373 721C462 682 562 682 651 721" stroke="#08111A" stroke-opacity="0.2" stroke-width="42" stroke-linecap="round"/>
+    <circle cx="512" cy="580" r="58" fill="#F8FAFC"/>
+    <circle cx="512" cy="580" r="25" fill="#0F766E"/>
+  </g>
+</svg>
