@@ -67,9 +67,14 @@ const requiredFiles = [
   'docs/05_privacy_model.md',
   interopDoc,
   'docs/07_non_goals.md',
+  'docs/08_brand_ui_system.md',
+  'design/tokens/colors.json',
+  'design/change-log.md',
   'AGENTS.md',
   '.agents/skills/passport-hardening-loop/SKILL.md',
   '.agents/skills/passport-hardening-loop/agents/openai.yaml',
+  '.agents/skills/passport-ui-design-system/SKILL.md',
+  '.agents/skills/passport-ui-design-system/agents/openai.yaml',
   'interop/core/adapter.js',
   'interop/context.js',
   'interop/registry.js',
@@ -166,6 +171,8 @@ checkContains(interopDoc, [
 
 checkContains('AGENTS.md', [
   '.agents/skills/passport-hardening-loop/SKILL.md',
+  '.agents/skills/passport-ui-design-system/SKILL.md',
+  'design/tokens/colors.json',
   'npm run hardening:gate',
   'Default CI must not fetch from the network'
 ]);
@@ -174,6 +181,26 @@ checkContains('.agents/skills/passport-hardening-loop/SKILL.md', [
   'Passport Hardening Loop',
   'hardening/maps/passport.invariants.json',
   'npm run hardening:gate'
+]);
+
+checkContains('.agents/skills/passport-ui-design-system/SKILL.md', [
+  'Passport UI Design System',
+  'design/tokens/colors.json',
+  'institutional finance palette'
+]);
+
+checkContains('docs/08_brand_ui_system.md', [
+  'institutional financial infrastructure',
+  'design/tokens/colors.json',
+  '#0B1F3A',
+  '#BD9B6B',
+  'Red is reserved for risk'
+]);
+
+checkContains('design/change-log.md', [
+  'Institutional Finance Palette',
+  'design/tokens/colors.json',
+  '.agents/skills/passport-ui-design-system/SKILL.md'
 ]);
 
 checkContains('scripts/ci.sh', [
@@ -310,6 +337,19 @@ try {
   else pass.push('hardening report passed');
 } catch (e) {
   fail.push(`hardening report JSON parse failed: ${e.message}`);
+}
+
+try {
+  const colorTokens = JSON.parse(read('design/tokens/colors.json'));
+  if (colorTokens.artifact !== 'aevelum_passport_color_tokens') fail.push(`color token artifact is ${colorTokens.artifact}`);
+  else pass.push('color token artifact is aevelum_passport_color_tokens');
+  for (const tokenPath of ['ink.900', 'ink.800', 'blue.700', 'teal.700', 'slate.700', 'gold.600', 'risk.700']) {
+    const token = tokenPath.split('.').reduce((obj, key) => obj?.[key], colorTokens.tokens);
+    if (!token?.hex) fail.push(`color token missing ${tokenPath}`);
+    else pass.push(`color token present ${tokenPath} ${token.hex}`);
+  }
+} catch (e) {
+  fail.push(`color tokens JSON parse failed: ${e.message}`);
 }
 
 const report = {

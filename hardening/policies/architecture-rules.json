@@ -10,7 +10,9 @@
       "paths": [
         "AGENTS.md",
         ".agents/skills/passport-hardening-loop/SKILL.md",
-        ".agents/skills/passport-hardening-loop/agents/openai.yaml"
+        ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+        ".agents/skills/passport-ui-design-system/SKILL.md",
+        ".agents/skills/passport-ui-design-system/agents/openai.yaml"
       ]
     },
     {
@@ -23,7 +25,9 @@
       ],
       "contains": [
         ".agents/skills/passport-hardening-loop/SKILL.md",
+        ".agents/skills/passport-ui-design-system/SKILL.md",
         "npm run hardening:gate",
+        "design/tokens/colors.json",
         "Default CI must not fetch from the network"
       ]
     },

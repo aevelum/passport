@@ -1,13 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
   <defs>
     <linearGradient id="accent" x1="8" y1="8" x2="112" y2="112" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0F766E"/>
-      <stop offset="100%" stop-color="#2563EB"/>
+      <stop offset="0%" stop-color="#0B1F3A"/>
+      <stop offset="100%" stop-color="#005F9E"/>
     </linearGradient>
   </defs>
 
   <rect x="8" y="8" width="104" height="104" rx="18" fill="url(#accent)"/>
-  <path d="M33 60 C46 38 74 38 87 60" stroke="white" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <path d="M33 60 C46 82 74 82 87 60" stroke="white" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <circle cx="60" cy="60" r="11" fill="white"/>
+  <circle cx="60" cy="60" r="27" stroke="white" stroke-width="5.5"/>
+  <path d="M35 60 H85" stroke="white" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M40 49 H80" stroke="white" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M40 71 H80" stroke="white" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M60 33 C48 44 48 76 60 87 C72 76 72 44 60 33" stroke="white" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

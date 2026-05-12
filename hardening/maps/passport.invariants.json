@@ -37,6 +37,38 @@
         "notes": "Codex app metadata for repo-local skill discovery and implicit invocation."
       },
       {
+        "path": ".agents/skills/passport-ui-design-system/SKILL.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Codex-discoverable repo-local UI and brand design skill."
+      },
+      {
+        "path": ".agents/skills/passport-ui-design-system/agents/openai.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Codex app metadata for UI design skill discovery and implicit invocation."
+      },
+      {
+        "path": "design/tokens/colors.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Machine-readable institutional finance color tokens."
+      },
+      {
+        "path": "docs/08_brand_ui_system.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Human-readable brand and UI usage rules for future frontend development."
+      },
+      {
         "path": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
         "language": "daml",
         "pin": "git:HEAD",
@@ -575,7 +607,11 @@
             "source_files": [
               "AGENTS.md",
               ".agents/skills/passport-hardening-loop/SKILL.md",
-              ".agents/skills/passport-hardening-loop/agents/openai.yaml"
+              ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+              ".agents/skills/passport-ui-design-system/SKILL.md",
+              ".agents/skills/passport-ui-design-system/agents/openai.yaml",
+              "design/tokens/colors.json",
+              "docs/08_brand_ui_system.md"
             ],
             "functions": [
               {

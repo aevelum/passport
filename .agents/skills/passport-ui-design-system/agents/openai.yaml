@@ -1,0 +1,6 @@
+interface:
+  display_name: "Passport UI Design System"
+  short_description: "Applies the institutional finance palette and visual rules for Passport frontend and brand work."
+  default_prompt: "Use the Passport UI design system tokens and docs before changing frontend, UX, UI, icon, logo, or Open Graph assets."
+policy:
+  allow_implicit_invocation: true

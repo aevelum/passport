@@ -3,6 +3,7 @@
 ## Repo-Local Skills
 
 - Use the repo skill at `.agents/skills/passport-hardening-loop/SKILL.md` for changes that touch Daml templates, Daml tests, interop adapters, CDM plugin behavior, CI, packaging, release artifacts, security boundaries, or architecture decisions.
+- Use the repo skill at `.agents/skills/passport-ui-design-system/SKILL.md` for frontend, UX, UI, icon, logo, Open Graph, README visual header, or brand/color changes.
 - Keep repo skills under `.agents/skills` so Codex CLI, IDE extension, and app agents can discover them from the repository root.
 - If a hardening-sensitive change modifies behavior, update `hardening/maps/passport.invariants.json`, regenerate `hardening/frontiers/passport.frontier.json`, and record the result in `hardening/change-log.md` or `hardening/rounds/`.
 
@@ -10,6 +11,7 @@
 
 - Run `npm run hardening:frontier` and `npm run hardening:gate` after hardening-sensitive changes.
 - Run `npm run ci` before handoff when code, generated artifacts, Daml, CI, package scripts, or hardening policy changes.
+- For visual asset changes, validate SVG XML and regenerate PNG derivatives from SVG sources.
 
 ## Architecture Boundaries
 
@@ -17,3 +19,9 @@
 - Keep interop framework-neutral: CDM is one static plugin, not repo-global special-case code.
 - Default CI must not fetch from the network.
 - Do not add dynamic plugin loading, eval-style execution, arbitrary plugin path resolution, or Passport provenance inside generated CDM payloads.
+
+## Frontend And Brand
+
+- Use `design/tokens/colors.json` and `docs/08_brand_ui_system.md` as the source of truth for colors.
+- The visual tone is institutional finance: navy, slate, off-white, restrained blue, muted teal, limited gold, and red only for risk.
+- Do not introduce bright cyan, neon green, decorative gradients, or consumer-fintech color treatments.

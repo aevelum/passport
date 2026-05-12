@@ -68,6 +68,10 @@ docs/
   05_privacy_model.md
   06_interop_adapters.md
   07_non_goals.md
+  08_brand_ui_system.md
+design/
+  tokens/colors.json
+  change-log.md
 interop/
   core/adapter.js
   registry.js
