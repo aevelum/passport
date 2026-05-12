@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 120" fill="none">
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="20" width="80" height="80" rx="12" fill="url(#accent)"/>
+  <path d="M23 60 C34 41 53 41 64 60" stroke="#08111A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <path d="M23 60 C34 79 53 79 64 60" stroke="#08111A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <circle cx="44" cy="60" r="8" fill="#08111A"/>
+
+  <text x="100" y="70" font-family="'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Menlo, Monaco, Consolas, monospace" font-size="43" font-weight="700">
+    <tspan fill="#E2E8F0">aevelum</tspan><tspan fill="url(#accent)"> passport</tspan>
+  </text>
+
+  <text x="102" y="96" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="14" fill="#94A3B8" letter-spacing="0.3">
+    Canton-native collateral capacity credentials
+  </text>
+</svg>

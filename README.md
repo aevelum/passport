@@ -1,4 +1,8 @@
-# Aevelum Passport Foundation
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner.svg">
+  <img alt="Aevelum Passport Foundation - Canton-native collateral capacity credentials" src="assets/banner.svg">
+</picture>
 
 Aevelum Passport is a Daml/Canton-native collateral credential account.
 
