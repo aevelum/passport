@@ -63,25 +63,28 @@ docs/
   03_collateral_capacity_credential.md
   04_repo_pretrade_workflow.md
   05_privacy_model.md
-  06_cdm_conformance.md
+  06_interop_adapters.md
   07_non_goals.md
-fixtures/
-  cdm/6.0/*.json
-schemas/
-  cdm/6.0/*.schema.json
+interop/
+  core/adapter.js
+  registry.js
+  runner.js
+  samples/repo-pretrade-passport-input.json
+  plugins/cdm/
 scripts/
   gates.mjs
   daml-coverage-gate.mjs
   export-demo-transcript.mjs
-  vendor-cdm-schemas.mjs
-  validate-cdm-conformance.mjs
+  interop-generate.mjs
+  interop-validate.mjs
+  interop-vendor-cdm.mjs
   run-daml-tests.sh
   canton-smoke.sh
   ci.sh
   package.mjs
 artifacts/
   demo_transcript.json
-  cdm_conformance_report.json
+  interop/report.json
   gate_report.json
 ```
 
@@ -91,18 +94,18 @@ artifacts/
 npm run ci
 ```
 
-This generates demo and CDM conformance artifacts, runs structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, and loads the core DAR into a local Canton sandbox. Generated `Archive` choices are excluded from the coverage threshold.
+This generates demo and interop artifacts, runs structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, and loads the core DAR into a local Canton sandbox. Generated `Archive` choices are excluded from the coverage threshold.
 
-The CDM conformance gate validates Passport collateral eligibility fixtures offline against the vendored FINOS CDM 6.0 JSON Schema subset:
+The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates them offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset:
 
 ```bash
-npm run cdm:validate
+npm run interop:validate
 ```
 
-To explicitly refresh the vendored schema subset from FINOS:
+To explicitly refresh the CDM plugin's vendored schema subset from FINOS:
 
 ```bash
-npm run cdm:vendor-schemas
+npm run interop:vendor:cdm
 ```
 
 To run only the local Canton sandbox smoke check:

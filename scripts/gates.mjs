@@ -40,11 +40,10 @@ const testFoundation = 'packages/passport-tests/daml/Aevelum/Passport/Test/Found
 const testPrivacy = 'packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml';
 const testReservation = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml';
 const testRevocation = 'packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml';
-const cdmConformanceDoc = 'docs/06_cdm_conformance.md';
-const cdmFixtureSpec = 'fixtures/cdm/6.0/eligible-collateral-specification.us-treasury.json';
-const cdmFixtureQuery = 'fixtures/cdm/6.0/eligibility-query.us-treasury.json';
-const cdmFixtureResult = 'fixtures/cdm/6.0/check-eligibility-result.us-treasury.json';
-const cdmNegativeFixture = 'fixtures/cdm/6.0/negative/invalid-eligibility-query.missing-required.json';
+const interopDoc = 'docs/06_interop_adapters.md';
+const interopSample = 'interop/samples/repo-pretrade-passport-input.json';
+const cdmSchemaRoot = 'interop/plugins/cdm/assets/schemas/6.0';
+const cdmArtifactRoot = 'artifacts/interop/cdm/6.0';
 const damlSourceRoots = [
   'packages/passport-core/daml',
   'packages/passport-tests/daml'
@@ -66,20 +65,28 @@ const requiredFiles = [
   'docs/03_collateral_capacity_credential.md',
   'docs/04_repo_pretrade_workflow.md',
   'docs/05_privacy_model.md',
-  cdmConformanceDoc,
+  interopDoc,
   'docs/07_non_goals.md',
-  'schemas/cdm/6.0/SOURCE.md',
-  'schemas/cdm/6.0/cdm-product-collateral-EligibleCollateralSpecification.schema.json',
-  'schemas/cdm/6.0/cdm-product-collateral-EligibilityQuery.schema.json',
-  'schemas/cdm/6.0/cdm-product-collateral-CheckEligibilityResult.schema.json',
-  cdmFixtureSpec,
-  cdmFixtureQuery,
-  cdmFixtureResult,
-  cdmNegativeFixture,
+  'interop/core/adapter.js',
+  'interop/context.js',
+  'interop/registry.js',
+  'interop/runner.js',
+  'interop/plugins/cdm/index.js',
+  'interop/plugins/cdm/vendor.js',
+  interopSample,
+  `${cdmSchemaRoot}/SOURCE.md`,
+  `${cdmSchemaRoot}/manifest.json`,
+  `${cdmSchemaRoot}/cdm-product-collateral-EligibleCollateralSpecification.schema.json`,
+  `${cdmSchemaRoot}/cdm-product-collateral-EligibilityQuery.schema.json`,
+  `${cdmSchemaRoot}/cdm-product-collateral-CheckEligibilityResult.schema.json`,
+  `${cdmArtifactRoot}/eligible-collateral-specification.json`,
+  `${cdmArtifactRoot}/eligibility-query.json`,
+  `${cdmArtifactRoot}/check-eligibility-result.json`,
   'artifacts/demo_transcript.json',
-  'artifacts/cdm_conformance_report.json',
-  'scripts/vendor-cdm-schemas.mjs',
-  'scripts/validate-cdm-conformance.mjs',
+  'artifacts/interop/report.json',
+  'scripts/interop-generate.mjs',
+  'scripts/interop-validate.mjs',
+  'scripts/interop-vendor-cdm.mjs',
   'scripts/canton-smoke.sh'
 ];
 
@@ -135,12 +142,24 @@ checkContains(testRevocation, [
   't022_supersede_credential'
 ]);
 
-checkContains(cdmConformanceDoc, [
-  'Formal FINOS CDM 6.0 JSON-schema conformance',
-  'EligibleCollateralSpecification',
-  'EligibilityQuery',
-  'CheckEligibilityResult',
+checkContains(interopDoc, [
+  'framework-neutral adapter surface',
+  'static plugin registry only',
+  'FINOS CDM',
   'not FINOS certification'
+]);
+
+checkContains('interop/registry.js', [
+  'adapterRegistry',
+  'cdmPlugin'
+]);
+
+checkContains('interop/plugins/cdm/index.js', [
+  'framework: \'cdm\'',
+  'eligible-collateral-specification',
+  'eligibility-query',
+  'check-eligibility-result',
+  'verifySchemaManifest'
 ]);
 
 // Forbidden implementation concepts: these names should not appear in Daml code.
@@ -188,19 +207,48 @@ try {
 }
 
 try {
-  const cdm = JSON.parse(read('artifacts/cdm_conformance_report.json'));
-  if (cdm.status !== 'passed') fail.push(`cdm_conformance_report status is ${cdm.status}`);
-  else pass.push('cdm_conformance_report passed');
-  if (cdm.cdmVersion !== '6.0') fail.push(`cdm_conformance_report cdmVersion is ${cdm.cdmVersion}`);
-  else pass.push('cdm_conformance_report pins CDM 6.0');
-  const results = new Map(cdm.results?.map(r => [r.name, r]));
-  for (const name of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result', 'negative-invalid-eligibility-query']) {
-    const result = results.get(name);
-    if (!result?.pass) fail.push(`cdm_conformance_report missing passing result ${name}`);
-    else pass.push(`cdm_conformance_report validates ${name}`);
+  const manifest = JSON.parse(read(`${cdmSchemaRoot}/manifest.json`));
+  if (manifest.framework !== 'cdm') fail.push(`cdm schema manifest framework is ${manifest.framework}`);
+  else pass.push('cdm schema manifest framework is cdm');
+  if (manifest.frameworkVersion !== '6.0') fail.push(`cdm schema manifest frameworkVersion is ${manifest.frameworkVersion}`);
+  else pass.push('cdm schema manifest pins CDM 6.0');
+  if (!Array.isArray(manifest.files) || manifest.files.length !== manifest.schemaCount) fail.push('cdm schema manifest file count mismatch');
+  else pass.push('cdm schema manifest file count matches');
+  for (const rootSchema of ['cdm-product-collateral-EligibleCollateralSpecification.schema.json', 'cdm-product-collateral-EligibilityQuery.schema.json', 'cdm-product-collateral-CheckEligibilityResult.schema.json']) {
+    if (!manifest.rootSchemas?.includes(rootSchema)) fail.push(`cdm schema manifest missing root schema ${rootSchema}`);
+    else pass.push(`cdm schema manifest root schema ${rootSchema}`);
   }
 } catch (e) {
-  fail.push(`cdm_conformance_report JSON parse failed: ${e.message}`);
+  fail.push(`cdm schema manifest JSON parse failed: ${e.message}`);
+}
+
+try {
+  const report = JSON.parse(read('artifacts/interop/report.json'));
+  if (report.status !== 'passed') fail.push(`interop report status is ${report.status}`);
+  else pass.push('interop report passed');
+  const cdmAdapter = report.adapters?.find(adapter => adapter.framework === 'cdm' && adapter.frameworkVersion === '6.0');
+  if (!cdmAdapter) fail.push('interop report missing CDM 6.0 adapter');
+  else pass.push('interop report includes CDM 6.0 adapter');
+  const results = new Map(report.results?.map(r => [r.artifactType, r]));
+  for (const name of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result']) {
+    const result = results.get(name);
+    if (!result?.validation?.valid) fail.push(`interop report missing valid result ${name}`);
+    else pass.push(`interop report validates ${name}`);
+  }
+  const negative = report.negativeResults?.find(result => result.name === 'negative-invalid-eligibility-query');
+  if (!negative?.pass) fail.push('interop report missing passing negative-invalid-eligibility-query');
+  else pass.push('interop report validates negative-invalid-eligibility-query');
+} catch (e) {
+  fail.push(`interop report JSON parse failed: ${e.message}`);
+}
+
+try {
+  for (const artifact of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result']) {
+    JSON.parse(read(`${cdmArtifactRoot}/${artifact}.json`));
+    pass.push(`generated CDM artifact parses: ${artifact}`);
+  }
+} catch (e) {
+  fail.push(`generated CDM artifact parse failed: ${e.message}`);
 }
 
 const report = {

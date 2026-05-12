@@ -14,6 +14,7 @@ The Foundation Release intentionally excludes:
 - diligence workspace UX;
 - production identity integration;
 - live external adapter integration;
+- Rosetta Engine execution;
 - formal standards-body endorsement.
 
 ## Safe claim
