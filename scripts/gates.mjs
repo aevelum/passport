@@ -67,6 +67,9 @@ const requiredFiles = [
   'docs/05_privacy_model.md',
   interopDoc,
   'docs/07_non_goals.md',
+  'AGENTS.md',
+  '.agents/skills/passport-hardening-loop/SKILL.md',
+  '.agents/skills/passport-hardening-loop/agents/openai.yaml',
   'interop/core/adapter.js',
   'interop/context.js',
   'interop/registry.js',
@@ -84,6 +87,18 @@ const requiredFiles = [
   `${cdmArtifactRoot}/check-eligibility-result.json`,
   'artifacts/demo_transcript.json',
   'artifacts/interop/report.json',
+  'artifacts/hardening_report.json',
+  'artifacts/hardening_map_report.json',
+  'hardening/maps/passport.invariants.json',
+  'hardening/frontiers/passport.frontier.json',
+  'hardening/policies/architecture-rules.json',
+  'hardening/rounds/round-0001.md',
+  'hardening/change-log.md',
+  'hardening/scripts/lib.mjs',
+  'hardening/scripts/validate-map.mjs',
+  'hardening/scripts/score-frontier.mjs',
+  'hardening/scripts/select-round.mjs',
+  'hardening/scripts/hardening-gate.mjs',
   'scripts/interop-generate.mjs',
   'scripts/interop-validate.mjs',
   'scripts/interop-vendor-cdm.mjs',
@@ -147,6 +162,23 @@ checkContains(interopDoc, [
   'static plugin registry only',
   'FINOS CDM',
   'not FINOS certification'
+]);
+
+checkContains('AGENTS.md', [
+  '.agents/skills/passport-hardening-loop/SKILL.md',
+  'npm run hardening:gate',
+  'Default CI must not fetch from the network'
+]);
+
+checkContains('.agents/skills/passport-hardening-loop/SKILL.md', [
+  'Passport Hardening Loop',
+  'hardening/maps/passport.invariants.json',
+  'npm run hardening:gate'
+]);
+
+checkContains('scripts/ci.sh', [
+  'npm run hardening:frontier',
+  'npm run hardening:gate'
 ]);
 
 checkContains('interop/registry.js', [
@@ -249,6 +281,35 @@ try {
   }
 } catch (e) {
   fail.push(`generated CDM artifact parse failed: ${e.message}`);
+}
+
+try {
+  const hardeningMap = JSON.parse(read('hardening/maps/passport.invariants.json'));
+  if (hardeningMap.artifact !== 'passport_invariant_property_map') fail.push(`hardening map artifact is ${hardeningMap.artifact}`);
+  else pass.push('hardening map artifact is passport_invariant_property_map');
+  const skillInventory = hardeningMap.scope?.source_inventory?.find(item => item.path === '.agents/skills/passport-hardening-loop/SKILL.md');
+  if (!skillInventory) fail.push('hardening map missing repo-local skill source inventory');
+  else pass.push('hardening map includes repo-local skill source inventory');
+} catch (e) {
+  fail.push(`hardening map JSON parse failed: ${e.message}`);
+}
+
+try {
+  const frontier = JSON.parse(read('hardening/frontiers/passport.frontier.json'));
+  if (frontier.artifact !== 'passport_hardening_frontier') fail.push(`hardening frontier artifact is ${frontier.artifact}`);
+  else pass.push('hardening frontier artifact is passport_hardening_frontier');
+  if (!frontier.summary?.top_candidate) fail.push('hardening frontier missing top candidate');
+  else pass.push(`hardening frontier top candidate ${frontier.summary.top_candidate}`);
+} catch (e) {
+  fail.push(`hardening frontier JSON parse failed: ${e.message}`);
+}
+
+try {
+  const hardeningReport = JSON.parse(read('artifacts/hardening_report.json'));
+  if (hardeningReport.status !== 'passed') fail.push(`hardening report status is ${hardeningReport.status}`);
+  else pass.push('hardening report passed');
+} catch (e) {
+  fail.push(`hardening report JSON parse failed: ${e.message}`);
 }
 
 const report = {

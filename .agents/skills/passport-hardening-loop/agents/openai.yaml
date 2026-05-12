@@ -1,0 +1,6 @@
+interface:
+  display_name: "Passport Hardening Loop"
+  short_description: "Keeps Passport invariants, frontier scoring, gates, and hardening round records synchronized."
+  default_prompt: "Use the Passport hardening loop to scope the change, refresh the invariant map/frontier, run hardening gates, and record the round result."
+policy:
+  allow_implicit_invocation: true

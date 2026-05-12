@@ -48,6 +48,9 @@ Auditor receives only scoped audit metadata.
 
 ```text
 multi-package.yaml
+AGENTS.md
+.agents/
+  skills/passport-hardening-loop/SKILL.md
 packages/
   passport-core/
     daml.yaml
@@ -71,6 +74,13 @@ interop/
   runner.js
   samples/repo-pretrade-passport-input.json
   plugins/cdm/
+hardening/
+  maps/passport.invariants.json
+  frontiers/passport.frontier.json
+  policies/architecture-rules.json
+  rounds/round-0001.md
+  change-log.md
+  scripts/*.mjs
 scripts/
   gates.mjs
   daml-coverage-gate.mjs
@@ -85,6 +95,8 @@ scripts/
 artifacts/
   demo_transcript.json
   interop/report.json
+  hardening_report.json
+  hardening_map_report.json
   gate_report.json
 ```
 
@@ -94,7 +106,15 @@ artifacts/
 npm run ci
 ```
 
-This generates demo and interop artifacts, runs structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, and loads the core DAR into a local Canton sandbox. Generated `Archive` choices are excluded from the coverage threshold.
+This generates demo and interop artifacts, refreshes the hardening frontier, runs architecture and structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, and loads the core DAR into a local Canton sandbox. Generated `Archive` choices are excluded from the coverage threshold.
+
+The repo-local hardening loop is discoverable to Codex agents through `.agents/skills/passport-hardening-loop/SKILL.md` and root `AGENTS.md`. To run only that lane:
+
+```bash
+npm run hardening:map
+npm run hardening:frontier
+npm run hardening:gate
+```
 
 The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates them offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset:
 
