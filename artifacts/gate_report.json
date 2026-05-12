@@ -2,7 +2,7 @@
   "artifact": "gate_report",
   "package": "aevelum-passport-foundation",
   "version": "0.1.0",
-  "generatedAt": "2026-05-12T05:16:55.951Z",
+  "generatedAt": "2026-05-12T05:36:56.504Z",
   "dpmSdk": "3.5.1-rc3",
   "note": "This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.",
   "pass": [
