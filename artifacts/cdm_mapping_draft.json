@@ -1,0 +1,52 @@
+{
+  "artifact": "cdm_mapping_draft",
+  "package": "aevelum-passport-foundation",
+  "version": "0.1.0",
+  "status": "draft_alignment_not_formal_conformance",
+  "mappings": [
+    {
+      "passportObject": "PassportAccount",
+      "marketConcept": "Party/account role"
+    },
+    {
+      "passportObject": "CollateralPolicy",
+      "marketConcept": "Eligibility schedule / collateral terms"
+    },
+    {
+      "passportObject": "CredentialRequest",
+      "marketConcept": "Request for collateral capacity evaluation"
+    },
+    {
+      "passportObject": "CapacityCredential",
+      "marketConcept": "Eligible collateral capacity representation"
+    },
+    {
+      "passportObject": "CredentialPresentation",
+      "marketConcept": "Scoped counterparty disclosure"
+    },
+    {
+      "passportObject": "CapacityReservation",
+      "marketConcept": "Allocation / lock / pre-settlement reservation"
+    },
+    {
+      "passportObject": "CredentialRevocation",
+      "marketConcept": "Lifecycle event / correction / revocation / supersession"
+    },
+    {
+      "passportObject": "AuditDisclosureGrant",
+      "marketConcept": "Audit permission / evidence trail"
+    },
+    {
+      "passportObject": "haircutScheduleRef",
+      "marketConcept": "Valuation / haircut reference"
+    },
+    {
+      "passportObject": "evidenceManifestHash",
+      "marketConcept": "Evidence provenance reference"
+    },
+    {
+      "passportObject": "calculationMethodHash",
+      "marketConcept": "Calculation provenance reference"
+    }
+  ]
+}

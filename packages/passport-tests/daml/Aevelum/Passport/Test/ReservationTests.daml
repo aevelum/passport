@@ -1,0 +1,108 @@
+module Aevelum.Passport.Test.ReservationTests where
+
+import Daml.Script
+import Aevelum.Passport.Types
+import Aevelum.Passport.Foundation
+import Aevelum.Passport.Test.FoundationScenario
+
+t006_reserve_partial_capacity : Script ()
+t006_reserve_partial_capacity = script do
+  reserved <- createReservedContext
+  dealerReservations <- query @CapacityReservation reserved.presented.base.actors.dealer
+  holderCredentials <- query @CapacityCredential reserved.presented.base.actors.holder
+  assertMsg "dealer should see one active reservation" (length dealerReservations == 1)
+  assertMsg "holder should see residual credential after partial reservation" (length holderCredentials >= 1)
+  return ()
+
+t007_reject_over_reservation : Script ()
+t007_reject_over_reservation = script do
+  presented <- createPresentedContext
+  let holder = presented.base.actors.holder
+  let dealer = presented.base.actors.dealer
+  let attester = presented.base.actors.attester
+  submitMustFail (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd presented.presentationCid ReserveFromPresentation with
+      reservationId = "reservation-over-001"
+      reservedAmount = 60000000.0
+      reservationPurpose = RepoPreTradeReservation
+      reservationValidUntil = "2026-05-10T04:03:00Z"
+      residualCredentialId = "credential-residual-over-001"
+  dealerReservations <- query @CapacityReservation dealer
+  assertMsg "over reservation should not create a reservation" (length dealerReservations == 0)
+  return ()
+
+t008_consume_and_reissue_residual_capacity : Script ()
+t008_consume_and_reissue_residual_capacity = script do
+  reserved <- createReservedContext
+  holderCredentials <- query @CapacityCredential reserved.presented.base.actors.holder
+  dealerCredentials <- query @CapacityCredential reserved.presented.base.actors.dealer
+  assertMsg "holder should retain residual capacity credential" (length holderCredentials >= 1)
+  assertMsg "dealer should not see raw residual credential" (length dealerCredentials == 0)
+  return ()
+
+t009_release_reservation : Script ()
+t009_release_reservation = script do
+  reserved <- createReservedContext
+  let holder = reserved.presented.base.actors.holder
+  let dealer = reserved.presented.base.actors.dealer
+  let attester = reserved.presented.base.actors.attester
+  _releasedCredentialCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd reserved.reservationCid ReleaseReservation with
+      releasedCredentialId = "credential-released-009"
+      releasedAt = "2026-05-10T01:00:00Z"
+  dealerReservations <- query @CapacityReservation dealer
+  assertMsg "release consumes reservation" (length dealerReservations == 0)
+  return ()
+
+t019_expire_reservation : Script ()
+t019_expire_reservation = script do
+  reserved <- createReservedContext
+  let holder = reserved.presented.base.actors.holder
+  let dealer = reserved.presented.base.actors.dealer
+  let attester = reserved.presented.base.actors.attester
+  _revocationCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd reserved.reservationCid ExpireReservation with
+      revocationId = "reservation-expiration-001"
+      expiredAt = "2026-05-10T05:00:00Z"
+  dealerRevocations <- query @CredentialRevocation dealer
+  dealerReservations <- query @CapacityReservation dealer
+  assertMsg "expiring reservation should create a revocation notice" (length dealerRevocations == 1)
+  assertMsg "expiring reservation consumes active reservation" (length dealerReservations == 0)
+  return ()
+
+t020_convert_reservation_to_execution_instruction : Script ()
+t020_convert_reservation_to_execution_instruction = script do
+  reserved <- createReservedContext
+  let holder = reserved.presented.base.actors.holder
+  let dealer = reserved.presented.base.actors.dealer
+  let attester = reserved.presented.base.actors.attester
+  let rail = reserved.presented.base.actors.operator
+  _instructionCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd reserved.reservationCid ConvertToExecutionInstruction with
+      instructionId = "execution-instruction-001"
+      executionRailParty = rail
+      instructionPurpose = "repo pre-trade handoff"
+      instructionCreatedAt = "2026-05-10T05:15:00Z"
+  railInstructions <- query @ExecutionInstruction rail
+  dealerReservations <- query @CapacityReservation dealer
+  assertMsg "execution rail should see execution instruction" (length railInstructions == 1)
+  assertMsg "conversion is nonconsuming and keeps reservation active" (length dealerReservations == 1)
+  return ()
+
+t021_dispute_reservation : Script ()
+t021_dispute_reservation = script do
+  reserved <- createReservedContext
+  let holder = reserved.presented.base.actors.holder
+  let dealer = reserved.presented.base.actors.dealer
+  let attester = reserved.presented.base.actors.attester
+  _disputeCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd reserved.reservationCid DisputeReservation with
+      disputeId = "reservation-dispute-001"
+      disputedBy = dealer
+      disputeReason = "dealer review requested"
+      disputedAt = "2026-05-10T05:30:00Z"
+  dealerDisputes <- query @ReservationDispute dealer
+  holderDisputes <- query @ReservationDispute holder
+  assertMsg "dealer should see reservation dispute" (length dealerDisputes == 1)
+  assertMsg "holder should see reservation dispute" (length holderDisputes == 1)
+  return ()

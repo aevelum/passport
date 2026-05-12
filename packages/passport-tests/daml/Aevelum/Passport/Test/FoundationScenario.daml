@@ -1,0 +1,248 @@
+module Aevelum.Passport.Test.FoundationScenario where
+
+import Daml.Script
+import Aevelum.Passport.Types
+import Aevelum.Passport.Foundation
+
+data Actors = Actors
+  with
+    holder : Party
+    dealer : Party
+    attester : Party
+    operator : Party
+    auditor : Party
+    outsider : Party
+
+data BaseContext = BaseContext
+  with
+    actors : Actors
+    accountCid : ContractId PassportAccount
+    policyCid : ContractId CollateralPolicy
+    requestCid : ContractId CredentialRequest
+    credentialCid : ContractId CapacityCredential
+
+data PresentedContext = PresentedContext
+  with
+    base : BaseContext
+    presentationCid : ContractId CredentialPresentation
+
+data ReservedContext = ReservedContext
+  with
+    presented : PresentedContext
+    reservationCid : ContractId CapacityReservation
+    residualCredentialCid : Optional (ContractId CapacityCredential)
+
+mkActors : Script Actors
+mkActors = script do
+  holder <- allocateParty "AevelumDemoHolder"
+  dealer <- allocateParty "AevelumDemoDealer"
+  attester <- allocateParty "AevelumDemoCustodianAttester"
+  operator <- allocateParty "AevelumDemoOperator"
+  auditor <- allocateParty "AevelumDemoAuditor"
+  outsider <- allocateParty "AevelumDemoOutsider"
+  return Actors with holder; dealer; attester; operator; auditor; outsider
+
+createBaseContext : Script BaseContext
+createBaseContext = script do
+  actors <- mkActors
+  let holder = actors.holder
+  let dealer = actors.dealer
+  let attester = actors.attester
+  let operator = actors.operator
+
+  accountCid <- submit holder do
+    createCmd PassportAccount with
+      accountId = "acct-holder-001"
+      holder
+      operator = Some operator
+      displayName = "Demo Holder Passport Account"
+      schemaVersion = "foundation-0.1"
+      createdAt = "2026-05-10T00:00:00Z"
+      status = AccountActive
+
+  policyCid <- submit dealer do
+    createCmd CollateralPolicy with
+      policyId = "repo-policy-001"
+      policyVersion = "v1"
+      policyPublisher = dealer
+      approvedHolders = [holder]
+      approvedAttesters = [attester]
+      eligibleAssetClasses = [USTreasury, TokenizedUSTreasury, MoneyMarketFund, TokenizedMoneyMarketFund]
+      eligibleCurrencies = ["USD"]
+      minimumCapacity = 50000000.0
+      haircutScheduleRef = "haircut-ust-mmf-v1"
+      concentrationLimitRef = "concentration-v1"
+      freshnessWindowHours = 24
+      reservationAllowed = True
+      validFrom = "2026-05-10T00:00:00Z"
+      validUntil = "2026-05-11T00:00:00Z"
+      schemaVersion = "foundation-0.1"
+      status = PolicyActive
+
+  requestCid <- submit holder do
+    exerciseCmd accountCid RequestCapacityCredential with
+      requestId = "request-001"
+      policyId = "repo-policy-001"
+      policyVersion = "v1"
+      policyPublisher = dealer
+      attester
+      requestedMinimumCapacity = 50000000.0
+      capacityCurrency = "USD"
+      purpose = RepoPreTrade
+      requestedAt = "2026-05-10T00:01:00Z"
+
+  credentialCid <- submit (actAs holder <> actAs attester) do
+    exerciseCmd requestCid IssueCapacityCredential with
+      credentialId = "credential-001"
+      capacityAmount = 50000000.0
+      capacityBand = AtLeast 50000000.0
+      haircutScheduleRef = "haircut-ust-mmf-v1"
+      valuationTime = "2026-05-10T00:02:00Z"
+      validFrom = "2026-05-10T00:02:00Z"
+      validUntil = "2026-05-11T00:02:00Z"
+      evidenceManifestHash = "sha256:evidence-demo-001"
+      calculationMethodHash = "sha256:calculation-demo-001"
+      reservableAmount = 50000000.0
+      schemaVersion = "foundation-0.1"
+
+  return BaseContext with actors; accountCid; policyCid; requestCid; credentialCid
+
+createPresentedContext : Script PresentedContext
+createPresentedContext = script do
+  base <- createBaseContext
+  let holder = base.actors.holder
+  let dealer = base.actors.dealer
+  presentationCid <- submit holder do
+    exerciseCmd base.credentialCid PresentToVerifier with
+      presentationId = "presentation-001"
+      verifier = dealer
+      presentationPurpose = RepoPreTrade
+      presentedAt = "2026-05-10T00:03:00Z"
+  return PresentedContext with base; presentationCid
+
+createReservedContext : Script ReservedContext
+createReservedContext = script do
+  presented <- createPresentedContext
+  let holder = presented.base.actors.holder
+  let dealer = presented.base.actors.dealer
+  let attester = presented.base.actors.attester
+  outcome <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd presented.presentationCid ReserveFromPresentation with
+      reservationId = "reservation-001"
+      reservedAmount = 30000000.0
+      reservationPurpose = RepoPreTradeReservation
+      reservationValidUntil = "2026-05-10T04:03:00Z"
+      residualCredentialId = "credential-residual-001"
+  return ReservedContext with
+    presented
+    reservationCid = outcome.reservationCid
+    residualCredentialCid = outcome.residualCredentialCid
+
+t001_create_passport_account : Script ()
+t001_create_passport_account = script do
+  actors <- mkActors
+  accountCid <- submit actors.holder do
+    createCmd PassportAccount with
+      accountId = "acct-test-001"
+      holder = actors.holder
+      operator = Some actors.operator
+      displayName = "Test Passport Account"
+      schemaVersion = "foundation-0.1"
+      createdAt = "2026-05-10T00:00:00Z"
+      status = AccountActive
+  holderAccounts <- query @PassportAccount actors.holder
+  outsiderAccounts <- query @PassportAccount actors.outsider
+  assertMsg "holder should see account" (length holderAccounts == 1)
+  assertMsg "outsider should not see account" (length outsiderAccounts == 0)
+  return ()
+
+t002_publish_collateral_policy : Script ()
+t002_publish_collateral_policy = script do
+  base <- createBaseContext
+  dealerPolicies <- query @CollateralPolicy base.actors.dealer
+  attesterPolicies <- query @CollateralPolicy base.actors.attester
+  outsiderPolicies <- query @CollateralPolicy base.actors.outsider
+  assertMsg "dealer should see policy" (length dealerPolicies == 1)
+  assertMsg "attester should see policy" (length attesterPolicies == 1)
+  assertMsg "outsider should not see policy" (length outsiderPolicies == 0)
+  return ()
+
+t003_issue_capacity_credential : Script ()
+t003_issue_capacity_credential = script do
+  base <- createBaseContext
+  holderCredentials <- query @CapacityCredential base.actors.holder
+  attesterCredentials <- query @CapacityCredential base.actors.attester
+  dealerCredentials <- query @CapacityCredential base.actors.dealer
+  assertMsg "holder should see capacity credential" (length holderCredentials == 1)
+  assertMsg "attester should see capacity credential" (length attesterCredentials == 1)
+  assertMsg "dealer should not see raw credential before presentation" (length dealerCredentials == 0)
+  return ()
+
+t004_present_credential_to_verifier : Script ()
+t004_present_credential_to_verifier = script do
+  presented <- createPresentedContext
+  verifierPresentations <- query @CredentialPresentation presented.base.actors.dealer
+  assertMsg "verifier should see presentation" (length verifierPresentations == 1)
+  return ()
+
+t015_full_repo_pretrade_happy_path : Script ()
+t015_full_repo_pretrade_happy_path = script do
+  reserved <- createReservedContext
+  let holder = reserved.presented.base.actors.holder
+  let dealer = reserved.presented.base.actors.dealer
+  let attester = reserved.presented.base.actors.attester
+  releasedCredentialCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd reserved.reservationCid ReleaseReservation with
+      releasedCredentialId = "credential-released-001"
+      releasedAt = "2026-05-10T01:00:00Z"
+  holderCredentials <- query @CapacityCredential holder
+  dealerReservations <- query @CapacityReservation dealer
+  assertMsg "holder should see active capacity credentials after release" (length holderCredentials >= 1)
+  assertMsg "released reservation should no longer be active for dealer" (length dealerReservations == 0)
+  return ()
+
+t016_amend_policy : Script ()
+t016_amend_policy = script do
+  base <- createBaseContext
+  amendedPolicyCid <- submit base.actors.dealer do
+    exerciseCmd base.policyCid AmendPolicy with
+      newPolicyVersion = "v2"
+      newMinimumCapacity = 60000000.0
+      newHaircutScheduleRef = "haircut-ust-mmf-v2"
+      newConcentrationLimitRef = "concentration-v2"
+      amendedAt = "2026-05-10T01:00:00Z"
+  dealerPolicies <- query @CollateralPolicy base.actors.dealer
+  assertMsg "amended policy should replace the original active policy" (length dealerPolicies == 1)
+  return ()
+
+t017_retire_policy : Script ()
+t017_retire_policy = script do
+  base <- createBaseContext
+  _eventCid <- submit base.actors.dealer do
+    exerciseCmd base.policyCid RetirePolicy with
+      retiredAt = "2026-05-10T02:00:00Z"
+      reason = "foundation lifecycle coverage"
+  dealerEvents <- query @PolicyLifecycleEvent base.actors.dealer
+  dealerPolicies <- query @CollateralPolicy base.actors.dealer
+  assertMsg "retiring a policy should create a lifecycle event" (length dealerEvents == 1)
+  assertMsg "retiring a policy should consume the active policy" (length dealerPolicies == 0)
+  return ()
+
+t018_close_passport_account : Script ()
+t018_close_passport_account = script do
+  actors <- mkActors
+  accountCid <- submit actors.holder do
+    createCmd PassportAccount with
+      accountId = "acct-close-001"
+      holder = actors.holder
+      operator = Some actors.operator
+      displayName = "Closeable Passport Account"
+      schemaVersion = "foundation-0.1"
+      createdAt = "2026-05-10T00:00:00Z"
+      status = AccountActive
+  submit actors.holder do
+    exerciseCmd accountCid ClosePassportAccount with
+      closedAt = "2026-05-10T03:00:00Z"
+  holderAccounts <- query @PassportAccount actors.holder
+  assertMsg "closing the account consumes it" (length holderAccounts == 0)
+  return ()

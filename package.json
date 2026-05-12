@@ -1,0 +1,18 @@
+{
+  "name": "aevelum-passport-foundation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Daml-as-spec foundation build for Aevelum Passport, a Canton-native collateral credential account.",
+  "scripts": {
+    "demo": "node scripts/export-demo-transcript.mjs",
+    "conformance:cdm-draft": "node scripts/export-cdm-mapping.mjs",
+    "gate": "node scripts/gates.mjs",
+    "daml:build": "dpm build --all",
+    "daml:test": "./scripts/run-daml-tests.sh",
+    "ci": "./scripts/ci.sh",
+    "package": "node scripts/package.mjs",
+    "all": "npm run ci && npm run package"
+  },
+  "devDependencies": {}
+}

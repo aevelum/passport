@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+if ! command -v dpm >/dev/null 2>&1; then
+  echo "dpm CLI not found. Install DPM: curl https://get.digitalasset.com/install/install.sh | sh" >&2
+  exit 127
+fi
+
+mkdir -p artifacts
+
+dpm build --all
+
+coverage_out="artifacts/daml_test_coverage.txt"
+dpm test \
+  --package-root packages/passport-tests \
+  --all \
+  --show-coverage \
+  --coverage-ignore-choice '.*:Archive' \
+  2>&1 | tee "$coverage_out"
+
+node scripts/daml-coverage-gate.mjs "$coverage_out"

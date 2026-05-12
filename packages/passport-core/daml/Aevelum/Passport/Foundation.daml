@@ -1,0 +1,611 @@
+module Aevelum.Passport.Foundation where
+
+import Aevelum.Passport.Types
+
+-- Aevelum Passport Foundation.
+-- Daml templates and choices are the normative specification.
+-- The product is a Canton-native collateral credential account.
+-- It supports issue, presentation, reservation, revocation, and scoped audit disclosure.
+
+template PassportAccount
+  with
+    accountId : AccountId
+    holder : Party
+    operator : Optional Party
+    displayName : Text
+    schemaVersion : Text
+    createdAt : IsoTimestamp
+    status : AccountStatus
+  where
+    signatory holder
+    observer case operator of
+      Some op -> op
+      None -> holder
+
+    ensure status == AccountActive
+
+    nonconsuming choice RequestCapacityCredential : ContractId CredentialRequest
+      with
+        requestId : Text
+        policyId : PolicyId
+        policyVersion : PolicyVersion
+        policyPublisher : Party
+        attester : Party
+        requestedMinimumCapacity : Amount
+        capacityCurrency : CurrencyCode
+        purpose : PresentationPurpose
+        requestedAt : IsoTimestamp
+      controller holder
+      do
+        assertMsg "requested capacity must be positive" (positive requestedMinimumCapacity)
+        create CredentialRequest with
+          requestId
+          accountId
+          holder
+          policyId
+          policyVersion
+          policyPublisher
+          attester
+          requestedMinimumCapacity
+          capacityCurrency
+          purpose
+          requestedAt
+          status = "Requested"
+
+    nonconsuming choice GrantAuditDisclosureFromAccount : ContractId AuditDisclosureGrant
+      with
+        grantId : GrantId
+        credentialId : CredentialId
+        attester : Party
+        auditor : Party
+        scope : AuditScope
+        allowedFields : [Text]
+        evidenceManifestHash : EvidenceManifestHash
+        validFrom : IsoTimestamp
+        validUntil : IsoTimestamp
+        legalBasisRef : Text
+      controller holder, attester
+      do
+        assertMsg "audit grant must name at least one allowed field" (not (null allowedFields))
+        create AuditDisclosureGrant with
+          grantId
+          credentialId
+          holder
+          attester
+          auditor
+          scope
+          allowedFields
+          evidenceManifestHash
+          validFrom
+          validUntil
+          legalBasisRef
+          schemaVersion
+
+    choice ClosePassportAccount : ()
+      with
+        closedAt : IsoTimestamp
+      controller holder
+      do
+        return ()
+
+template CollateralPolicy
+  with
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    policyPublisher : Party
+    approvedHolders : [Party]
+    approvedAttesters : [Party]
+    eligibleAssetClasses : [AssetClass]
+    eligibleCurrencies : [CurrencyCode]
+    minimumCapacity : Amount
+    haircutScheduleRef : HaircutScheduleRef
+    concentrationLimitRef : ConcentrationLimitRef
+    freshnessWindowHours : Int
+    reservationAllowed : Bool
+    validFrom : IsoTimestamp
+    validUntil : IsoTimestamp
+    schemaVersion : Text
+    status : PolicyStatus
+  where
+    signatory policyPublisher
+    observer approvedHolders, approvedAttesters
+
+    ensure status == PolicyActive && positive minimumCapacity && freshnessWindowHours > 0
+
+    choice RetirePolicy : ContractId PolicyLifecycleEvent
+      with
+        retiredAt : IsoTimestamp
+        reason : Text
+      controller policyPublisher
+      do
+        create PolicyLifecycleEvent with
+          eventId = policyId <> ":retired:" <> retiredAt
+          policyId
+          policyVersion
+          policyPublisher
+          eventType = "Retired"
+          eventTime = retiredAt
+          reason
+          schemaVersion
+
+    choice AmendPolicy : ContractId CollateralPolicy
+      with
+        newPolicyVersion : PolicyVersion
+        newMinimumCapacity : Amount
+        newHaircutScheduleRef : HaircutScheduleRef
+        newConcentrationLimitRef : ConcentrationLimitRef
+        amendedAt : IsoTimestamp
+      controller policyPublisher
+      do
+        assertMsg "new minimum capacity must be positive" (positive newMinimumCapacity)
+        create this with
+          policyVersion = newPolicyVersion
+          minimumCapacity = newMinimumCapacity
+          haircutScheduleRef = newHaircutScheduleRef
+          concentrationLimitRef = newConcentrationLimitRef
+          validFrom = amendedAt
+          status = PolicyActive
+
+template PolicyLifecycleEvent
+  with
+    eventId : Text
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    policyPublisher : Party
+    eventType : Text
+    eventTime : IsoTimestamp
+    reason : Text
+    schemaVersion : Text
+  where
+    signatory policyPublisher
+
+template CredentialRequest
+  with
+    requestId : Text
+    accountId : AccountId
+    holder : Party
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    policyPublisher : Party
+    attester : Party
+    requestedMinimumCapacity : Amount
+    capacityCurrency : CurrencyCode
+    purpose : PresentationPurpose
+    requestedAt : IsoTimestamp
+    status : Text
+  where
+    signatory holder
+    observer policyPublisher, attester
+
+    ensure positive requestedMinimumCapacity
+
+    choice IssueCapacityCredential : ContractId CapacityCredential
+      with
+        credentialId : CredentialId
+        capacityAmount : Amount
+        capacityBand : CapacityBand
+        haircutScheduleRef : HaircutScheduleRef
+        valuationTime : IsoTimestamp
+        validFrom : IsoTimestamp
+        validUntil : IsoTimestamp
+        evidenceManifestHash : EvidenceManifestHash
+        calculationMethodHash : CalculationMethodHash
+        reservableAmount : Amount
+        schemaVersion : Text
+      controller holder, attester
+      do
+        assertMsg "capacity amount must meet requested minimum" (capacityAmount >= requestedMinimumCapacity)
+        assertMsg "reservable amount cannot exceed credential capacity" (reservableAmount <= capacityAmount)
+        assertMsg "reservable amount cannot be negative" (nonNegative reservableAmount)
+        create CapacityCredential with
+          credentialId
+          holder
+          attester
+          policyPublisher
+          policyId
+          policyVersion
+          capacityAmount
+          capacityCurrency
+          capacityBand
+          haircutScheduleRef
+          valuationTime
+          validFrom
+          validUntil
+          evidenceManifestHash
+          calculationMethodHash
+          reservableAmount
+          status = CredentialActive
+          schemaVersion
+
+template CapacityCredential
+  with
+    credentialId : CredentialId
+    holder : Party
+    attester : Party
+    policyPublisher : Party
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    capacityAmount : Amount
+    capacityCurrency : CurrencyCode
+    capacityBand : CapacityBand
+    haircutScheduleRef : HaircutScheduleRef
+    valuationTime : IsoTimestamp
+    validFrom : IsoTimestamp
+    validUntil : IsoTimestamp
+    evidenceManifestHash : EvidenceManifestHash
+    calculationMethodHash : CalculationMethodHash
+    reservableAmount : Amount
+    status : CredentialStatus
+    schemaVersion : Text
+  where
+    signatory holder, attester
+
+    ensure status == CredentialActive && positive capacityAmount && reservableAmount <= capacityAmount && nonNegative reservableAmount
+
+    nonconsuming choice PresentToVerifier : ContractId CredentialPresentation
+      with
+        presentationId : PresentationId
+        verifier : Party
+        presentationPurpose : PresentationPurpose
+        presentedAt : IsoTimestamp
+      controller holder
+      do
+        create CredentialPresentation with
+          presentationId
+          sourceCredentialCid = self
+          credentialId
+          holder
+          attester
+          verifier
+          policyPublisher
+          policyId
+          policyVersion
+          capacityBand
+          capacityCurrency
+          validUntil
+          reservationAllowed = reservableAmount > 0.0
+          presentedReservableAmount = reservableAmount
+          evidenceManifestHash
+          calculationMethodHash
+          presentationPurpose
+          presentedAt
+          schemaVersion
+
+    choice RevokeCredential : ContractId CredentialRevocation
+      with
+        revocationId : RevocationId
+        reasonCode : RevocationReason
+        revokedAt : IsoTimestamp
+        priorVerifiers : [Party]
+        supersedingCredentialId : Optional CredentialId
+      controller attester
+      do
+        create CredentialRevocation with
+          revocationId
+          credentialId
+          holder
+          attester
+          priorVerifiers
+          reasonCode
+          revokedAt
+          supersedingCredentialId
+          schemaVersion
+
+    choice ExpireCredential : ContractId CredentialRevocation
+      with
+        revocationId : RevocationId
+        expiredAt : IsoTimestamp
+        priorVerifiers : [Party]
+      controller holder, attester
+      do
+        create CredentialRevocation with
+          revocationId
+          credentialId
+          holder
+          attester
+          priorVerifiers
+          reasonCode = CredentialExpiredReason
+          revokedAt = expiredAt
+          supersedingCredentialId = None
+          schemaVersion
+
+    choice SupersedeCredential : ContractId CapacityCredential
+      with
+        newCredentialId : CredentialId
+        newCapacityAmount : Amount
+        newCapacityBand : CapacityBand
+        newReservableAmount : Amount
+        supersededAt : IsoTimestamp
+        newEvidenceManifestHash : EvidenceManifestHash
+        newCalculationMethodHash : CalculationMethodHash
+      controller holder, attester
+      do
+        assertMsg "new capacity amount must be positive" (positive newCapacityAmount)
+        assertMsg "new reservable amount cannot exceed new capacity" (newReservableAmount <= newCapacityAmount)
+        create this with
+          credentialId = newCredentialId
+          capacityAmount = newCapacityAmount
+          capacityBand = newCapacityBand
+          valuationTime = supersededAt
+          validFrom = supersededAt
+          evidenceManifestHash = newEvidenceManifestHash
+          calculationMethodHash = newCalculationMethodHash
+          reservableAmount = newReservableAmount
+          status = CredentialActive
+
+template CredentialPresentation
+  with
+    presentationId : PresentationId
+    sourceCredentialCid : ContractId CapacityCredential
+    credentialId : CredentialId
+    holder : Party
+    attester : Party
+    verifier : Party
+    policyPublisher : Party
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    capacityBand : CapacityBand
+    capacityCurrency : CurrencyCode
+    validUntil : IsoTimestamp
+    reservationAllowed : Bool
+    presentedReservableAmount : Amount
+    evidenceManifestHash : EvidenceManifestHash
+    calculationMethodHash : CalculationMethodHash
+    presentationPurpose : PresentationPurpose
+    presentedAt : IsoTimestamp
+    schemaVersion : Text
+  where
+    signatory holder
+    observer verifier, attester
+
+    ensure nonNegative presentedReservableAmount
+
+    choice ReserveFromPresentation : ReservationOutcome
+      with
+        reservationId : ReservationId
+        reservedAmount : Amount
+        reservationPurpose : ReservationPurpose
+        reservationValidUntil : IsoTimestamp
+        residualCredentialId : CredentialId
+      controller holder, attester, verifier
+      do
+        assertMsg "reservation must be allowed" reservationAllowed
+        assertMsg "reserved amount must be positive" (positive reservedAmount)
+        assertMsg "cannot reserve more than presented reservable amount" (reservedAmount <= presentedReservableAmount)
+        archive sourceCredentialCid
+        reservationCid <- create CapacityReservation with
+          reservationId
+          sourceCredentialId = credentialId
+          holder
+          attester
+          verifier
+          executionRail = None
+          auditor = None
+          reservedAmount
+          currency = capacityCurrency
+          policyId
+          policyVersion
+          validUntil = reservationValidUntil
+          reservationPurpose
+          status = ReservationActive
+          evidenceManifestHash
+          calculationMethodHash
+          schemaVersion
+        residualCid <- if reservedAmount < presentedReservableAmount
+          then do
+            newResidual <- create CapacityCredential with
+              credentialId = residualCredentialId
+              holder
+              attester
+              policyPublisher
+              policyId
+              policyVersion
+              capacityAmount = presentedReservableAmount - reservedAmount
+              capacityCurrency
+              capacityBand = AtLeast (presentedReservableAmount - reservedAmount)
+              haircutScheduleRef = "residual-from-" <> credentialId
+              valuationTime = presentedAt
+              validFrom = presentedAt
+              validUntil
+              evidenceManifestHash
+              calculationMethodHash
+              reservableAmount = presentedReservableAmount - reservedAmount
+              status = CredentialActive
+              schemaVersion
+            return (Some newResidual)
+          else return None
+        return ReservationOutcome with
+          reservationCid
+          residualCredentialCid = residualCid
+
+data ReservationOutcome = ReservationOutcome
+  with
+    reservationCid : ContractId CapacityReservation
+    residualCredentialCid : Optional (ContractId CapacityCredential)
+
+template CapacityReservation
+  with
+    reservationId : ReservationId
+    sourceCredentialId : CredentialId
+    holder : Party
+    attester : Party
+    verifier : Party
+    executionRail : Optional Party
+    auditor : Optional Party
+    reservedAmount : Amount
+    currency : CurrencyCode
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    validUntil : IsoTimestamp
+    reservationPurpose : ReservationPurpose
+    status : ReservationStatus
+    evidenceManifestHash : EvidenceManifestHash
+    calculationMethodHash : CalculationMethodHash
+    schemaVersion : Text
+  where
+    signatory holder, attester, verifier
+    observer case executionRail of
+      Some rail -> rail
+      None -> verifier
+    observer case auditor of
+      Some aud -> aud
+      None -> verifier
+
+    ensure status == ReservationActive && positive reservedAmount
+
+    choice ReleaseReservation : ContractId CapacityCredential
+      with
+        releasedCredentialId : CredentialId
+        releasedAt : IsoTimestamp
+      controller holder, attester, verifier
+      do
+        create CapacityCredential with
+          credentialId = releasedCredentialId
+          holder
+          attester
+          policyPublisher = verifier
+          policyId
+          policyVersion
+          capacityAmount = reservedAmount
+          capacityCurrency = currency
+          capacityBand = AtLeast reservedAmount
+          haircutScheduleRef = "released-from-" <> reservationId
+          valuationTime = releasedAt
+          validFrom = releasedAt
+          validUntil
+          evidenceManifestHash
+          calculationMethodHash
+          reservableAmount = reservedAmount
+          status = CredentialActive
+          schemaVersion
+
+    choice ExpireReservation : ContractId CredentialRevocation
+      with
+        revocationId : RevocationId
+        expiredAt : IsoTimestamp
+      controller holder, attester, verifier
+      do
+        create CredentialRevocation with
+          revocationId
+          credentialId = sourceCredentialId
+          holder
+          attester
+          priorVerifiers = [verifier]
+          reasonCode = CredentialExpiredReason
+          revokedAt = expiredAt
+          supersedingCredentialId = None
+          schemaVersion
+
+    nonconsuming choice ConvertToExecutionInstruction : ContractId ExecutionInstruction
+      with
+        instructionId : Text
+        executionRailParty : Party
+        instructionPurpose : Text
+        instructionCreatedAt : IsoTimestamp
+      controller holder, attester, verifier
+      do
+        create ExecutionInstruction with
+          instructionId
+          reservationId
+          holder
+          attester
+          verifier
+          executionRailParty
+          reservedAmount
+          currency
+          policyId
+          policyVersion
+          instructionPurpose
+          instructionCreatedAt
+          evidenceManifestHash
+          schemaVersion
+
+    nonconsuming choice DisputeReservation : ContractId ReservationDispute
+      with
+        disputeId : Text
+        disputedBy : Party
+        disputeReason : Text
+        disputedAt : IsoTimestamp
+      controller holder, attester, verifier
+      do
+        assertMsg "disputing party must be part of reservation" (elem disputedBy [holder, attester, verifier])
+        create ReservationDispute with
+          disputeId
+          reservationId
+          holder
+          attester
+          verifier
+          disputedBy
+          disputeReason
+          disputedAt
+          schemaVersion
+
+template ExecutionInstruction
+  with
+    instructionId : Text
+    reservationId : ReservationId
+    holder : Party
+    attester : Party
+    verifier : Party
+    executionRailParty : Party
+    reservedAmount : Amount
+    currency : CurrencyCode
+    policyId : PolicyId
+    policyVersion : PolicyVersion
+    instructionPurpose : Text
+    instructionCreatedAt : IsoTimestamp
+    evidenceManifestHash : EvidenceManifestHash
+    schemaVersion : Text
+  where
+    signatory holder, attester, verifier
+    observer executionRailParty
+
+template ReservationDispute
+  with
+    disputeId : Text
+    reservationId : ReservationId
+    holder : Party
+    attester : Party
+    verifier : Party
+    disputedBy : Party
+    disputeReason : Text
+    disputedAt : IsoTimestamp
+    schemaVersion : Text
+  where
+    signatory disputedBy
+    observer holder, attester, verifier
+
+template CredentialRevocation
+  with
+    revocationId : RevocationId
+    credentialId : CredentialId
+    holder : Party
+    attester : Party
+    priorVerifiers : [Party]
+    reasonCode : RevocationReason
+    revokedAt : IsoTimestamp
+    supersedingCredentialId : Optional CredentialId
+    schemaVersion : Text
+  where
+    signatory attester
+    observer holder, priorVerifiers
+
+template AuditDisclosureGrant
+  with
+    grantId : GrantId
+    credentialId : CredentialId
+    holder : Party
+    attester : Party
+    auditor : Party
+    scope : AuditScope
+    allowedFields : [Text]
+    evidenceManifestHash : EvidenceManifestHash
+    validFrom : IsoTimestamp
+    validUntil : IsoTimestamp
+    legalBasisRef : Text
+    schemaVersion : Text
+  where
+    signatory holder, attester
+    observer auditor
+
+    ensure not (null allowedFields)

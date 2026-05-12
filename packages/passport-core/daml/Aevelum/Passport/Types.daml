@@ -1,0 +1,110 @@
+module Aevelum.Passport.Types where
+
+-- Aevelum Passport Foundation types.
+-- The package intentionally models collateral capacity credentials only.
+-- It does not model custody, settlement, execution, legal title, credit approval, or ZK proofs.
+
+type AccountId = Text
+type PolicyId = Text
+type PolicyVersion = Text
+type CredentialId = Text
+type PresentationId = Text
+type ReservationId = Text
+type RevocationId = Text
+type GrantId = Text
+type EvidenceManifestHash = Text
+type CalculationMethodHash = Text
+type HaircutScheduleRef = Text
+type ConcentrationLimitRef = Text
+type IsoTimestamp = Text
+type CurrencyCode = Text
+type Amount = Decimal
+
+data AccountStatus
+  = AccountActive
+  | AccountClosed
+  deriving (Eq, Show)
+
+data PolicyStatus
+  = PolicyActive
+  | PolicyRetired
+  | PolicyAmended
+  deriving (Eq, Show)
+
+data CredentialStatus
+  = CredentialActive
+  | CredentialSuperseded
+  | CredentialRevoked
+  | CredentialExpired
+  deriving (Eq, Show)
+
+data ReservationStatus
+  = ReservationActive
+  | ReservationReleased
+  | ReservationExpired
+  | ReservationConverted
+  | ReservationDisputed
+  deriving (Eq, Show)
+
+data RevocationReason
+  = ValuationStale
+  | PolicyChanged
+  | CapacityChanged
+  | AttesterCorrection
+  | HolderRequested
+  | ComplianceEvent
+  | CredentialExpiredReason
+  deriving (Eq, Show)
+
+data PresentationPurpose
+  = RepoPreTrade
+  | SecuritiesLendingPreTrade
+  | MarginCapacityCheck
+  | SecuredCreditPreClearance
+  | AuditReview
+  deriving (Eq, Show)
+
+data ReservationPurpose
+  = RepoPreTradeReservation
+  | SecuritiesLendingReservation
+  | MarginReservation
+  | CreditFacilityReservation
+  deriving (Eq, Show)
+
+data AuditScope
+  = EvidenceManifestOnly
+  | CalculationMethodOnly
+  | PolicyAndCredentialMetadata
+  | DisputeReviewScope
+  deriving (Eq, Show)
+
+data AssetClass
+  = USTreasury
+  | TokenizedUSTreasury
+  | MoneyMarketFund
+  | TokenizedMoneyMarketFund
+  | SovereignBond
+  | CashInstrument
+  | OtherEligibleAsset Text
+  deriving (Eq, Show)
+
+data CapacityBand
+  = AtLeast Amount
+  | Between with
+      low : Amount
+      high : Amount
+  | ExactAmount Amount
+  deriving (Eq, Show)
+
+capacityBandFloor : CapacityBand -> Amount
+capacityBandFloor band =
+  case band of
+    AtLeast amount -> amount
+    Between with low -> low
+    ExactAmount amount -> amount
+
+nonNegative : Amount -> Bool
+nonNegative amount = amount >= 0.0
+
+positive : Amount -> Bool
+positive amount = amount > 0.0

@@ -1,0 +1,3 @@
+packages:
+  - ./packages/passport-core
+  - ./packages/passport-tests

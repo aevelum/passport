@@ -1,0 +1,57 @@
+module Aevelum.Passport.Test.PrivacyTests where
+
+import Daml.Script
+import Aevelum.Passport.Types
+import Aevelum.Passport.Foundation
+import Aevelum.Passport.Test.FoundationScenario
+
+t005_unauthorized_party_cannot_see_credential : Script ()
+t005_unauthorized_party_cannot_see_credential = script do
+  presented <- createPresentedContext
+  outsiderCredentials <- query @CapacityCredential presented.base.actors.outsider
+  outsiderPresentations <- query @CredentialPresentation presented.base.actors.outsider
+  outsiderReservations <- query @CapacityReservation presented.base.actors.outsider
+  assertMsg "outsider cannot see capacity credential" (length outsiderCredentials == 0)
+  assertMsg "outsider cannot see credential presentation" (length outsiderPresentations == 0)
+  assertMsg "outsider cannot see capacity reservation" (length outsiderReservations == 0)
+  return ()
+
+t013_grant_scoped_audit_disclosure : Script ()
+t013_grant_scoped_audit_disclosure = script do
+  base <- createBaseContext
+  grantCid <- submit (actAs (base.actors.holder) <> actAs (base.actors.attester)) do
+    exerciseCmd base.accountCid GrantAuditDisclosureFromAccount with
+      grantId = "audit-grant-001"
+      credentialId = "credential-001"
+      attester = base.actors.attester
+      auditor = base.actors.auditor
+      scope = EvidenceManifestOnly
+      allowedFields = ["credentialId", "evidenceManifestHash", "policyId", "policyVersion"]
+      evidenceManifestHash = "sha256:evidence-demo-001"
+      validFrom = "2026-05-10T00:00:00Z"
+      validUntil = "2026-05-11T00:00:00Z"
+      legalBasisRef = "demo-audit-request"
+  auditorGrants <- query @AuditDisclosureGrant base.actors.auditor
+  assertMsg "auditor should see one scoped audit grant" (length auditorGrants == 1)
+  return ()
+
+t014_auditor_cannot_see_unscoped_fields : Script ()
+t014_auditor_cannot_see_unscoped_fields = script do
+  base <- createBaseContext
+  _grantCid <- submit (actAs (base.actors.holder) <> actAs (base.actors.attester)) do
+    exerciseCmd base.accountCid GrantAuditDisclosureFromAccount with
+      grantId = "audit-grant-privacy-001"
+      credentialId = "credential-001"
+      attester = base.actors.attester
+      auditor = base.actors.auditor
+      scope = EvidenceManifestOnly
+      allowedFields = ["credentialId", "evidenceManifestHash"]
+      evidenceManifestHash = "sha256:evidence-demo-001"
+      validFrom = "2026-05-10T00:00:00Z"
+      validUntil = "2026-05-11T00:00:00Z"
+      legalBasisRef = "demo-audit-request"
+  auditorCredentials <- query @CapacityCredential base.actors.auditor
+  outsiderGrants <- query @AuditDisclosureGrant base.actors.outsider
+  assertMsg "auditor should not receive full capacity credential from audit grant" (length auditorCredentials == 0)
+  assertMsg "outsider should not see audit grants" (length outsiderGrants == 0)
+  return ()

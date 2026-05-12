@@ -1,0 +1,73 @@
+module Aevelum.Passport.Test.RevocationTests where
+
+import Daml.Script
+import Aevelum.Passport.Types
+import Aevelum.Passport.Foundation
+import Aevelum.Passport.Test.FoundationScenario
+
+t010_revoke_credential : Script ()
+t010_revoke_credential = script do
+  presented <- createPresentedContext
+  revocationCid <- submit presented.base.actors.attester do
+    exerciseCmd presented.base.credentialCid RevokeCredential with
+      revocationId = "revocation-001"
+      reasonCode = AttesterCorrection
+      revokedAt = "2026-05-10T00:10:00Z"
+      priorVerifiers = [presented.base.actors.dealer]
+      supersedingCredentialId = None
+  dealerRevocations <- query @CredentialRevocation presented.base.actors.dealer
+  holderRevocations <- query @CredentialRevocation presented.base.actors.holder
+  assertMsg "dealer should see revocation notice" (length dealerRevocations == 1)
+  assertMsg "holder should see revocation notice" (length holderRevocations == 1)
+  return ()
+
+t011_reject_revoked_credential_reservation : Script ()
+t011_reject_revoked_credential_reservation = script do
+  presented <- createPresentedContext
+  _revocationCid <- submit presented.base.actors.attester do
+    exerciseCmd presented.base.credentialCid RevokeCredential with
+      revocationId = "revocation-before-reserve-001"
+      reasonCode = AttesterCorrection
+      revokedAt = "2026-05-10T00:10:00Z"
+      priorVerifiers = [presented.base.actors.dealer]
+      supersedingCredentialId = None
+  submitMustFail (actAs (presented.base.actors.holder) <> actAs (presented.base.actors.attester) <> actAs (presented.base.actors.dealer)) do
+    exerciseCmd presented.presentationCid ReserveFromPresentation with
+      reservationId = "reservation-after-revocation-001"
+      reservedAmount = 30000000.0
+      reservationPurpose = RepoPreTradeReservation
+      reservationValidUntil = "2026-05-10T04:03:00Z"
+      residualCredentialId = "credential-residual-after-revocation-001"
+  return ()
+
+t012_reject_expired_credential : Script ()
+t012_reject_expired_credential = script do
+  base <- createBaseContext
+  _expired <- submit (actAs (base.actors.holder) <> actAs (base.actors.attester)) do
+    exerciseCmd base.credentialCid ExpireCredential with
+      revocationId = "expiration-001"
+      expiredAt = "2026-05-12T00:00:00Z"
+      priorVerifiers = [base.actors.dealer]
+  submitMustFail base.actors.holder do
+    exerciseCmd base.credentialCid PresentToVerifier with
+      presentationId = "presentation-after-expiration-001"
+      verifier = base.actors.dealer
+      presentationPurpose = RepoPreTrade
+      presentedAt = "2026-05-12T00:01:00Z"
+  return ()
+
+t022_supersede_credential : Script ()
+t022_supersede_credential = script do
+  base <- createBaseContext
+  _newCredentialCid <- submit (actAs (base.actors.holder) <> actAs (base.actors.attester)) do
+    exerciseCmd base.credentialCid SupersedeCredential with
+      newCredentialId = "credential-superseded-001"
+      newCapacityAmount = 55000000.0
+      newCapacityBand = Between with low = 50000000.0; high = 55000000.0
+      newReservableAmount = 55000000.0
+      supersededAt = "2026-05-10T06:00:00Z"
+      newEvidenceManifestHash = "sha256:evidence-superseded-001"
+      newCalculationMethodHash = "sha256:calculation-superseded-001"
+  holderCredentials <- query @CapacityCredential base.actors.holder
+  assertMsg "superseding should replace the prior credential" (length holderCredentials == 1)
+  return ()
