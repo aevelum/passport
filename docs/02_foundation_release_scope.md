@@ -11,7 +11,8 @@ The Foundation Release proves one committee-ready workflow:
 - Repo pre-trade demo.
 - Daml Script tests.
 - Privacy assertions.
-- CDM-aligned mapping draft.
+- Framework-neutral interop adapter surface.
+- CDM 6.0 collateral eligibility plugin.
 - Local structural gates.
 
 ## Out of scope
@@ -26,7 +27,8 @@ The Foundation Release proves one committee-ready workflow:
 - ZK proofs.
 - Diligence workspace UI.
 - Production identity integration.
-- Formal CDM conformance.
+- Rosetta Engine execution.
+- Formal standards-body endorsement.
 
 ## Acceptance definition
 

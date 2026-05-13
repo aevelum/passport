@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { getGeneratedAt } from './generated-time.mjs';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const fail = [];
@@ -40,6 +41,10 @@ const testFoundation = 'packages/passport-tests/daml/Aevelum/Passport/Test/Found
 const testPrivacy = 'packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml';
 const testReservation = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml';
 const testRevocation = 'packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml';
+const interopDoc = 'docs/06_interop_adapters.md';
+const interopSample = 'interop/samples/repo-pretrade-passport-input.json';
+const cdmSchemaRoot = 'interop/plugins/cdm/assets/schemas/6.0';
+const cdmArtifactRoot = 'artifacts/interop/cdm/6.0';
 const damlSourceRoots = [
   'packages/passport-core/daml',
   'packages/passport-tests/daml'
@@ -47,6 +52,9 @@ const damlSourceRoots = [
 
 const requiredFiles = [
   'multi-package.yaml',
+  '.github/workflows/ci.yml',
+  'package.json',
+  'package-lock.json',
   'packages/passport-core/daml.yaml',
   'packages/passport-tests/daml.yaml',
   coreTypes,
@@ -61,10 +69,53 @@ const requiredFiles = [
   'docs/03_collateral_capacity_credential.md',
   'docs/04_repo_pretrade_workflow.md',
   'docs/05_privacy_model.md',
-  'docs/06_cdm_mapping_draft.md',
+  interopDoc,
   'docs/07_non_goals.md',
+  'docs/08_brand_ui_system.md',
+  'design/tokens/colors.json',
+  'design/change-log.md',
+  'AGENTS.md',
+  '.agents/skills/passport-hardening-loop/SKILL.md',
+  '.agents/skills/passport-hardening-loop/agents/openai.yaml',
+  '.agents/skills/passport-ui-design-system/SKILL.md',
+  '.agents/skills/passport-ui-design-system/agents/openai.yaml',
+  'interop/core/adapter.js',
+  'interop/context.js',
+  'interop/registry.js',
+  'interop/runner.js',
+  'interop/plugins/cdm/index.js',
+  'interop/plugins/cdm/vendor.js',
+  interopSample,
+  `${cdmSchemaRoot}/SOURCE.md`,
+  `${cdmSchemaRoot}/manifest.json`,
+  `${cdmSchemaRoot}/cdm-product-collateral-EligibleCollateralSpecification.schema.json`,
+  `${cdmSchemaRoot}/cdm-product-collateral-EligibilityQuery.schema.json`,
+  `${cdmSchemaRoot}/cdm-product-collateral-CheckEligibilityResult.schema.json`,
+  `${cdmArtifactRoot}/eligible-collateral-specification.json`,
+  `${cdmArtifactRoot}/eligibility-query.json`,
+  `${cdmArtifactRoot}/check-eligibility-result.json`,
   'artifacts/demo_transcript.json',
-  'artifacts/cdm_mapping_draft.json'
+  'artifacts/interop/report.json',
+  'artifacts/hardening_report.json',
+  'artifacts/hardening_map_report.json',
+  'hardening/maps/passport.invariants.json',
+  'hardening/frontiers/passport.frontier.json',
+  'hardening/policies/architecture-rules.json',
+  'hardening/rounds/round-0001.md',
+  'hardening/rounds/round-0002.md',
+  'hardening/change-log.md',
+  'hardening/scripts/lib.mjs',
+  'hardening/scripts/validate-map.mjs',
+  'hardening/scripts/score-frontier.mjs',
+  'hardening/scripts/select-round.mjs',
+  'hardening/scripts/hardening-gate.mjs',
+  'scripts/generated-time.mjs',
+  'scripts/interop-generate.mjs',
+  'scripts/interop-validate.mjs',
+  'scripts/interop-vendor-cdm.mjs',
+  'scripts/run-daml-tests.sh',
+  'scripts/daml-coverage-gate.mjs',
+  'scripts/canton-smoke.sh'
 ];
 
 for (const rel of requiredFiles) exists(rel);
@@ -119,6 +170,67 @@ checkContains(testRevocation, [
   't022_supersede_credential'
 ]);
 
+checkContains(interopDoc, [
+  'framework-neutral adapter surface',
+  'static plugin registry only',
+  'FINOS CDM',
+  'not FINOS certification'
+]);
+
+checkContains('AGENTS.md', [
+  '.agents/skills/passport-hardening-loop/SKILL.md',
+  '.agents/skills/passport-ui-design-system/SKILL.md',
+  'design/tokens/colors.json',
+  'npm run hardening:gate',
+  'Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.'
+]);
+
+checkContains('.agents/skills/passport-hardening-loop/SKILL.md', [
+  'Passport Hardening Loop',
+  'hardening/maps/passport.invariants.json',
+  'npm run hardening:gate'
+]);
+
+checkContains('.agents/skills/passport-ui-design-system/SKILL.md', [
+  'Passport UI Design System',
+  'design/tokens/colors.json',
+  'institutional finance palette'
+]);
+
+checkContains('docs/08_brand_ui_system.md', [
+  'institutional financial infrastructure',
+  'design/tokens/colors.json',
+  '#0B1F3A',
+  '#BD9B6B',
+  'Red is reserved for risk'
+]);
+
+checkContains('design/change-log.md', [
+  'Institutional Finance Palette',
+  'design/tokens/colors.json',
+  '.agents/skills/passport-ui-design-system/SKILL.md'
+]);
+
+checkContains('scripts/ci.sh', [
+  'npm run hardening:frontier',
+  'npm run hardening:gate',
+  'npm run package',
+  'git diff --exit-code -- artifacts hardening/frontiers hardening/maps'
+]);
+
+checkContains('interop/registry.js', [
+  'adapterRegistry',
+  'cdmPlugin'
+]);
+
+checkContains('interop/plugins/cdm/index.js', [
+  'framework: \'cdm\'',
+  'eligible-collateral-specification',
+  'eligibility-query',
+  'check-eligibility-result',
+  'verifySchemaManifest'
+]);
+
 // Forbidden implementation concepts: these names should not appear in Daml code.
 const damlFiles = damlSourceRoots.flatMap(dir => walk(dir)).filter(f => f.endsWith('.daml'));
 const forbiddenDaml = [
@@ -164,21 +276,106 @@ try {
 }
 
 try {
-  const cdm = JSON.parse(read('artifacts/cdm_mapping_draft.json'));
-  const names = new Set(cdm.mappings?.map(m => m.passportObject));
-  for (const obj of ['CollateralPolicy', 'CapacityCredential', 'CredentialPresentation', 'CapacityReservation', 'CredentialRevocation', 'AuditDisclosureGrant']) {
-    if (!names.has(obj)) fail.push(`cdm_mapping_draft missing ${obj}`);
-    else pass.push(`cdm_mapping_draft maps ${obj}`);
+  const manifest = JSON.parse(read(`${cdmSchemaRoot}/manifest.json`));
+  if (manifest.framework !== 'cdm') fail.push(`cdm schema manifest framework is ${manifest.framework}`);
+  else pass.push('cdm schema manifest framework is cdm');
+  if (manifest.frameworkVersion !== '6.0') fail.push(`cdm schema manifest frameworkVersion is ${manifest.frameworkVersion}`);
+  else pass.push('cdm schema manifest pins CDM 6.0');
+  if (!Array.isArray(manifest.files) || manifest.files.length !== manifest.schemaCount) fail.push('cdm schema manifest file count mismatch');
+  else pass.push('cdm schema manifest file count matches');
+  if (!manifest.schemaSetDigest?.startsWith('sha256:')) fail.push('cdm schema manifest missing schemaSetDigest');
+  else pass.push('cdm schema manifest has schemaSetDigest review anchor');
+  for (const rootSchema of ['cdm-product-collateral-EligibleCollateralSpecification.schema.json', 'cdm-product-collateral-EligibilityQuery.schema.json', 'cdm-product-collateral-CheckEligibilityResult.schema.json']) {
+    if (!manifest.rootSchemas?.includes(rootSchema)) fail.push(`cdm schema manifest missing root schema ${rootSchema}`);
+    else pass.push(`cdm schema manifest root schema ${rootSchema}`);
   }
 } catch (e) {
-  fail.push(`cdm_mapping JSON parse failed: ${e.message}`);
+  fail.push(`cdm schema manifest JSON parse failed: ${e.message}`);
+}
+
+try {
+  const report = JSON.parse(read('artifacts/interop/report.json'));
+  if (report.status !== 'passed') fail.push(`interop report status is ${report.status}`);
+  else pass.push('interop report passed');
+  const cdmAdapter = report.adapters?.find(adapter => adapter.framework === 'cdm' && adapter.frameworkVersion === '6.0');
+  if (!cdmAdapter) fail.push('interop report missing CDM 6.0 adapter');
+  else pass.push('interop report includes CDM 6.0 adapter');
+  const results = new Map(report.results?.map(r => [r.artifactType, r]));
+  for (const name of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result']) {
+    const result = results.get(name);
+    if (!result?.validation?.valid) fail.push(`interop report missing valid result ${name}`);
+    else pass.push(`interop report validates ${name}`);
+  }
+  const negative = report.negativeResults?.find(result => result.name === 'negative-invalid-eligibility-query');
+  if (!negative?.pass) fail.push('interop report missing passing negative-invalid-eligibility-query');
+  else pass.push('interop report validates negative-invalid-eligibility-query');
+  const semanticNegative = report.negativeResults?.find(result => result.name === 'negative-passport-decision-rejected-without-cdm-engine');
+  if (!semanticNegative?.pass) fail.push('interop report missing passing negative-passport-decision-rejected-without-cdm-engine');
+  else pass.push('interop report validates negative-passport-decision-rejected-without-cdm-engine');
+  const checkEligibility = results.get('check-eligibility-result');
+  const mirrorWarning = 'CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed.';
+  if (!checkEligibility?.warnings?.includes(mirrorWarning)) fail.push('interop report missing CDM decision mirror warning');
+  else pass.push('interop report records CDM decision mirror warning');
+} catch (e) {
+  fail.push(`interop report JSON parse failed: ${e.message}`);
+}
+
+try {
+  for (const artifact of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result']) {
+    JSON.parse(read(`${cdmArtifactRoot}/${artifact}.json`));
+    pass.push(`generated CDM artifact parses: ${artifact}`);
+  }
+} catch (e) {
+  fail.push(`generated CDM artifact parse failed: ${e.message}`);
+}
+
+try {
+  const hardeningMap = JSON.parse(read('hardening/maps/passport.invariants.json'));
+  if (hardeningMap.artifact !== 'passport_invariant_property_map') fail.push(`hardening map artifact is ${hardeningMap.artifact}`);
+  else pass.push('hardening map artifact is passport_invariant_property_map');
+  const skillInventory = hardeningMap.scope?.source_inventory?.find(item => item.path === '.agents/skills/passport-hardening-loop/SKILL.md');
+  if (!skillInventory) fail.push('hardening map missing repo-local skill source inventory');
+  else pass.push('hardening map includes repo-local skill source inventory');
+} catch (e) {
+  fail.push(`hardening map JSON parse failed: ${e.message}`);
+}
+
+try {
+  const frontier = JSON.parse(read('hardening/frontiers/passport.frontier.json'));
+  if (frontier.artifact !== 'passport_hardening_frontier') fail.push(`hardening frontier artifact is ${frontier.artifact}`);
+  else pass.push('hardening frontier artifact is passport_hardening_frontier');
+  if (!frontier.summary?.top_candidate) fail.push('hardening frontier missing top candidate');
+  else pass.push(`hardening frontier top candidate ${frontier.summary.top_candidate}`);
+} catch (e) {
+  fail.push(`hardening frontier JSON parse failed: ${e.message}`);
+}
+
+try {
+  const hardeningReport = JSON.parse(read('artifacts/hardening_report.json'));
+  if (hardeningReport.status !== 'passed') fail.push(`hardening report status is ${hardeningReport.status}`);
+  else pass.push('hardening report passed');
+} catch (e) {
+  fail.push(`hardening report JSON parse failed: ${e.message}`);
+}
+
+try {
+  const colorTokens = JSON.parse(read('design/tokens/colors.json'));
+  if (colorTokens.artifact !== 'aevelum_passport_color_tokens') fail.push(`color token artifact is ${colorTokens.artifact}`);
+  else pass.push('color token artifact is aevelum_passport_color_tokens');
+  for (const tokenPath of ['ink.900', 'ink.800', 'blue.700', 'teal.700', 'slate.700', 'gold.600', 'risk.700']) {
+    const token = tokenPath.split('.').reduce((obj, key) => obj?.[key], colorTokens.tokens);
+    if (!token?.hex) fail.push(`color token missing ${tokenPath}`);
+    else pass.push(`color token present ${tokenPath} ${token.hex}`);
+  }
+} catch (e) {
+  fail.push(`color tokens JSON parse failed: ${e.message}`);
 }
 
 const report = {
   artifact: 'gate_report',
   package: 'aevelum-passport-foundation',
   version: '0.1.0',
-  generatedAt: new Date().toISOString(),
+  generatedAt: getGeneratedAt(),
   dpmSdk: '3.5.1-rc3',
   note: 'This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.',
   pass,

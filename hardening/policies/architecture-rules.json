@@ -1,0 +1,186 @@
+{
+  "artifact": "passport_hardening_architecture_rules",
+  "schemaVersion": "0.1.0",
+  "rules": [
+    {
+      "id": "arch.agent.repo-local-skill-discovery",
+      "severity": "high",
+      "description": "Repo hardening skills must live in Codex's repo skill discovery path.",
+      "type": "required-paths",
+      "paths": [
+        "AGENTS.md",
+        ".agents/skills/passport-hardening-loop/SKILL.md",
+        ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+        ".agents/skills/passport-ui-design-system/SKILL.md",
+        ".agents/skills/passport-ui-design-system/agents/openai.yaml",
+        ".github/workflows/ci.yml",
+        "package.json",
+        "package-lock.json",
+        "scripts/generated-time.mjs",
+        "hardening/rounds/round-0002.md"
+      ]
+    },
+    {
+      "id": "arch.agent.agents-md-points-to-skill",
+      "severity": "high",
+      "description": "Root AGENTS.md must tell future agents to use the repo-local hardening skill.",
+      "type": "required-substrings",
+      "files": [
+        "AGENTS.md"
+      ],
+      "contains": [
+        ".agents/skills/passport-hardening-loop/SKILL.md",
+        ".agents/skills/passport-ui-design-system/SKILL.md",
+        "npm run hardening:gate",
+        "design/tokens/colors.json",
+        "Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache."
+      ]
+    },
+    {
+      "id": "arch.interop.static-registry",
+      "severity": "critical",
+      "description": "The interop registry must remain static and frozen.",
+      "type": "required-substrings",
+      "files": [
+        "interop/registry.js"
+      ],
+      "contains": [
+        "import { cdmPlugin } from './plugins/cdm/index.js';",
+        "export const adapterRegistry = Object.freeze([",
+        "cdmPlugin"
+      ]
+    },
+    {
+      "id": "arch.interop.no-dynamic-execution",
+      "severity": "critical",
+      "description": "Repo-authored interop code must not dynamically load plugins or execute generated code.",
+      "type": "forbidden-patterns",
+      "paths": [
+        "interop"
+      ],
+      "extensions": [
+        ".js",
+        ".mjs"
+      ],
+      "forbidden": [
+        "import(",
+        "eval(",
+        "new Function",
+        "require-from-string",
+        "node:vm",
+        "vm."
+      ]
+    },
+    {
+      "id": "arch.ci.network-only-explicit-vendor",
+      "severity": "critical",
+      "description": "Network fetches must stay isolated to the explicit CDM vendor module.",
+      "type": "allow-pattern-only",
+      "paths": [
+        "interop",
+        "scripts",
+        "hardening/scripts"
+      ],
+      "extensions": [
+        ".js",
+        ".mjs",
+        ".sh"
+      ],
+      "pattern": "fetch(",
+      "allowed_files": [
+        "interop/plugins/cdm/vendor.js"
+      ]
+    },
+    {
+      "id": "arch.ci.no-vendor-refresh-in-default-ci",
+      "severity": "critical",
+      "description": "Default CI must not refresh vendored schemas from the network.",
+      "type": "forbidden-patterns",
+      "files": [
+        "scripts/ci.sh",
+        ".github/workflows/ci.yml"
+      ],
+      "forbidden": [
+        "interop:vendor:cdm",
+        "cdm:vendor"
+      ]
+    },
+    {
+      "id": "arch.ci.github-workflow-offline",
+      "severity": "critical",
+      "description": "The default PR workflow must run on the pre-baked offline runner and install npm dependencies only from cache.",
+      "type": "required-substrings",
+      "files": [
+        ".github/workflows/ci.yml"
+      ],
+      "contains": [
+        "permissions:",
+        "contents: read",
+        "runs-on: [self-hosted, linux, passport-offline-ci]",
+        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+        "fetch-depth: 1",
+        "persist-credentials: false",
+        "dpm version --active",
+        "npm ci --offline --ignore-scripts --audit=false --fund=false",
+        "npm run ci"
+      ]
+    },
+    {
+      "id": "arch.ci.hardening-gate-in-ci",
+      "severity": "high",
+      "description": "The hardening gate, package step, and freshness diff must run in default local CI.",
+      "type": "required-substrings",
+      "files": [
+        "scripts/ci.sh"
+      ],
+      "contains": [
+        "npm run hardening:map",
+        "npm run hardening:frontier",
+        "npm run hardening:gate",
+        "npm run package",
+        "git diff --exit-code -- artifacts hardening/frontiers hardening/maps"
+      ]
+    },
+    {
+      "id": "arch.ci.deterministic-generated-time",
+      "severity": "high",
+      "description": "Generated tracked reports must use the shared deterministic timestamp helper.",
+      "type": "required-substrings",
+      "files": [
+        "scripts/generated-time.mjs",
+        "interop/context.js",
+        "scripts/gates.mjs",
+        "hardening/scripts/hardening-gate.mjs"
+      ],
+      "contains": [
+        "getGeneratedAt"
+      ]
+    },
+    {
+      "id": "arch.no-global-cdm-special-case",
+      "severity": "high",
+      "description": "CDM schemas and fixtures must stay plugin-scoped.",
+      "type": "absent-paths",
+      "paths": [
+        "schemas/cdm",
+        "fixtures/cdm",
+        "scripts/validate-cdm-conformance.mjs",
+        "scripts/vendor-cdm-schemas.mjs",
+        "artifacts/cdm_conformance_report.json"
+      ]
+    },
+    {
+      "id": "arch.release.package-tracked-files",
+      "severity": "medium",
+      "description": "Release packaging must use git-tracked files as its input set.",
+      "type": "required-substrings",
+      "files": [
+        "scripts/package.mjs"
+      ],
+      "contains": [
+        "git",
+        "ls-files"
+      ]
+    }
+  ]
+}

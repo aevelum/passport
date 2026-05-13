@@ -1,0 +1,137 @@
+{
+  "artifact": "aevelum_passport_color_tokens",
+  "version": "0.1.0",
+  "intent": "Institutional finance palette for Aevelum Passport brand, frontend, and review artifacts.",
+  "principles": [
+    "Use navy and slate as the base for trust, governance, and institutional stability.",
+    "Use blue for verified digital infrastructure and controlled global interoperability.",
+    "Use muted teal for credentials, positive status, and collateral capacity signals.",
+    "Use gold only as a restrained prestige or endorsement accent.",
+    "Use red only for risk, error, or negative financial state."
+  ],
+  "tokens": {
+    "ink": {
+      "900": {
+        "hex": "#07111A",
+        "role": "primary dark background and deep brand ink"
+      },
+      "800": {
+        "hex": "#0B1F3A",
+        "role": "institutional navy surface"
+      },
+      "700": {
+        "hex": "#102A43",
+        "role": "secondary navy surface and borders"
+      }
+    },
+    "blue": {
+      "700": {
+        "hex": "#005F9E",
+        "role": "global infrastructure and globe accent"
+      },
+      "600": {
+        "hex": "#1D4ED8",
+        "role": "interactive trust blue"
+      },
+      "300": {
+        "hex": "#7DAAB9",
+        "role": "quiet data and diagram accent"
+      }
+    },
+    "teal": {
+      "700": {
+        "hex": "#00818F",
+        "role": "credential and positive collateral capacity accent"
+      },
+      "500": {
+        "hex": "#2E8F86",
+        "role": "active outline or selected state"
+      },
+      "100": {
+        "hex": "#DDEFEA",
+        "role": "light credential surface"
+      }
+    },
+    "slate": {
+      "700": {
+        "hex": "#343741",
+        "role": "institutional text and dark neutral"
+      },
+      "500": {
+        "hex": "#5F6673",
+        "role": "secondary text"
+      },
+      "300": {
+        "hex": "#CBD5E1",
+        "role": "borders and quiet dividers"
+      },
+      "100": {
+        "hex": "#EEF2F4",
+        "role": "light app background"
+      }
+    },
+    "surface": {
+      "0": {
+        "hex": "#FFFFFF",
+        "role": "document and card surface"
+      },
+      "50": {
+        "hex": "#F8FAFC",
+        "role": "off-white app surface"
+      }
+    },
+    "gold": {
+      "600": {
+        "hex": "#BD9B6B",
+        "role": "limited prestige, endorsement, or official seal accent"
+      }
+    },
+    "risk": {
+      "700": {
+        "hex": "#872907",
+        "role": "negative state, loss, rejection, or warning only"
+      }
+    }
+  },
+  "approvedGradients": {
+    "institutionalMark": [
+      "#0B1F3A",
+      "#005F9E"
+    ],
+    "darkBackground": [
+      "#07111A",
+      "#0B1F3A"
+    ],
+    "lightBackground": [
+      "#F8FAFC",
+      "#EEF2F4"
+    ]
+  },
+  "accessibilityPairs": [
+    {
+      "foreground": "#F8FAFC",
+      "background": "#07111A",
+      "usage": "primary dark mode text"
+    },
+    {
+      "foreground": "#07111A",
+      "background": "#F8FAFC",
+      "usage": "primary light mode text"
+    },
+    {
+      "foreground": "#07111A",
+      "background": "#BD9B6B",
+      "usage": "small official accent labels only"
+    },
+    {
+      "foreground": "#F8FAFC",
+      "background": "#0B1F3A",
+      "usage": "dark UI labels and panels"
+    }
+  ],
+  "doNotUseAsDominant": [
+    "#BD9B6B",
+    "#872907",
+    "#2E8F86"
+  ]
+}

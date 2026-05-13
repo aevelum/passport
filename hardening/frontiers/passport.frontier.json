@@ -1,0 +1,196 @@
+{
+  "artifact": "passport_hardening_frontier",
+  "schemaVersion": "0.1.0",
+  "map_path": "hardening/maps/passport.invariants.json",
+  "generatedFrom": {
+    "package": "aevelum-passport-foundation",
+    "pinned_version": "git:HEAD",
+    "round_id": "round-0002"
+  },
+  "summary": {
+    "candidates": 8,
+    "widen": 0,
+    "deepen": 8,
+    "kill": 0,
+    "package": 0,
+    "top_candidate": "bd.cdm.schema-substitution"
+  },
+  "candidates": [
+    {
+      "id": "bd.cdm.schema-substitution",
+      "source_id": "bd.cdm.schema-substitution",
+      "component_id": "cmp.interop.cdm-vendor",
+      "property_id": "prop.cdm.hashes-verified-before-validation",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 85,
+      "score_breakdown": {
+        "severity": 50,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Modify a vendored CDM schema without updating manifest.json and confirm npm run interop:validate fails.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.ci.network-fetch-default",
+      "source_id": "bd.ci.network-fetch-default",
+      "component_id": "cmp.ci.gates",
+      "property_id": "prop.cdm.network-only-explicit-vendor",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 85,
+      "score_breakdown": {
+        "severity": 50,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "hardening:gate scans workflow YAML, shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module and offline npm ci.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Add interop:vendor:cdm to scripts/ci.sh and confirm npm run hardening:gate fails.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.interop.dynamic-plugin-loading",
+      "source_id": "bd.interop.dynamic-plugin-loading",
+      "component_id": "cmp.interop.registry",
+      "property_id": "prop.interop.registry-static",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 85,
+      "score_breakdown": {
+        "severity": 50,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "hardening:gate rejects dynamic imports, eval-style execution, and non-static registry shape.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Add import( to interop/registry.js and confirm npm run hardening:gate fails.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.ci.generated-artifact-staleness",
+      "source_id": "bd.ci.generated-artifact-staleness",
+      "component_id": "cmp.ci.gates",
+      "property_id": "prop.ci.generated-artifacts-current",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 70,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "npm run ci finishes with git diff --exit-code over tracked artifacts, hardening maps, and hardening frontiers.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.interop.payload-provenance-leak",
+      "source_id": "bd.interop.payload-provenance-leak",
+      "component_id": "cmp.interop.runner",
+      "property_id": "prop.interop.payloads-clean",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 70,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "hardening:gate scans generated CDM payload keys for Passport provenance fields.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Add a provenance key to a generated CDM payload and confirm npm run hardening:gate fails.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.agent.skill-not-discovered",
+      "source_id": "bd.agent.skill-not-discovered",
+      "component_id": "cmp.agent.repo-guidance",
+      "property_id": "prop.agent.skill-under-dot-agents",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 60,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 0,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "hardening:gate requires `.agents/skills/passport-hardening-loop/SKILL.md` and AGENTS.md references.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.daml.capacity-over-reservation",
+      "source_id": "bd.daml.capacity-over-reservation",
+      "component_id": "cmp.daml.ledger-schema",
+      "property_id": "prop.daml.reservation-positive-bounded",
+      "action": "deepen",
+      "status": "covered",
+      "priority_score": 60,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 20,
+        "missing_tests": 0,
+        "architecture_drift": 5,
+        "status": 0
+      },
+      "kill_gate": "Reservation negative tests must reject over-reservation.",
+      "evidence_needed": [
+        "No new evidence needed unless the linked source changes."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.daml.unauthorized-transition",
+      "source_id": "bd.daml.unauthorized-transition",
+      "component_id": "cmp.daml.ledger-schema",
+      "property_id": "prop.daml.controllers-match-authority",
+      "action": "deepen",
+      "status": "covered",
+      "priority_score": 60,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 20,
+        "missing_tests": 0,
+        "architecture_drift": 5,
+        "status": 0
+      },
+      "kill_gate": "Daml Script negative tests and coverage gate fail when external authorization coverage drops.",
+      "evidence_needed": [
+        "No new evidence needed unless the linked source changes."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0002"
+    }
+  ]
+}

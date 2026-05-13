@@ -1,0 +1,760 @@
+{
+  "artifact": "cdm_schema_manifest",
+  "framework": "cdm",
+  "frameworkVersion": "6.0",
+  "schemaSource": "https://cdm.finos.org/schemas/6.0/",
+  "rootSchemas": [
+    "cdm-product-collateral-EligibleCollateralSpecification.schema.json",
+    "cdm-product-collateral-EligibilityQuery.schema.json",
+    "cdm-product-collateral-CheckEligibilityResult.schema.json"
+  ],
+  "schemaCount": 186,
+  "schemaSetDigest": "sha256:433bbcf1a8015a444ad542f9d1603688653737fb3b34214733a1e335e6e88f37",
+  "generatedAt": "2026-05-12T19:34:47.699Z",
+  "files": [
+    {
+      "path": "cdm-base-datetime-AdjustableDate.schema.json",
+      "sha256": "e99f92ba15f2f39cc1ec47660492e3ba7a9ffa288fe34c6f51dae9d41f4df67b"
+    },
+    {
+      "path": "cdm-base-datetime-BusinessCenterEnum.schema.json",
+      "sha256": "1d919b718db7800962ffeef1f86164a6605dac781e6ac79915ca5524fcc5cd97"
+    },
+    {
+      "path": "cdm-base-datetime-BusinessCenters.schema.json",
+      "sha256": "aca3fe55d8ca550a88a863665541b0350a94532ef50fb49bfc879ab53e3c72b7"
+    },
+    {
+      "path": "cdm-base-datetime-BusinessDayAdjustments.schema.json",
+      "sha256": "e7e111f5a7761f12943399b4d5a837847b48d14867bf58b37fb817ba438c7059"
+    },
+    {
+      "path": "cdm-base-datetime-BusinessDayConventionEnum.schema.json",
+      "sha256": "682817820c0597c38a8870fec2aa70109f473d480553dc4f7dbec9beae67182b"
+    },
+    {
+      "path": "cdm-base-datetime-CommodityBusinessCalendarEnum.schema.json",
+      "sha256": "961eaeae72e2648967030b8da99ee61823e3d97d3bc522cd72658fcceb57e33b"
+    },
+    {
+      "path": "cdm-base-datetime-DayTypeEnum.schema.json",
+      "sha256": "a008e37a730d6045e18a5d009f3a03f1638df17ce678e53d1a413eae660a3952"
+    },
+    {
+      "path": "cdm-base-datetime-Frequency.schema.json",
+      "sha256": "0fb31a60e7482832c19690d4ab523e997dd72266714b8252202b9002804794e0"
+    },
+    {
+      "path": "cdm-base-datetime-Offset.schema.json",
+      "sha256": "5a666467e920786f09d56488b68905dc3ed4ef45f49197a73615ad8c7e1f2f2e"
+    },
+    {
+      "path": "cdm-base-datetime-Period.schema.json",
+      "sha256": "62fae7171adaef5deb526f14007199da068f30beacb8e913dd721e6c18b078e4"
+    },
+    {
+      "path": "cdm-base-datetime-PeriodBound.schema.json",
+      "sha256": "b0f32062e9f5fa3d1fa1676f4c42d7969b329bf85a0ea4a7ba908fec5b3abac6"
+    },
+    {
+      "path": "cdm-base-datetime-PeriodEnum.schema.json",
+      "sha256": "642cc7c485759fbc2403ecbd5c4e47bbbb11f4e208cd170a34e27ce043c0eb0c"
+    },
+    {
+      "path": "cdm-base-datetime-PeriodExtendedEnum.schema.json",
+      "sha256": "6b35d8137f3539c82589ef81d04900aecbe216377d39ac9a9d9050150c1cfbfb"
+    },
+    {
+      "path": "cdm-base-datetime-PeriodRange.schema.json",
+      "sha256": "fd883ef195ed72bb8604864a831781b2e48b2783ac0d6b76c886f6e6e47a47b9"
+    },
+    {
+      "path": "cdm-base-datetime-metafields-FieldWithMetaBusinessCenterEnum.schema.json",
+      "sha256": "46fba5d9a7d3bd465c64e3d8294eea7e58e7844b273278dcc1ff2bf4086b706c"
+    },
+    {
+      "path": "cdm-base-datetime-metafields-FieldWithMetaCommodityBusinessCalendarEnum.schema.json",
+      "sha256": "c8cca9f83cf488ba46ee6e9b8fc92c534f5b28c5352ddfe989fc931494de1a04"
+    },
+    {
+      "path": "cdm-base-datetime-metafields-ReferenceWithMetaBusinessCenters.schema.json",
+      "sha256": "800685693f67734fabcf4741b7823aeb1b3144554c0e522ed2ddb697c7f9c895"
+    },
+    {
+      "path": "cdm-base-datetime-metafields-ReferenceWithMetaBusinessDayAdjustments.schema.json",
+      "sha256": "f397b2577c0cb0d017999674102627266814f6ddf22ea264fa50288c91f8c5a2"
+    },
+    {
+      "path": "cdm-base-math-ArithmeticOperationEnum.schema.json",
+      "sha256": "65f6b4c199f5555c31019dc425cd1b5d2953c6c0e48ac952cb6907a90f39491b"
+    },
+    {
+      "path": "cdm-base-math-CapacityUnitEnum.schema.json",
+      "sha256": "c0f8293848ad43347c8407f9ed7ea14920b6f65bfbf5f0b946deb0fb1499788d"
+    },
+    {
+      "path": "cdm-base-math-DatedValue.schema.json",
+      "sha256": "4c2aaa69dbecf8c02e2fcbff76d2c0ec78171853d2f4dea8c78c73db6283379d"
+    },
+    {
+      "path": "cdm-base-math-FinancialUnitEnum.schema.json",
+      "sha256": "bc6b609c7a3f1bcd121da19f0eebc2bda6d6346cbd313fd874b1fed9a7e98d4e"
+    },
+    {
+      "path": "cdm-base-math-Measure.schema.json",
+      "sha256": "b8193eed677c1c7634cf9cc30a8e595fcde3caf1728c47e637b3398608698282"
+    },
+    {
+      "path": "cdm-base-math-MoneyBound.schema.json",
+      "sha256": "9a5d1faa8c407e84c082288b7a4aa37ad1c5db6e40336af4c3d5f78ad1a91258"
+    },
+    {
+      "path": "cdm-base-math-MoneyRange.schema.json",
+      "sha256": "df5261be501bf1ea45bc499f601b8f2c984a056b9a122113ca18c17c962159a4"
+    },
+    {
+      "path": "cdm-base-math-NumberBound.schema.json",
+      "sha256": "e9907751dfab2c6b767a3956f6beeff6a392e133b014be74cec090f5f517b9a6"
+    },
+    {
+      "path": "cdm-base-math-NumberRange.schema.json",
+      "sha256": "342f6e3bcae213a69192abcb81c2fff26ffa2d5c8601a102d2b0019109b6221a"
+    },
+    {
+      "path": "cdm-base-math-QuantifierEnum.schema.json",
+      "sha256": "5406a6444020db12a3d092133fc934259ac21fd68bb91e828aa359b25761c5fe"
+    },
+    {
+      "path": "cdm-base-math-UnitType.schema.json",
+      "sha256": "2b90799aafcc1efd8bfdcb2bb602a15503c995d30e10563a3235361578fa9fa8"
+    },
+    {
+      "path": "cdm-base-math-WeatherUnitEnum.schema.json",
+      "sha256": "5c35ba4616b2cd21c051d5187a8b8963ad85e8dc960e82a6e4e8efa570f3f0c2"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-AssetClassEnum.schema.json",
+      "sha256": "7d213d32d33bcc7ddd4b088d401b45822665a8b632b85109c36eb0defbe45240"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-AssetIdTypeEnum.schema.json",
+      "sha256": "aa88b2103fd0ee0e1c57f6fff62d5cba2b1f4510ce026182be5cd164171e29c8"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-AssetIdentifier.schema.json",
+      "sha256": "743f83688f94c977f1558bc4abe809ed96ffd18cd1e421a4e4df829f4ea2650f"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-AssetType.schema.json",
+      "sha256": "41381aba2db99785d37b992cd06eb69ebbffda23602b3df3e0777bb9d4fa9b28"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-AssetTypeEnum.schema.json",
+      "sha256": "962ee391c8e0a2e4b248b9feb6dbff1868d12be5c3abcf8805fe138fec1e3890"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-Cash.schema.json",
+      "sha256": "4b5455dadaaa026b76a33bbb50118f82490aed223cb229e6d3b0a2a6f017c1ec"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CollateralIssuerType.schema.json",
+      "sha256": "f3ce4d6010602ecf83966dd9e95f4b4888c7402d8f5112bba56e07025b751fd5"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CollateralTaxonomy.schema.json",
+      "sha256": "c2c63bab425e5ca5858cd826142b1740b04893741e2d519f32e2e0648cbd5517"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CollateralTaxonomyValue.schema.json",
+      "sha256": "43023c3233c501f08bb4ac80271ab3611db61f0479977ee380cf1070ac4a9684"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-Commodity.schema.json",
+      "sha256": "d2369fa050d802cd3f03c0ec5af48f88254cc75b130a8d2e8fe3d47e614bf58a"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CommodityInformationPublisherEnum.schema.json",
+      "sha256": "943608929e6e4a80f95ada14584ec2867ea4d86672803c379381bad02547bb4a"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CommodityProductDefinition.schema.json",
+      "sha256": "8b0b2db80ebe78fda8f1466f6bb6b6719730ce04356008d4d582f4e9e2773f43"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CommodityReferenceFramework.schema.json",
+      "sha256": "f1e911408ca183c4e09a3017dc7412de9343aa0a886354035e8d5e31d0322417"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CreditRiskEnum.schema.json",
+      "sha256": "ad3222ff3a7915d7da26a4ff60f91da8361b892c65004a8c2d3cd61684d824ad"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-CurrencyCodeEnum.schema.json",
+      "sha256": "0a914efe81f996850715f49346424f7bce098fe5c8318fcbdaa427b54b6c05ca"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DebtClassEnum.schema.json",
+      "sha256": "691acb8ff00885b3d6c20a777580b9e2558831e6f60665345bee58976b83ed6a"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DebtEconomics.schema.json",
+      "sha256": "7e616398957161608a6d608a2d7359f6fac3e40865957d2fc3c2563c3dc5b8ad"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DebtInterestEnum.schema.json",
+      "sha256": "05748eb1affd2456eabb5f1e1ee4b9b59db4d1488d71f07a9130d3c9f3b4119c"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DebtPrincipalEnum.schema.json",
+      "sha256": "028b4224369fce946b984c20ccf99ad32909887fbe53f4a267853beb4fc256d6"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DebtSeniorityEnum.schema.json",
+      "sha256": "2f3850f5ccbeaf55ad04782a93b012ef8179f2fdeff0baca2947ee26f95f9e60"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DebtType.schema.json",
+      "sha256": "c195b1594741a119d6bce741573d26ffe899a5e84ef1a5b868c72a5b059d7a5a"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DeliveryDateParameters.schema.json",
+      "sha256": "76b3fadd0db74f2b9f081abdb012c9598790fad33cfd84000d70253258f3cee5"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-DigitalAsset.schema.json",
+      "sha256": "e7f282be010b9fb95ca6fdc23e44be7cf742cc40475cc9a31e066d7783ba3f11"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-EU_EMIR_EligibleCollateralEnum.schema.json",
+      "sha256": "09c53d55fdcc1a3c1001dd8749482a508693afb29698657785ce157149ab5329"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-EquityTypeEnum.schema.json",
+      "sha256": "45c366de5e3d5ed9fbd0cfa6542e654ae7ed4a1c51352e1393196feae6e22c7a"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-FundProductTypeEnum.schema.json",
+      "sha256": "774d0a2364e2ca0a6b124a47f3d79ca6724f92cefedef9f0be1374ba8ff3f6a6"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-ISOCountryCodeEnum.schema.json",
+      "sha256": "705316e6578df4d64fc61e324eb120aef79b2fbd3cf3534b067171f76d9342cc"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-Instrument.schema.json",
+      "sha256": "99058db3b8cc3a9e943ca951d0c77d5650ff75973407fceace70fd3004403cc8"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-InstrumentTypeEnum.schema.json",
+      "sha256": "2026e86daeec1f36938a1a7611b758dfbc68d3495ed1c29e2ac1b5c429d3997d"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-IssuerTypeEnum.schema.json",
+      "sha256": "f1d0a86aec0d598dc1ca57fe29847212f8636ddb8f9bc8055199f534e20ee570"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-ListedDerivative.schema.json",
+      "sha256": "ac2d5b6e3c5ed2ad27519f910ea6f69d21b2dff112af2d0f5e610025026e625d"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-Loan.schema.json",
+      "sha256": "c6b55b81306b7b8bf0e395af2b059321cba9b853145fa6cc3c65a66270b23d58"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-MaturityTypeEnum.schema.json",
+      "sha256": "42a17ae7fa8605507b6e3b0a18134f082fe7ad4e30fbe29050ee55e5c87fb319"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-PriceSource.schema.json",
+      "sha256": "209ee7271817961649d826754fbf84f33b2bf432ab069ddfc83adb7f08dfd474"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-PutCallEnum.schema.json",
+      "sha256": "268c623517d60ff0b5ae536a740714d5829efb9827db3d443b0210bcc01a60fc"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-QuasiGovernmentIssuerType.schema.json",
+      "sha256": "34fef275402963d522f56dd35488c11e58f4e92c889d36f57a7c4da95135828f"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-RegionalGovernmentIssuerType.schema.json",
+      "sha256": "84c57b58e60397779047d4cd3570160bf498f3b8e714234d08d50d10ab7a4516"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-Security.schema.json",
+      "sha256": "ae2e999193d7d2873df9959962c1a1b32281c9c8f1dfd57319303869ccb61d03"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-SpecialPurposeVehicleIssuerType.schema.json",
+      "sha256": "c4a5ae76206ae9d9f14269241beea6377cb3a571078a55c084b2502efa7e8b5c"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-SupraNationalIssuerTypeEnum.schema.json",
+      "sha256": "4ec672e3a17507783325b1dd00198504394321fae5ef6ca9492b911c47a49572"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-Taxonomy.schema.json",
+      "sha256": "d1e13dbd75bb86e3e9d36697eda196e67dafc26f699d2ae839f851ca272b13f4"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-TaxonomyClassification.schema.json",
+      "sha256": "84a127d000bbaadd7a1818ccb43e11154e3abf97fe601b7eaf7d209fd19260cb"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-TaxonomySourceEnum.schema.json",
+      "sha256": "d5e2cf5de016292ff2eb71d412d1dd6848d80982248aef0477f16d5683e5b0b9"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-TaxonomyValue.schema.json",
+      "sha256": "81a1cc824bbdcf53adb1ed8bbc4439a63eed09b5eecbc845a4f5b0af7da64eaf"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-UK_EMIR_EligibleCollateralEnum.schema.json",
+      "sha256": "5ddc8b345ab5a79e9f9df30d583bea97a961066fce32c213836a6b1b892c5586"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-common-US_CFTC_PR_EligibleCollateralEnum.schema.json",
+      "sha256": "836da1b6c98af41fa4049932263edcc1912dc72f8e9972a845e2aeb0582224b8"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-rates-FloatingRateIndexEnum.schema.json",
+      "sha256": "ad8c2452f498f3f7524d23798a2e8434382c4e135ba2d8e68278c6f23170faa9"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-rates-InflationRateIndexEnum.schema.json",
+      "sha256": "c2d2e9f4a98382cf02d80d6fc720856a9b2942259fb86ce2ad994947a88a698c"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-rates-metafields-FieldWithMetaFloatingRateIndexEnum.schema.json",
+      "sha256": "0d55bc872318e47a9d29296b377d6ca9022a5463128820f16e1203c04e045158"
+    },
+    {
+      "path": "cdm-base-staticdata-asset-rates-metafields-FieldWithMetaInflationRateIndexEnum.schema.json",
+      "sha256": "ca09aa4f80cf20e8a13fdff9943ffe296e9d6599fdb3746e6c7f9c2a0831205c"
+    },
+    {
+      "path": "cdm-base-staticdata-identifier-AssignedIdentifier.schema.json",
+      "sha256": "684e8a13575f3bcd5a11092b732fc0c3f4467e6a293d7beea9dd60128be2f58c"
+    },
+    {
+      "path": "cdm-base-staticdata-identifier-Identifier.schema.json",
+      "sha256": "0a4353812bf019e93426a95d65db576fa2285fbcb7a3959c15a6bbda1d8f7dc4"
+    },
+    {
+      "path": "cdm-base-staticdata-party-Account.schema.json",
+      "sha256": "3005f4ea59009bf38172e18eb9fe0c57e3214ae681b6f1366aae19ea5377b675"
+    },
+    {
+      "path": "cdm-base-staticdata-party-AccountTypeEnum.schema.json",
+      "sha256": "d37c05d1a95068af3308f84d37799bacdd5f8f78c5dbee5c31d242edf5d46b36"
+    },
+    {
+      "path": "cdm-base-staticdata-party-Address.schema.json",
+      "sha256": "564d9de05cc7fddb644eecc62d139509ef3868810dfb42c436ebb16509f02d45"
+    },
+    {
+      "path": "cdm-base-staticdata-party-BusinessUnit.schema.json",
+      "sha256": "5ceab3e33429ce452b0f2701eeb8fb9e7ed16e77f3106257e3791b9e6e246a83"
+    },
+    {
+      "path": "cdm-base-staticdata-party-ContactInformation.schema.json",
+      "sha256": "0693e0d7f7045ff208a705e7ccd7f732eae53e7e0f56880c7459c3a6c41b6a5c"
+    },
+    {
+      "path": "cdm-base-staticdata-party-Counterparty.schema.json",
+      "sha256": "11404b8a5db0fc2eddbdd52c74fc49a4b6f3aec55a39a6eeedcc4b1e0bdcad6a"
+    },
+    {
+      "path": "cdm-base-staticdata-party-CounterpartyRoleEnum.schema.json",
+      "sha256": "4b77c7f5633cc87da3b893c61e7c248daf9be0a58b7071c61185f43c5d940df7"
+    },
+    {
+      "path": "cdm-base-staticdata-party-LegalEntity.schema.json",
+      "sha256": "56cdae5c0ea4d9eb87cb777c7b9df08b42106d03bced829fa4dc19ff15bfdabf"
+    },
+    {
+      "path": "cdm-base-staticdata-party-NaturalPerson.schema.json",
+      "sha256": "0fe1dedc32d894b4ce15a2b6b1347ed5b590e4d07e7690968c0d5bdfd562da75"
+    },
+    {
+      "path": "cdm-base-staticdata-party-NaturalPersonRole.schema.json",
+      "sha256": "2c35b234cbbdce7efb405c6debf5d0c98bb171a1e5103ee6c98e2b40a5698906"
+    },
+    {
+      "path": "cdm-base-staticdata-party-NaturalPersonRoleEnum.schema.json",
+      "sha256": "305cac5ad96224cf70f0d5878a3d8adb2d3274125a7a9917683152c29bdd542e"
+    },
+    {
+      "path": "cdm-base-staticdata-party-Party.schema.json",
+      "sha256": "a8fe1d07072602b3e4b62287b42ec6df3555d27df7c5ffe200a2fa0802d576c4"
+    },
+    {
+      "path": "cdm-base-staticdata-party-PartyIdentifier.schema.json",
+      "sha256": "cb27135bae53cb676c787dbce67ce0fa921a9173dfa6f2d79d8ac52b4d84586b"
+    },
+    {
+      "path": "cdm-base-staticdata-party-PartyIdentifierTypeEnum.schema.json",
+      "sha256": "965d8e8f45ff36e4dde81afb815422a9a802a51b8336837f648ccd2c62bf1686"
+    },
+    {
+      "path": "cdm-base-staticdata-party-PartyRole.schema.json",
+      "sha256": "ed00ce40cc35865c4a97a2ac2fb3fa53c7b7a0516a6e8ac0a1f644edcc382414"
+    },
+    {
+      "path": "cdm-base-staticdata-party-PartyRoleEnum.schema.json",
+      "sha256": "b76139a1c0c7d98a4ab106b102d8d317700943c24de1ebfb6f66444506d22066"
+    },
+    {
+      "path": "cdm-base-staticdata-party-PersonIdentifier.schema.json",
+      "sha256": "1f052e94f224a549012d86c833c16c6470cf90f1a9c8c8c2a5f7358dcfb6a392"
+    },
+    {
+      "path": "cdm-base-staticdata-party-PersonIdentifierTypeEnum.schema.json",
+      "sha256": "6bc7b632dba5d4f428a21577cfde06340952cb87d967d99bf6ca295def7e14cf"
+    },
+    {
+      "path": "cdm-base-staticdata-party-TelephoneNumber.schema.json",
+      "sha256": "2902c5302b8243f8cda91e4a9f3c99b650f2bdfecb7f8e61df489b7e0ef408f1"
+    },
+    {
+      "path": "cdm-base-staticdata-party-TelephoneTypeEnum.schema.json",
+      "sha256": "28645069b14045c444401f83c1db126530955cc568d7476ff5753f3a3754ad88"
+    },
+    {
+      "path": "cdm-base-staticdata-party-metafields-FieldWithMetaAccountTypeEnum.schema.json",
+      "sha256": "4b2f951d9f69a3fc6e4c26a61b6bc8c3fc36cb482b3550ab8bb7570a44e345c8"
+    },
+    {
+      "path": "cdm-base-staticdata-party-metafields-FieldWithMetaNaturalPersonRoleEnum.schema.json",
+      "sha256": "ead18ca1e1eefb8ece655357c3978272835e1754b2e052af5551b53e9a4b1956"
+    },
+    {
+      "path": "cdm-base-staticdata-party-metafields-FieldWithMetaPersonIdentifier.schema.json",
+      "sha256": "5628e3a96db7d7a89767dfe4874e2047e2767954db9a1934ca2951f5ed682e5d"
+    },
+    {
+      "path": "cdm-base-staticdata-party-metafields-ReferenceWithMetaLegalEntity.schema.json",
+      "sha256": "4159fb03f3e3e065d94f297d09688db4ecc5cd0d404c6445946daab1e5b395d8"
+    },
+    {
+      "path": "cdm-base-staticdata-party-metafields-ReferenceWithMetaNaturalPerson.schema.json",
+      "sha256": "8719ae8576e39cf396d84d3eb14c8ca71aba06ab9f271f04904d705892951db9"
+    },
+    {
+      "path": "cdm-base-staticdata-party-metafields-ReferenceWithMetaParty.schema.json",
+      "sha256": "45c0e2a63f6699bcc551d19b3959deb912743bd910fdf0f97084ce8b273ab280"
+    },
+    {
+      "path": "cdm-observable-asset-CashPrice.schema.json",
+      "sha256": "1383919bc53a7c0cbbde0da6e1e7eecbef79e969165d37267c507e67e0404896"
+    },
+    {
+      "path": "cdm-observable-asset-CashPriceTypeEnum.schema.json",
+      "sha256": "2e6c4b4d800b46f1f3b0e1514e71ef0be7e9f8178cdd554a6b5f2086dfe6d065"
+    },
+    {
+      "path": "cdm-observable-asset-CreditIndex.schema.json",
+      "sha256": "10f3d65e359c76d528fee01c384a562511d5413394a29439362b12aebefe0144"
+    },
+    {
+      "path": "cdm-observable-asset-CreditNotation.schema.json",
+      "sha256": "6d2e67f6b4be8d3479027cf25bddc8aa87b17398bb456d67b44a90dbfb2fea17"
+    },
+    {
+      "path": "cdm-observable-asset-CreditNotationBoundaryEnum.schema.json",
+      "sha256": "a310e1c486f54251057f9b260bfc9e4d13bf711ffc085c57dd14be85f2e896f8"
+    },
+    {
+      "path": "cdm-observable-asset-CreditNotationMismatchResolutionEnum.schema.json",
+      "sha256": "d1f4a624a0bc1efcae064fd977bb288645a418b3408526d14491f649cc020e0c"
+    },
+    {
+      "path": "cdm-observable-asset-CreditRatingAgencyEnum.schema.json",
+      "sha256": "6377ae3f23dd3668365b60e6d8d59238f8ba46755d4ac58c9d53d0582a5c0614"
+    },
+    {
+      "path": "cdm-observable-asset-CreditRatingCreditWatchEnum.schema.json",
+      "sha256": "dbbc5d5e990fc3974549c541a37495599fea94f3674ee3c5e7cdba1ed3fe3c2d"
+    },
+    {
+      "path": "cdm-observable-asset-CreditRatingDebt.schema.json",
+      "sha256": "5d3b5643a80b53b6038bdba3ebbd435422c1b090973367a4b8d9e43109989eeb"
+    },
+    {
+      "path": "cdm-observable-asset-CreditRatingOutlookEnum.schema.json",
+      "sha256": "aa6530b974452f70561d7256eee0e16c8724b4e282e25fb74d95bf55334fc765"
+    },
+    {
+      "path": "cdm-observable-asset-EquityIndex.schema.json",
+      "sha256": "c698115c75505fbe6793935253017b193a534c75e3c5f8e349a1772652eaac4b"
+    },
+    {
+      "path": "cdm-observable-asset-FeeTypeEnum.schema.json",
+      "sha256": "b085fa30f672e6b3e397c3a8d2474530c1fc42b6d231fbb88ec9cf712debf572"
+    },
+    {
+      "path": "cdm-observable-asset-FloatingRateIndex.schema.json",
+      "sha256": "21a6981e4c6ad9a9d61339b495dcb5b6ee01e872599bb90e27e192f1a073a386"
+    },
+    {
+      "path": "cdm-observable-asset-ForeignExchangeRateIndex.schema.json",
+      "sha256": "2d0eb52f6df1d8adf404b1c051dd7b794f911f712345dd9ab290a4fc36ae515c"
+    },
+    {
+      "path": "cdm-observable-asset-Index.schema.json",
+      "sha256": "241fd8d7c96380815627a46ffc10221c5afe3e1bdfa147a519e58022359f607f"
+    },
+    {
+      "path": "cdm-observable-asset-InflationIndex.schema.json",
+      "sha256": "28fe44188456ba7b872d8978c9e2b08fdb226ebde8780bfd5b201059c42f6be3"
+    },
+    {
+      "path": "cdm-observable-asset-InformationProviderEnum.schema.json",
+      "sha256": "3a746f20f71068ac801b69b37bde412794b695ff682316503ef7c5d6a7831250"
+    },
+    {
+      "path": "cdm-observable-asset-InformationSource.schema.json",
+      "sha256": "427f451356f15f4ad9409871f05257e6378cb824513a60bf8fad4434b6e42e1a"
+    },
+    {
+      "path": "cdm-observable-asset-InterestRateIndex.schema.json",
+      "sha256": "eb8f5e6c7811f300c67a95e189e0f2d8b48ee16c86330b7c52f5942f3645d8ac"
+    },
+    {
+      "path": "cdm-observable-asset-Money.schema.json",
+      "sha256": "4dbce0f3eb81868e1b3ee527aed4ae982d4ee64a4720dd6d2307de717cd1665f"
+    },
+    {
+      "path": "cdm-observable-asset-MultipleDebtTypes.schema.json",
+      "sha256": "c710eb80593c7befce45c4e72781dbaf7dfcde92bcbf441c0d015a68845f06c5"
+    },
+    {
+      "path": "cdm-observable-asset-OtherIndex.schema.json",
+      "sha256": "c662940942a390badc3d0545d7de4cc72530d17b994403a3c18bed5578aed043"
+    },
+    {
+      "path": "cdm-observable-asset-PremiumExpression.schema.json",
+      "sha256": "64dceff5d5cc17c02dbaaf877bd8c62721aec5adea7ebcf85cdecfc659f7aa98"
+    },
+    {
+      "path": "cdm-observable-asset-PremiumTypeEnum.schema.json",
+      "sha256": "bb1a262b58878f3519d504814269c0e053e28b3c516e9cce89cec14e865f2a59"
+    },
+    {
+      "path": "cdm-observable-asset-Price.schema.json",
+      "sha256": "5ab91dcc75aa90e4296aa32c1d415bb253c3e3300b30437f882f38190e363671"
+    },
+    {
+      "path": "cdm-observable-asset-PriceComposite.schema.json",
+      "sha256": "2ed004e2daa6abb5984fc2dac1c45aac0debf1848aa8e9fd57ed977fef8a2e6f"
+    },
+    {
+      "path": "cdm-observable-asset-PriceExpressionEnum.schema.json",
+      "sha256": "063d204673b306f5fc682f3f4679d4570d453fec47c7b0d2ceeddb717d29d461"
+    },
+    {
+      "path": "cdm-observable-asset-PriceOperandEnum.schema.json",
+      "sha256": "aeb18c35164cce15b22e78845dadaedaaa9bd4b0cca622a4f9fb523f976d1f46"
+    },
+    {
+      "path": "cdm-observable-asset-PriceTypeEnum.schema.json",
+      "sha256": "c0e015e6495c2b20083ecb264c1a0b514f7039a7542994024e6bfd13b56a4e80"
+    },
+    {
+      "path": "cdm-observable-asset-QuotationSideEnum.schema.json",
+      "sha256": "a3f453eb4fc3598d53a0b354ee5c849e0af96af12aee2ea203fe3395dbc7c0d1"
+    },
+    {
+      "path": "cdm-observable-asset-QuoteBasisEnum.schema.json",
+      "sha256": "20694f18ab03ed4eabbf91aad545a64016670b45227b98f54ba60a270803dc2c"
+    },
+    {
+      "path": "cdm-observable-asset-QuotedCurrencyPair.schema.json",
+      "sha256": "714a978892b7ce45d43332fb87ddf4981ca165a96bf8806bafc6d3276f18b446"
+    },
+    {
+      "path": "cdm-observable-asset-metafields-FieldWithMetaInformationProviderEnum.schema.json",
+      "sha256": "a52be0d6b13112c1e9d8a89974e6e28c7598f1bb93ce7dc5021bbf9dcda011a1"
+    },
+    {
+      "path": "cdm-observable-asset-metafields-FieldWithMetaInterestRateIndex.schema.json",
+      "sha256": "29387bb501b27eef67c1eb25f3646f6f4c62fc22c3b292c6f415084abd240552"
+    },
+    {
+      "path": "cdm-observable-asset-metafields-FieldWithMetaQuotedCurrencyPair.schema.json",
+      "sha256": "7ed536db76eed7385003cec1355599bb78d60bc9f982e3fd914c106711b0e5b9"
+    },
+    {
+      "path": "cdm-product-asset-CreditSeniorityEnum.schema.json",
+      "sha256": "54a26f86d9f770003fb92919470d8d06f2742e2b3a7ccb645227f32df9add9ac"
+    },
+    {
+      "path": "cdm-product-asset-IndexAnnexSourceEnum.schema.json",
+      "sha256": "153d85db820f265a9cf42d919e593c1550385192cb7064c564637f0b8b9e88ad"
+    },
+    {
+      "path": "cdm-product-asset-ReferenceInformation.schema.json",
+      "sha256": "39ea4fa2bd0bac381aad24a515d9897876d9fd09f95b785b034b57b96a9511bf"
+    },
+    {
+      "path": "cdm-product-asset-ReferenceObligation.schema.json",
+      "sha256": "f29090a8c96065c2270f7dfa1e20cb20d32bc47aa5817427425a821a39c0a3dc"
+    },
+    {
+      "path": "cdm-product-asset-SettledEntityMatrix.schema.json",
+      "sha256": "d80a4c39ca15775f34ca6e1254cc7c282a7ecafb5ff2af2217af2a2b3c729c9f"
+    },
+    {
+      "path": "cdm-product-asset-SettledEntityMatrixSourceEnum.schema.json",
+      "sha256": "e0b5a675e518d7507d7666a09af0d101d8977407fbd1f17a94bdacbcdc78bf6c"
+    },
+    {
+      "path": "cdm-product-asset-Tranche.schema.json",
+      "sha256": "8c968155f371e5d0301fc8865bd03e1fe944c96f93b8f4f815ba95a4efa97eb8"
+    },
+    {
+      "path": "cdm-product-asset-metafields-FieldWithMetaIndexAnnexSourceEnum.schema.json",
+      "sha256": "a6cd21fef2763a8557249ed02e38294cf1ab9dc9cc4e1427d22a1fe7154de6c9"
+    },
+    {
+      "path": "cdm-product-asset-metafields-FieldWithMetaSettledEntityMatrixSourceEnum.schema.json",
+      "sha256": "b58afac4c404584690d03493e0f76792cd41d14008abf7630d25f7de3ecaaaf8"
+    },
+    {
+      "path": "cdm-product-collateral-AgencyRatingCriteria.schema.json",
+      "sha256": "33cbf78dafb16580e42a2078043998dbee49ff5873b148801f0487c71ba4123b"
+    },
+    {
+      "path": "cdm-product-collateral-AllCriteria.schema.json",
+      "sha256": "b8d9d7466c9a096b4df2ba61c991079ec8312a7f2bac54714c2ac4f6cfe441ce"
+    },
+    {
+      "path": "cdm-product-collateral-AnyCriteria.schema.json",
+      "sha256": "cc7b68e912f8b0b3ca9ea3f5ec82c38807e0cf52802a4122a0c756cf5fcfca8f"
+    },
+    {
+      "path": "cdm-product-collateral-AssetAgencyRating.schema.json",
+      "sha256": "634279c88eee2e4077de266f47a0c8875ef158b187fbed62d0780a7f26ca299e"
+    },
+    {
+      "path": "cdm-product-collateral-AssetCountryOfOrigin.schema.json",
+      "sha256": "0f6198f8cdd75e8df31e390bb6fe89a53eeaeb9a4dc65d743980ed3b78561813"
+    },
+    {
+      "path": "cdm-product-collateral-AssetMaturity.schema.json",
+      "sha256": "3cf1e23fc51826c6569e80b0576750116f4b42e43571b7a064af0f5060be9fd3"
+    },
+    {
+      "path": "cdm-product-collateral-AverageTradingVolume.schema.json",
+      "sha256": "013d03423913a1152f144dab20bbfa5799510c55d6657ac55882192db9c52288"
+    },
+    {
+      "path": "cdm-product-collateral-AverageTradingVolumeMethodologyEnum.schema.json",
+      "sha256": "6be0592a7bb80edca45011faadd12ae039dd2e7f82e451f70033ee3f4aa4cc85"
+    },
+    {
+      "path": "cdm-product-collateral-CheckEligibilityResult.schema.json",
+      "sha256": "032cf19247a455fc16aa25fcab0b7b817db755684bf2eb9de6d473b98eb85346"
+    },
+    {
+      "path": "cdm-product-collateral-CollateralCriteria.schema.json",
+      "sha256": "7d68e893de82a4073300bc2e058556db91c724d5ba442bafdb73cf307f529b74"
+    },
+    {
+      "path": "cdm-product-collateral-CollateralMarginTypeEnum.schema.json",
+      "sha256": "f104e0c5b89f2fad5bb7a02a366a4feba6adc8a7f755b807fb00321bcb13bf92"
+    },
+    {
+      "path": "cdm-product-collateral-CollateralTreatment.schema.json",
+      "sha256": "763f72a43ec7431827b883823faec39c6ae3f6fc22d208edd85653e70590671c"
+    },
+    {
+      "path": "cdm-product-collateral-CollateralValuationTreatment.schema.json",
+      "sha256": "c9facd9de9bf01e5db409caff67de17c0ed8d86efeb250a808854c65b468fa24"
+    },
+    {
+      "path": "cdm-product-collateral-ConcentrationLimit.schema.json",
+      "sha256": "4545b8914b7673437c96a4b54c8c21440e309dabbcded0c7ce7fee094287e051"
+    },
+    {
+      "path": "cdm-product-collateral-ConcentrationLimitCriteria.schema.json",
+      "sha256": "537afd6efc6130e0d7b0348e07aff6a03b409a75bc2f1ec2673a1c1d876ec215"
+    },
+    {
+      "path": "cdm-product-collateral-ConcentrationLimitTypeEnum.schema.json",
+      "sha256": "4541ddbb608216bbe37123ed21ad8a7c40969d7bfdb65b61c6ca32b99a95b255"
+    },
+    {
+      "path": "cdm-product-collateral-CounterpartyOwnIssuePermitted.schema.json",
+      "sha256": "81a9299b98bccbf0671b1cc38c0f5f30ec929523f5f57c0ea1e831e9bfb4491e"
+    },
+    {
+      "path": "cdm-product-collateral-DomesticCurrencyIssued.schema.json",
+      "sha256": "24bac947b547ed23bf58b031fcc3a75bc9027359edfd3b5de4ed87a0e5a8ece0"
+    },
+    {
+      "path": "cdm-product-collateral-EligibilityQuery.schema.json",
+      "sha256": "afa42a9dff9d166172fb4a1e981cdce180bf1de0d16b0805fc092a79c0d4d9ff"
+    },
+    {
+      "path": "cdm-product-collateral-EligibleCollateralCriteria.schema.json",
+      "sha256": "2bca536126edfd868dd9cc56961f72f6a985eb3e929471b549ab27a8d185964d"
+    },
+    {
+      "path": "cdm-product-collateral-EligibleCollateralSpecification.schema.json",
+      "sha256": "f5ad7d2416e453250f52b8ac651dc86bcfc2cd396532828c9019a4e852a86718"
+    },
+    {
+      "path": "cdm-product-collateral-IssuerAgencyRating.schema.json",
+      "sha256": "f7d44f1ca71fd9c4bd6d2d6d33e891db20abc1831d8fb6e823f9acf9df1679c7"
+    },
+    {
+      "path": "cdm-product-collateral-IssuerCountryOfOrigin.schema.json",
+      "sha256": "9e090752b2f5e60803c500d8977049a93f7b87ee629dbb5d3062254746b7ee46"
+    },
+    {
+      "path": "cdm-product-collateral-IssuerName.schema.json",
+      "sha256": "9ef240be7462fc8e645b07d50a9a0f1cd1a019207ba9b88d70fe0efce035a071"
+    },
+    {
+      "path": "cdm-product-collateral-ListingExchange.schema.json",
+      "sha256": "adfc1ce4fa0abdb7c89e8428d17be97d016b8908bf21ad26f79e95420a80b61c"
+    },
+    {
+      "path": "cdm-product-collateral-ListingSector.schema.json",
+      "sha256": "fc044e9d95e4cf2353ad0f41e7d37eb0bff58f812ca8ce110e27dea5a4b6ba75"
+    },
+    {
+      "path": "cdm-product-collateral-NegativeCriteria.schema.json",
+      "sha256": "b5e7b7102449483cb52d8b10eb5bfcdcd74b403e018512b18be427a1b53de337"
+    },
+    {
+      "path": "cdm-product-collateral-RatingPriorityResolutionEnum.schema.json",
+      "sha256": "1f3967c2764d4602fbf74d038909bb311fcfa5df3f5ff1c997223ff3b4b1a55b"
+    },
+    {
+      "path": "cdm-product-collateral-SovereignAgencyRating.schema.json",
+      "sha256": "f493dec84e0910527ff433831a064295d5a35af0aff6c44ac6d7ab3840e4ed6a"
+    },
+    {
+      "path": "cdm-product-collateral-SpecificAsset.schema.json",
+      "sha256": "c998cbc4db6477276476fb195f158af9b74666da40e3b656658c583f8a91a5ce"
+    },
+    {
+      "path": "com-rosetta-model-lib-meta-Key.schema.json",
+      "sha256": "0ae0543033d4c085a8204e6de4a322d661695302b2bdde1ccf971fb6bd065f7e"
+    },
+    {
+      "path": "com-rosetta-model-lib-meta-Reference.schema.json",
+      "sha256": "68d9339e2e960ffb9bb497bebdee8cac67faf2ed9cbfd9a81a0769ca34f37cf9"
+    },
+    {
+      "path": "com-rosetta-model-metafields-FieldWithMetaString.schema.json",
+      "sha256": "8cd4ba2f286ce11525440d3cef368e643202804058588bc39058378ec393b305"
+    },
+    {
+      "path": "com-rosetta-model-metafields-MetaFields.schema.json",
+      "sha256": "7cdc18e73f919729c326c699725b931773ce21eb18d8b4d9894791b4bb77ea01"
+    }
+  ]
+}

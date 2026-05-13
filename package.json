@@ -6,13 +6,23 @@
   "description": "Daml-as-spec foundation build for Aevelum Passport, a Canton-native collateral credential account.",
   "scripts": {
     "demo": "node scripts/export-demo-transcript.mjs",
-    "conformance:cdm-draft": "node scripts/export-cdm-mapping.mjs",
+    "interop:generate": "node scripts/interop-generate.mjs",
+    "interop:validate": "node scripts/interop-validate.mjs",
+    "interop:vendor:cdm": "node scripts/interop-vendor-cdm.mjs",
+    "hardening:map": "node hardening/scripts/validate-map.mjs",
+    "hardening:frontier": "node hardening/scripts/score-frontier.mjs",
+    "hardening:select": "node hardening/scripts/select-round.mjs",
+    "hardening:gate": "node hardening/scripts/hardening-gate.mjs",
     "gate": "node scripts/gates.mjs",
     "daml:build": "dpm build --all",
     "daml:test": "./scripts/run-daml-tests.sh",
+    "canton:smoke": "./scripts/canton-smoke.sh",
     "ci": "./scripts/ci.sh",
     "package": "node scripts/package.mjs",
-    "all": "npm run ci && npm run package"
+    "all": "npm run ci"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-draft-04": "1.0.0"
+  }
 }

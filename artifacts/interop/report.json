@@ -1,0 +1,155 @@
+{
+  "artifact": "interop_report",
+  "package": "aevelum-passport-foundation",
+  "version": "0.1.0",
+  "status": "passed",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "sourceRef": "interop/samples/repo-pretrade-passport-input.json",
+  "securityPolicy": {
+    "allowDynamicPlugins": false,
+    "allowEval": false,
+    "allowNetworkInCi": false
+  },
+  "adapters": [
+    {
+      "id": "cdm-collateral-eligibility",
+      "framework": "cdm",
+      "frameworkVersion": "6.0",
+      "outputFormat": "json",
+      "artifactTypes": [
+        "eligible-collateral-specification",
+        "eligibility-query",
+        "check-eligibility-result"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "plugin": {
+        "id": "cdm-collateral-eligibility",
+        "framework": "cdm",
+        "frameworkVersion": "6.0",
+        "outputFormat": "json"
+      },
+      "artifactType": "eligible-collateral-specification",
+      "artifactPath": "artifacts/interop/cdm/6.0/eligible-collateral-specification.json",
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "provenance": {
+        "sourceRef": "interop/samples/repo-pretrade-passport-input.json",
+        "sourceType": "passport.repo-pretrade-sample",
+        "sourceId": "passport-repo-pretrade-us-treasury-v1",
+        "adapterVersion": "0.1.0",
+        "generatedAt": "1970-01-01T00:00:00.000Z"
+      },
+      "warnings": []
+    },
+    {
+      "plugin": {
+        "id": "cdm-collateral-eligibility",
+        "framework": "cdm",
+        "frameworkVersion": "6.0",
+        "outputFormat": "json"
+      },
+      "artifactType": "eligibility-query",
+      "artifactPath": "artifacts/interop/cdm/6.0/eligibility-query.json",
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "provenance": {
+        "sourceRef": "interop/samples/repo-pretrade-passport-input.json",
+        "sourceType": "passport.repo-pretrade-sample",
+        "sourceId": "passport-repo-pretrade-us-treasury-v1",
+        "adapterVersion": "0.1.0",
+        "generatedAt": "1970-01-01T00:00:00.000Z"
+      },
+      "warnings": []
+    },
+    {
+      "plugin": {
+        "id": "cdm-collateral-eligibility",
+        "framework": "cdm",
+        "frameworkVersion": "6.0",
+        "outputFormat": "json"
+      },
+      "artifactType": "check-eligibility-result",
+      "artifactPath": "artifacts/interop/cdm/6.0/check-eligibility-result.json",
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "provenance": {
+        "sourceRef": "interop/samples/repo-pretrade-passport-input.json",
+        "sourceType": "passport.repo-pretrade-sample",
+        "sourceId": "passport-repo-pretrade-us-treasury-v1",
+        "adapterVersion": "0.1.0",
+        "generatedAt": "1970-01-01T00:00:00.000Z"
+      },
+      "warnings": [
+        "CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed."
+      ]
+    }
+  ],
+  "negativeResults": [
+    {
+      "name": "negative-invalid-eligibility-query",
+      "expectedValid": false,
+      "actualValid": false,
+      "pass": true,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "collateralAssetType"
+          },
+          "message": "must have required property 'collateralAssetType'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "agencyRating"
+          },
+          "message": "must have required property 'agencyRating'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "issuerType"
+          },
+          "message": "must have required property 'issuerType'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "issuerName"
+          },
+          "message": "must have required property 'issuerName'"
+        }
+      ]
+    },
+    {
+      "name": "negative-passport-decision-rejected-without-cdm-engine",
+      "expectedValid": true,
+      "actualValid": true,
+      "expectedEligible": false,
+      "actualEligible": false,
+      "pass": true,
+      "warnings": [
+        "CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed."
+      ],
+      "assertion": "A Passport sample decision can be mirrored as rejected without executing a CDM eligibility engine.",
+      "errors": []
+    }
+  ]
+}

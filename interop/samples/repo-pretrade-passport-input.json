@@ -1,0 +1,40 @@
+{
+  "sourceType": "passport.repo-pretrade-sample",
+  "sourceId": "passport-repo-pretrade-us-treasury-v1",
+  "policy": {
+    "policyId": "repo-policy-001",
+    "policyVersion": "v1",
+    "eligibleAssetClasses": [
+      "USTreasury"
+    ],
+    "eligibleCurrencies": [
+      "USD"
+    ],
+    "minimumCapacity": "50000000.0",
+    "haircutScheduleRef": "haircut-us-treasury-2pct",
+    "concentrationLimitRef": "none"
+  },
+  "request": {
+    "requestId": "credential-request-001",
+    "requestedMinimumCapacity": "30000000.0",
+    "purpose": "RepoPreTrade"
+  },
+  "collateral": {
+    "assetClass": "USTreasury",
+    "assetType": "Security",
+    "securityType": "Debt",
+    "issuerType": "SovereignCentralBank",
+    "assetCountryOfOrigin": "US",
+    "denominatedCurrency": "USD",
+    "maturityYears": 7,
+    "rating": {
+      "agency": "StandardAndPoors",
+      "notation": "AA+",
+      "boundary": "Minimum"
+    },
+    "issuerName": "United States Treasury"
+  },
+  "eligibilityDecision": {
+    "isEligible": true
+  }
+}

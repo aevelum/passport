@@ -1,0 +1,37 @@
+{
+  "criteria": [
+    {
+      "collateralCriteria": {
+        "AllCriteria": {
+          "allCriteria": [
+            {
+              "AssetType": {
+                "assetType": "Security",
+                "securityType": "Debt"
+              }
+            },
+            {
+              "CollateralIssuerType": {
+                "issuerType": "SovereignCentralBank"
+              }
+            },
+            {
+              "AssetCountryOfOrigin": {
+                "assetCountryOfOrigin": "US"
+              }
+            },
+            {
+              "CurrencyCodeEnum": "USD"
+            }
+          ]
+        }
+      },
+      "treatment": {
+        "valuationTreatment": {
+          "haircutPercentage": 0.02
+        },
+        "isIncluded": true
+      }
+    }
+  ]
+}

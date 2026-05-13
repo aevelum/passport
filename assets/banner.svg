@@ -1,87 +1,98 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" fill="none">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#FAFAFB"/>
+      <stop stop-color="#F8FAFC"/>
       <stop offset="100%" stop-color="#EEF2F4"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0F766E"/>
-      <stop offset="100%" stop-color="#2563EB"/>
+    <linearGradient id="iconSurface" x1="8" y1="8" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#EEF2F4"/>
     </linearGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0F766E" stop-opacity="0.38"/>
-      <stop offset="100%" stop-color="#2563EB" stop-opacity="0.16"/>
+    <linearGradient id="globeNavy" x1="14" y1="14" x2="74" y2="74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F3A"/>
+      <stop offset="100%" stop-color="#07111A"/>
     </linearGradient>
+    <linearGradient id="linkLine" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#BD9B6B" stop-opacity="0.48"/>
+      <stop offset="100%" stop-color="#5F6673" stop-opacity="0.18"/>
+    </linearGradient>
+    <clipPath id="globeInterior">
+      <circle cx="44" cy="44" r="29"/>
+    </clipPath>
   </defs>
 
   <rect width="1280" height="640" fill="url(#bg)"/>
 
-  <g stroke="#CBD5E1" stroke-width="0.5" opacity="0.35">
+  <g stroke="#CBD5E1" stroke-width="0.5" opacity="0.32">
     <line x1="0" y1="320" x2="1280" y2="320"/>
     <line x1="640" y1="0" x2="640" y2="640"/>
   </g>
 
   <g transform="translate(80, 195)">
-    <rect width="88" height="88" rx="14" fill="url(#accent)"/>
-    <path d="M27 48 C38 29 57 29 68 48" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <path d="M27 48 C38 67 57 67 68 48" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <circle cx="48" cy="48" r="9" fill="white"/>
+    <rect x="4" y="4" width="80" height="80" rx="16" fill="url(#iconSurface)"/>
+    <rect x="3" y="3" width="82" height="82" rx="17" stroke="#CBD5E1" stroke-opacity="0.95" stroke-width="2"/>
+    <g clip-path="url(#globeInterior)">
+      <path d="M44 12 C30 27 30 61 44 76 C58 61 58 27 44 12" stroke="#0B1F3A" stroke-opacity="0.18" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M16 44 H72" stroke="#BD9B6B" stroke-width="5.2"/>
+      <path d="M22 33 H66" stroke="#BD9B6B" stroke-opacity="0.82" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M22 55 H66" stroke="#BD9B6B" stroke-opacity="0.82" stroke-width="4.2" stroke-linecap="round"/>
+    </g>
+    <circle cx="44" cy="44" r="29" stroke="url(#globeNavy)" stroke-width="6"/>
   </g>
 
-  <text x="184" y="258" font-family="'SF Mono', 'Fira Code', 'JetBrains Mono', Menlo, Monaco, Consolas, monospace" font-size="52" font-weight="700">
-    <tspan fill="#111827">aevelum</tspan><tspan fill="url(#accent)"> passport</tspan>
-  </text>
+  <text x="184" y="258" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="52" font-weight="700" fill="#07111A">aevelum</text>
+  <text x="420" y="258" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="52" font-weight="700" fill="#BD9B6B">passport</text>
 
-  <text x="82" y="326" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="18" fill="#475569">
+  <text x="82" y="326" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="18" fill="#343741">
     Canton-native collateral capacity credentials
   </text>
 
-  <g font-family="'Inter', system-ui, sans-serif" font-size="15" fill="#64748B">
+  <g font-family="'Inter', system-ui, sans-serif" font-size="15" fill="#5F6673">
     <text x="82" y="384">Issue, present, reserve, revoke, and audit</text>
     <text x="82" y="408">repo pre-trade collateral capacity in Daml.</text>
   </g>
 
   <g transform="translate(730, 132)">
-    <rect x="148" y="118" width="224" height="160" rx="16" fill="white" stroke="#0F766E" stroke-width="1.5"/>
-    <text x="260" y="148" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="10" font-weight="700" fill="#0F766E" letter-spacing="1.4">PASSPORT ACCOUNT</text>
-    <rect x="176" y="172" width="76" height="36" rx="6" fill="#F8FAFC" stroke="#0F766E" stroke-width="1"/>
-    <text x="214" y="194" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#0F766E">Credential</text>
-    <rect x="268" y="172" width="76" height="36" rx="6" fill="#F8FAFC" stroke="#2563EB" stroke-width="1"/>
-    <text x="306" y="194" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#2563EB">Reserve</text>
-    <circle cx="260" cy="242" r="4" fill="#22C55E"/>
-    <text x="260" y="262" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="9" fill="#94A3B8">scoped disclosure</text>
+    <rect x="148" y="118" width="224" height="160" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="260" y="148" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="10" font-weight="700" fill="#0B1F3A" letter-spacing="1.4">PASSPORT ACCOUNT</text>
+    <rect x="176" y="172" width="76" height="36" rx="6" fill="#F8FAFC" stroke="#BD9B6B" stroke-width="1.2"/>
+    <text x="214" y="194" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#0B1F3A">Credential</text>
+    <rect x="268" y="172" width="76" height="36" rx="6" fill="#F8FAFC" stroke="#5F6673" stroke-width="1.2"/>
+    <text x="306" y="194" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#343741">Reserve</text>
+    <circle cx="260" cy="242" r="4" fill="#BD9B6B"/>
+    <text x="260" y="262" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="9" fill="#5F6673">scoped disclosure</text>
 
     <g font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="600">
       <g transform="translate(40, 68)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="white" stroke="#0F766E" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#0F766E">Holder</text>
+        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#FFFFFF" stroke="#BD9B6B" stroke-width="1.4"/>
+        <text y="4" text-anchor="middle" fill="#0B1F3A">Holder</text>
       </g>
       <g transform="translate(480, 68)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="white" stroke="#2563EB" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#2563EB">Dealer</text>
+        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.4"/>
+        <text y="4" text-anchor="middle" fill="#343741">Dealer</text>
       </g>
       <g transform="translate(40, 328)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="white" stroke="#0F766E" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#0F766E">Attester</text>
+        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#FFFFFF" stroke="#BD9B6B" stroke-width="1.4"/>
+        <text y="4" text-anchor="middle" fill="#0B1F3A">Attester</text>
       </g>
       <g transform="translate(480, 328)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="white" stroke="#2563EB" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#2563EB">Auditor</text>
+        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.4"/>
+        <text y="4" text-anchor="middle" fill="#343741">Auditor</text>
       </g>
     </g>
 
-    <g stroke="url(#edge)" stroke-width="1.5">
+    <g stroke="url(#linkLine)" stroke-width="1.6">
       <line x1="88" y1="78" x2="148" y2="144"/>
       <line x1="432" y1="78" x2="372" y2="144"/>
       <line x1="88" y1="318" x2="148" y2="252"/>
       <line x1="432" y1="318" x2="372" y2="252"/>
     </g>
 
-    <circle cx="120" cy="112" r="3" fill="#0F766E" opacity="0.55"/>
-    <circle cx="400" cy="112" r="3" fill="#2563EB" opacity="0.45"/>
-    <circle cx="120" cy="284" r="3" fill="#0F766E" opacity="0.45"/>
-    <circle cx="400" cy="284" r="3" fill="#2563EB" opacity="0.45"/>
+    <circle cx="120" cy="112" r="3" fill="#BD9B6B" opacity="0.75"/>
+    <circle cx="400" cy="112" r="3" fill="#5F6673" opacity="0.46"/>
+    <circle cx="120" cy="284" r="3" fill="#BD9B6B" opacity="0.62"/>
+    <circle cx="400" cy="284" r="3" fill="#5F6673" opacity="0.44"/>
   </g>
 
-  <rect x="0" y="634" width="1280" height="6" fill="url(#accent)" opacity="0.65"/>
+  <rect x="0" y="634" width="1280" height="6" fill="#BD9B6B" opacity="0.68"/>
 </svg>

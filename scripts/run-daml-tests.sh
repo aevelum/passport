@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 if ! command -v dpm >/dev/null 2>&1; then
-  echo "dpm CLI not found. Install DPM: curl https://get.digitalasset.com/install/install.sh | sh" >&2
+  echo "dpm CLI not found. Install DPM outside the default CI path and pin SDK 3.5.1-rc3." >&2
   exit 127
 fi
 

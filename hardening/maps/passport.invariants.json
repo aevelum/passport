@@ -1,0 +1,1372 @@
+{
+  "artifact": "passport_invariant_property_map",
+  "schemaVersion": "0.1.0",
+  "package": "aevelum-passport-foundation",
+  "scope": {
+    "source_root": ".",
+    "pinned_version": "git:HEAD",
+    "objective": "Harden Passport during development by keeping Canton ledger semantics, framework-neutral interop, generated artifacts, and release boundaries tied to explicit invariants and executable gates.",
+    "assumptions": [
+      "Daml templates remain the normative Canton ledger schema for this milestone.",
+      "FINOS CDM support means offline JSON-schema conformance for generated collateral eligibility artifacts, not FINOS certification, Rosetta Engine execution, or CDM eligibility-engine execution.",
+      "Default PR CI must not fetch network resources after GitHub platform checkout; dependency and DPM toolchains are provided by a pre-baked offline runner.",
+      "The CDM schema manifest provides committed local integrity for reviewed schema files, not upstream authenticity when schema and manifest are changed together."
+    ],
+    "source_inventory": [
+      {
+        "path": "AGENTS.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Repository-level instructions that direct agents to repo-local skills and hardening gates."
+      },
+      {
+        "path": ".agents/skills/passport-hardening-loop/SKILL.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Codex-discoverable repo-local hardening skill."
+      },
+      {
+        "path": ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Codex app metadata for repo-local skill discovery and implicit invocation."
+      },
+      {
+        "path": ".agents/skills/passport-ui-design-system/SKILL.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Codex-discoverable repo-local UI and brand design skill."
+      },
+      {
+        "path": ".agents/skills/passport-ui-design-system/agents/openai.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Codex app metadata for UI design skill discovery and implicit invocation."
+      },
+      {
+        "path": "design/tokens/colors.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Machine-readable institutional finance color tokens."
+      },
+      {
+        "path": "docs/08_brand_ui_system.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Human-readable brand and UI usage rules for future frontend development."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "breakdown",
+        "notes": "Normative templates, choices, parties, and state-transition guards."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/Types.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.domain-types",
+        "status": "semantics",
+        "notes": "Domain enums, identifiers, amount helpers, and non-goal boundary comments."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Happy-path and lifecycle Daml Script coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Visibility and scoped audit disclosure negative coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Reservation amount, lifecycle, execution instruction, and dispute coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Revocation, expiry, and supersession coverage."
+      },
+      {
+        "path": "interop/core/adapter.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "breakdown",
+        "notes": "Adapter plugin contract and shape validation."
+      },
+      {
+        "path": "interop/context.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Default adapter context, resolvers, and security policy."
+      },
+      {
+        "path": "interop/registry.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.registry",
+        "status": "breakdown",
+        "notes": "Static plugin registry."
+      },
+      {
+        "path": "interop/runner.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Offline generation and validation runner."
+      },
+      {
+        "path": "interop/plugins/cdm/index.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-plugin",
+        "status": "breakdown",
+        "notes": "CDM artifact generation, validation, and negative case."
+      },
+      {
+        "path": "interop/plugins/cdm/vendor.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-vendor",
+        "status": "breakdown",
+        "notes": "Explicit CDM schema refresh and manifest verification."
+      },
+      {
+        "path": "scripts/ci.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Default local CI command order, package check, and freshness diff gate."
+      },
+      {
+        "path": "scripts/gates.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Repository structure and generated artifact gate."
+      },
+      {
+        "path": "scripts/package.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.release.package",
+        "status": "breakdown",
+        "notes": "Review archive source selection."
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Default GitHub PR workflow and offline runner contract."
+      },
+      {
+        "path": "package.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "NPM script graph for local and default CI commands."
+      },
+      {
+        "path": "package-lock.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned npm dependency graph and AJV transitive exception evidence."
+      },
+      {
+        "path": "multi-package.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "DPM multi-package build root used by CI."
+      },
+      {
+        "path": "packages/passport-core/daml.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned core DPM package configuration."
+      },
+      {
+        "path": "packages/passport-tests/daml.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned Daml test package configuration."
+      },
+      {
+        "path": "scripts/generated-time.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Shared deterministic generated timestamp helper."
+      },
+      {
+        "path": "scripts/run-daml-tests.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "DPM build, Daml Script, and coverage runner."
+      },
+      {
+        "path": "scripts/daml-coverage-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Daml coverage parser and threshold gate."
+      },
+      {
+        "path": "scripts/canton-smoke.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Local Canton sandbox smoke gate."
+      },
+      {
+        "path": "scripts/export-demo-transcript.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Generated demo transcript writer."
+      },
+      {
+        "path": "scripts/interop-generate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Interop artifact generation command wrapper."
+      },
+      {
+        "path": "scripts/interop-validate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Interop validation command wrapper."
+      },
+      {
+        "path": "scripts/interop-vendor-cdm.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-vendor",
+        "status": "breakdown",
+        "notes": "Explicit networked CDM schema refresh wrapper."
+      },
+      {
+        "path": "hardening/maps/passport.invariants.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Invariant/property map source of truth."
+      },
+      {
+        "path": "hardening/frontiers/passport.frontier.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Generated hardening frontier."
+      },
+      {
+        "path": "hardening/policies/architecture-rules.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Architecture rule policy consumed by hardening gate."
+      },
+      {
+        "path": "hardening/rounds/round-0001.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "First hardening round record."
+      },
+      {
+        "path": "hardening/rounds/round-0002.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Offline CI enforcement hardening round record."
+      },
+      {
+        "path": "hardening/change-log.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Hardening change log."
+      },
+      {
+        "path": "hardening/scripts/lib.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening map/frontier validation library and source-inventory coverage gate."
+      },
+      {
+        "path": "hardening/scripts/validate-map.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening map validation command."
+      },
+      {
+        "path": "hardening/scripts/score-frontier.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening frontier scoring command."
+      },
+      {
+        "path": "hardening/scripts/select-round.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening round selection command."
+      },
+      {
+        "path": "hardening/scripts/hardening-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Architecture, offline CI, dependency exception, and payload purity gate."
+      }
+    ]
+  },
+  "frontier": {
+    "round_id": "round-0002",
+    "selected_surfaces": [
+      "inv.ci.default-green-bar",
+      "prop.ci.default-ci-offline",
+      "prop.ci.generated-artifacts-current",
+      "inv.cdm.schema-reproducibility"
+    ],
+    "selection_reason": "Round 0002 closes enforcement gaps found in PR review by making default CI offline, deterministic, freshness-gated, and explicitly inventoried in the hardening map.",
+    "kill_gates": [
+      "hardening:gate fails if workflow YAML, shell scripts, package scripts, or repo-authored JS introduce network primitives outside the explicit CDM vendor refresh module.",
+      "hardening:map fails if hardening-sensitive tracked files are absent from source_inventory.",
+      "npm run ci fails if regenerated tracked artifacts, hardening maps, or hardening frontiers differ from committed output.",
+      "hardening:gate fails if the AJV require-from-string exception is no longer pinned as the expected transitive validator dependency."
+    ]
+  },
+  "tree": {
+    "assets": [
+      {
+        "id": "asset.canton-ledger",
+        "name": "Canton Ledger Schema",
+        "components": [
+          {
+            "id": "cmp.daml.ledger-schema",
+            "name": "Passport ledger templates and choices",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+            ],
+            "functions": [
+              {
+                "id": "fn.daml.request-capacity-credential",
+                "name": "RequestCapacityCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.issue-capacity-credential",
+                "name": "IssueCapacityCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.present-to-verifier",
+                "name": "PresentToVerifier",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.reserve-from-presentation",
+                "name": "ReserveFromPresentation",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.revoke-credential",
+                "name": "RevokeCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.grant-audit-disclosure",
+                "name": "GrantAuditDisclosureFromAccount",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.daml.authorization",
+                "statement": "Only the intended parties can create, present, reserve, revoke, or disclose credential state.",
+                "properties": [
+                  {
+                    "id": "prop.daml.controllers-match-authority",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Every externally relevant choice is controlled by the holder, attester, verifier, or publisher role that owns the transition.",
+                    "enforcing_functions": [
+                      "fn.daml.request-capacity-credential",
+                      "fn.daml.issue-capacity-credential",
+                      "fn.daml.present-to-verifier",
+                      "fn.daml.reserve-from-presentation",
+                      "fn.daml.revoke-credential",
+                      "fn.daml.grant-audit-disclosure"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.visibility-minimized",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Credential and audit data is visible only to signatories, intended observers, or scoped auditors.",
+                    "enforcing_functions": [
+                      "fn.daml.present-to-verifier",
+                      "fn.daml.grant-audit-disclosure"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "inv.daml.capacity-conservation",
+                "statement": "Reservation transitions cannot create more reservable capacity than the presented credential permits.",
+                "properties": [
+                  {
+                    "id": "prop.daml.reservation-positive-bounded",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "A reservation must be positive and cannot exceed the presented reservable amount.",
+                    "enforcing_functions": [
+                      "fn.daml.reserve-from-presentation"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.residual-capacity-subtractive",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Residual credentials are minted only for presented reservable amount minus reserved amount.",
+                    "enforcing_functions": [
+                      "fn.daml.reserve-from-presentation"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.daml.domain-types",
+            "name": "Passport domain types",
+            "mapping_depth": "semantics",
+            "source_files": [
+              "packages/passport-core/daml/Aevelum/Passport/Types.daml"
+            ],
+            "functions": [
+              {
+                "id": "fn.daml.positive",
+                "name": "positive",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Types.daml"
+              },
+              {
+                "id": "fn.daml.non-negative",
+                "name": "nonNegative",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Types.daml"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.daml.domain-boundary",
+                "statement": "The foundation package models collateral capacity credentials only, without expanding into custody, settlement, legal title, credit approval, or proof systems.",
+                "properties": [
+                  {
+                    "id": "prop.daml.non-goal-boundary-explicit",
+                    "type": "assumption",
+                    "severity": "medium",
+                    "statement": "New domain types must stay within the collateral credential account boundary unless an ADR updates the scope.",
+                    "enforcing_functions": [
+                      "fn.daml.positive",
+                      "fn.daml.non-negative"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.daml.tests",
+            "name": "Daml Script coverage",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml"
+            ],
+            "functions": [
+              {
+                "id": "fn.test.daml-suite",
+                "name": "Daml Script suite",
+                "source_ref": "packages/passport-tests/daml"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.tests.external-coverage",
+                "statement": "External templates and domain choices stay covered by Daml Script tests.",
+                "properties": [
+                  {
+                    "id": "prop.tests.coverage-gate-required",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The Daml test command must fail if external template or domain-choice coverage drops below 100%.",
+                    "enforcing_functions": [
+                      "fn.test.daml-suite"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "asset.framework-interop",
+        "name": "Framework-Neutral Interop",
+        "components": [
+          {
+            "id": "cmp.interop.adapter-core",
+            "name": "Adapter contract and context",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "interop/core/adapter.js",
+              "interop/context.js"
+            ],
+            "functions": [
+              {
+                "id": "fn.interop.define-plugin",
+                "name": "defineAdapterPlugin",
+                "source_ref": "interop/core/adapter.js"
+              },
+              {
+                "id": "fn.interop.default-context",
+                "name": "createDefaultAdapterContext",
+                "source_ref": "interop/context.js"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.interop.adapter-contract",
+                "statement": "Every framework adapter exposes the same minimal generate and validate contract without arbitrary execution privileges.",
+                "properties": [
+                  {
+                    "id": "prop.interop.plugin-shape-checked",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Plugins must define id, framework, frameworkVersion, outputFormat, artifactTypes, generate, and validate before registration.",
+                    "enforcing_functions": [
+                      "fn.interop.define-plugin"
+                    ]
+                  },
+                  {
+                    "id": "prop.interop.security-policy-explicit",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The adapter context must state that dynamic plugins, eval, and network access in CI are disabled.",
+                    "enforcing_functions": [
+                      "fn.interop.default-context"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.interop.registry",
+            "name": "Static adapter registry",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "interop/registry.js"
+            ],
+            "functions": [
+              {
+                "id": "fn.interop.list-adapters",
+                "name": "listAdapters",
+                "source_ref": "interop/registry.js"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.interop.static-plugin-boundary",
+                "statement": "Repo-authored framework adapters are registered statically and cannot be loaded from remote code, arbitrary paths, runtime strings, or dynamic execution primitives.",
+                "properties": [
+                  {
+                    "id": "prop.interop.registry-static",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "The repo-authored adapter registry imports known plugins statically, exports a frozen registry, and does not use dynamic plugin execution.",
+                    "enforcing_functions": [
+                      "fn.interop.list-adapters"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.interop.runner",
+            "name": "Interop artifact runner",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "interop/runner.js",
+              "scripts/interop-generate.mjs",
+              "scripts/interop-validate.mjs"
+            ],
+            "functions": [
+              {
+                "id": "fn.interop.generate-artifacts",
+                "name": "generateInteropArtifacts",
+                "source_ref": "interop/runner.js"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.interop.provenance-separation",
+                "statement": "Framework payloads remain clean while Passport provenance is recorded in adapter metadata and reports.",
+                "properties": [
+                  {
+                    "id": "prop.interop.payloads-clean",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Generated framework payload files must not contain Passport provenance keys.",
+                    "enforcing_functions": [
+                      "fn.interop.generate-artifacts"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.interop.cdm-plugin",
+            "name": "CDM collateral eligibility plugin",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "interop/plugins/cdm/index.js"
+            ],
+            "functions": [
+              {
+                "id": "fn.cdm.generate",
+                "name": "generate",
+                "source_ref": "interop/plugins/cdm/index.js"
+              },
+              {
+                "id": "fn.cdm.validate",
+                "name": "validate",
+                "source_ref": "interop/plugins/cdm/index.js"
+              },
+              {
+                "id": "fn.cdm.negative-cases",
+                "name": "validateNegativeCases",
+                "source_ref": "interop/plugins/cdm/index.js"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.cdm.schema-conformance",
+                "statement": "The CDM plugin generates Passport collateral eligibility artifacts and validates their JSON shape against pinned FINOS CDM 6.0 schemas without executing a CDM eligibility engine.",
+                "properties": [
+                  {
+                    "id": "prop.cdm.three-root-artifacts",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "EligibleCollateralSpecification, EligibilityQuery, and CheckEligibilityResult are generated from one Passport repo pre-trade sample.",
+                    "enforcing_functions": [
+                      "fn.cdm.generate"
+                    ]
+                  },
+                  {
+                    "id": "prop.cdm.negative-case-fails",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The validator must prove at least one malformed CDM payload fails schema validation.",
+                    "enforcing_functions": [
+                      "fn.cdm.negative-cases"
+                    ]
+                  },
+                  {
+                    "id": "prop.cdm.decision-mirror-warning",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "CheckEligibilityResult reports must warn that the Passport sample eligibility decision is mirrored and no CDM eligibility engine is executed.",
+                    "enforcing_functions": [
+                      "fn.cdm.generate"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.interop.cdm-vendor",
+            "name": "CDM schema vendor manifest",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "interop/plugins/cdm/vendor.js",
+              "scripts/interop-vendor-cdm.mjs"
+            ],
+            "functions": [
+              {
+                "id": "fn.cdm.verify-manifest",
+                "name": "verifySchemaManifest",
+                "source_ref": "interop/plugins/cdm/vendor.js"
+              },
+              {
+                "id": "fn.cdm.vendor-schemas",
+                "name": "vendorCdmSchemas",
+                "source_ref": "interop/plugins/cdm/vendor.js"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.cdm.schema-reproducibility",
+                "statement": "CDM schema validation is offline and reproducible from committed plugin-scoped schema files whose local manifest hashes and schema-set digest are verified before validation.",
+                "properties": [
+                  {
+                    "id": "prop.cdm.hashes-verified-before-validation",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "Committed schema hashes and the schema-set digest must be verified before AJV registers schemas for validation; this is local integrity, not upstream authenticity.",
+                    "enforcing_functions": [
+                      "fn.cdm.verify-manifest"
+                    ]
+                  },
+                  {
+                    "id": "prop.cdm.network-only-explicit-vendor",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "Repo-authored network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or CI.",
+                    "enforcing_functions": [
+                      "fn.cdm.vendor-schemas"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "asset.ci-release",
+        "name": "CI and Release Boundary",
+        "components": [
+          {
+            "id": "cmp.agent.repo-guidance",
+            "name": "Repo-local agent guidance",
+            "mapping_depth": "semantics",
+            "source_files": [
+              "AGENTS.md",
+              ".agents/skills/passport-hardening-loop/SKILL.md",
+              ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+              ".agents/skills/passport-ui-design-system/SKILL.md",
+              ".agents/skills/passport-ui-design-system/agents/openai.yaml",
+              "design/tokens/colors.json",
+              "docs/08_brand_ui_system.md"
+            ],
+            "functions": [
+              {
+                "id": "fn.agent.skill-discovery",
+                "name": "Codex repo skill discovery",
+                "source_ref": ".agents/skills/passport-hardening-loop/SKILL.md"
+              },
+              {
+                "id": "fn.agent.project-instructions",
+                "name": "Codex project instructions",
+                "source_ref": "AGENTS.md"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.agent.repo-local-skill-discovery",
+                "statement": "Skills used for this repo are checked into the repository in Codex's repo skill discovery path and are referenced by project instructions.",
+                "properties": [
+                  {
+                    "id": "prop.agent.skill-under-dot-agents",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The Passport hardening skill must live under `.agents/skills` so other Codex agents launched in the repo can discover it.",
+                    "enforcing_functions": [
+                      "fn.agent.skill-discovery"
+                    ]
+                  },
+                  {
+                    "id": "prop.agent.agents-md-requires-skill",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Root AGENTS.md must instruct future agents when to use the Passport hardening loop.",
+                    "enforcing_functions": [
+                      "fn.agent.project-instructions"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.ci.gates",
+            "name": "Default CI and gates",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "scripts/ci.sh",
+              ".github/workflows/ci.yml",
+              "package.json",
+              "package-lock.json",
+              "multi-package.yaml",
+              "packages/passport-core/daml.yaml",
+              "packages/passport-tests/daml.yaml",
+              "scripts/generated-time.mjs",
+              "scripts/gates.mjs",
+              "scripts/run-daml-tests.sh",
+              "scripts/daml-coverage-gate.mjs",
+              "scripts/canton-smoke.sh",
+              "scripts/export-demo-transcript.mjs",
+              "hardening/maps/passport.invariants.json",
+              "hardening/frontiers/passport.frontier.json",
+              "hardening/policies/architecture-rules.json",
+              "hardening/scripts/lib.mjs",
+              "hardening/scripts/validate-map.mjs",
+              "hardening/scripts/score-frontier.mjs",
+              "hardening/scripts/select-round.mjs",
+              "hardening/scripts/hardening-gate.mjs"
+            ],
+            "functions": [
+              {
+                "id": "fn.ci.local-ci",
+                "name": "npm run ci",
+                "source_ref": "scripts/ci.sh"
+              },
+              {
+                "id": "fn.ci.local-gate",
+                "name": "npm run gate",
+                "source_ref": "scripts/gates.mjs"
+              },
+              {
+                "id": "fn.ci.github-workflow",
+                "name": "GitHub offline PR workflow",
+                "source_ref": ".github/workflows/ci.yml"
+              },
+              {
+                "id": "fn.ci.generated-time",
+                "name": "getGeneratedAt",
+                "source_ref": "scripts/generated-time.mjs"
+              },
+              {
+                "id": "fn.ci.source-inventory-gate",
+                "name": "validateMap hardening-sensitive source inventory coverage",
+                "source_ref": "hardening/scripts/lib.mjs"
+              },
+              {
+                "id": "fn.ci.network-policy-gate",
+                "name": "checkDefaultCiNetworkPolicy",
+                "source_ref": "hardening/scripts/hardening-gate.mjs"
+              },
+              {
+                "id": "fn.ci.dependency-exception-gate",
+                "name": "checkAjvDynamicExecutionDependencyException",
+                "source_ref": "hardening/scripts/hardening-gate.mjs"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.ci.default-green-bar",
+                "statement": "The default PR and local CI paths run from a pre-baked offline toolchain, cover generated artifacts, hardening controls, repository gates, packaging, Daml tests, Canton smoke, and freshness checks.",
+                "properties": [
+                  {
+                    "id": "prop.ci.hardening-gate-in-ci",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "npm run ci must execute npm run hardening:gate before Daml and Canton smoke tests.",
+                    "enforcing_functions": [
+                      "fn.ci.local-ci"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.default-ci-offline",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "Default PR CI must not run networked bootstrap, dependency install, schema refresh, or arbitrary network primitives after GitHub platform checkout.",
+                    "enforcing_functions": [
+                      "fn.ci.github-workflow",
+                      "fn.ci.network-policy-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.generated-artifacts-current",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Default CI must fail when regenerated tracked artifacts, invariant maps, or frontiers differ from committed output.",
+                    "enforcing_functions": [
+                      "fn.ci.local-ci",
+                      "fn.ci.generated-time"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.source-inventory-complete",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Every hardening-sensitive tracked workflow, package, Daml, interop, script, policy, map, frontier, round, and change-log file must appear in the invariant map source inventory.",
+                    "enforcing_functions": [
+                      "fn.ci.source-inventory-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.package-in-ci",
+                    "type": "guarantee",
+                    "severity": "medium",
+                    "statement": "npm run ci must run npm run package so release archive regressions cannot bypass the default green bar.",
+                    "enforcing_functions": [
+                      "fn.ci.local-ci"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.ajv-exception-pinned",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The AJV transitive require-from-string dependency is allowed only as the pinned package-lock edge from AJV and is not a repo-authored dynamic execution mechanism.",
+                    "enforcing_functions": [
+                      "fn.ci.dependency-exception-gate"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.release.package",
+            "name": "Review archive package",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "scripts/package.mjs"
+            ],
+            "functions": [
+              {
+                "id": "fn.release.package",
+                "name": "npm run package",
+                "source_ref": "scripts/package.mjs"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.release.reviewable-archive",
+                "statement": "The generated release archive includes reviewable source, docs, hardening artifacts, and generated interop artifacts while excluding build/cache output.",
+                "properties": [
+                  {
+                    "id": "prop.release.git-ls-files-only",
+                    "type": "guarantee",
+                    "severity": "medium",
+                    "statement": "Packaging must use tracked files and exclude Daml build coverage output.",
+                    "enforcing_functions": [
+                      "fn.release.package"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "catalog": {
+    "tests": [
+      {
+        "id": "test.daml.coverage-suite",
+        "kind": "daml-script",
+        "command": "npm run daml:test",
+        "status": "active",
+        "covers": [
+          "inv.daml.authorization",
+          "prop.daml.controllers-match-authority",
+          "prop.daml.visibility-minimized",
+          "inv.daml.capacity-conservation",
+          "prop.daml.reservation-positive-bounded",
+          "prop.daml.residual-capacity-subtractive",
+          "inv.tests.external-coverage",
+          "prop.tests.coverage-gate-required"
+        ]
+      },
+      {
+        "id": "test.interop.validate",
+        "kind": "node-script",
+        "command": "npm run interop:validate",
+        "status": "active",
+        "covers": [
+          "inv.interop.provenance-separation",
+          "prop.interop.payloads-clean",
+          "inv.cdm.schema-conformance",
+          "prop.cdm.three-root-artifacts",
+          "prop.cdm.negative-case-fails",
+          "inv.cdm.schema-reproducibility",
+          "prop.cdm.hashes-verified-before-validation",
+          "prop.cdm.decision-mirror-warning"
+        ]
+      },
+      {
+        "id": "test.hardening.architecture-gate",
+        "kind": "node-script",
+        "command": "npm run hardening:gate",
+        "status": "active",
+        "covers": [
+          "inv.agent.repo-local-skill-discovery",
+          "prop.agent.skill-under-dot-agents",
+          "prop.agent.agents-md-requires-skill",
+          "inv.interop.adapter-contract",
+          "prop.interop.plugin-shape-checked",
+          "prop.interop.security-policy-explicit",
+          "inv.interop.static-plugin-boundary",
+          "prop.interop.registry-static",
+          "prop.cdm.network-only-explicit-vendor",
+          "inv.ci.default-green-bar",
+          "prop.ci.hardening-gate-in-ci",
+          "inv.release.reviewable-archive",
+          "prop.release.git-ls-files-only",
+          "prop.ci.default-ci-offline",
+          "prop.ci.source-inventory-complete",
+          "prop.ci.ajv-exception-pinned"
+        ]
+      },
+      {
+        "id": "test.canton.smoke",
+        "kind": "canton-sandbox",
+        "command": "npm run canton:smoke",
+        "status": "active",
+        "covers": [
+          "inv.daml.authorization",
+          "inv.daml.capacity-conservation",
+          "inv.ci.default-green-bar"
+        ]
+      },
+      {
+        "id": "test.ci.full",
+        "kind": "shell-script",
+        "command": "npm run ci",
+        "status": "active",
+        "covers": [
+          "inv.ci.default-green-bar",
+          "prop.ci.hardening-gate-in-ci",
+          "prop.ci.default-ci-offline",
+          "prop.ci.generated-artifacts-current",
+          "prop.ci.source-inventory-complete",
+          "prop.ci.package-in-ci",
+          "prop.release.git-ls-files-only"
+        ]
+      }
+    ],
+    "breakdowns": [
+      {
+        "id": "bd.agent.skill-not-discovered",
+        "component_id": "cmp.agent.repo-guidance",
+        "property_id": "prop.agent.skill-under-dot-agents",
+        "attacker_control": "none",
+        "severity": "high",
+        "status": "guarded",
+        "description": "A hardening skill is stored outside Codex's repo skill discovery path, so future agents do not see it automatically.",
+        "evidence": [
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [
+          "xp.agent.missed-hardening-loop"
+        ],
+        "kill_gate": "hardening:gate requires `.agents/skills/passport-hardening-loop/SKILL.md` and AGENTS.md references."
+      },
+      {
+        "id": "bd.daml.unauthorized-transition",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.controllers-match-authority",
+        "attacker_control": "direct",
+        "severity": "high",
+        "status": "covered",
+        "description": "A party outside the intended holder, attester, verifier, or publisher set attempts to exercise a state-changing choice.",
+        "evidence": [
+          "test.daml.coverage-suite"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.unauthorized-reservation"
+        ],
+        "kill_gate": "Daml Script negative tests and coverage gate fail when external authorization coverage drops."
+      },
+      {
+        "id": "bd.daml.capacity-over-reservation",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.reservation-positive-bounded",
+        "attacker_control": "direct",
+        "severity": "high",
+        "status": "covered",
+        "description": "A verifier tries to reserve more than the presented reservable amount.",
+        "evidence": [
+          "test.daml.coverage-suite"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.capacity-inflation"
+        ],
+        "kill_gate": "Reservation negative tests must reject over-reservation."
+      },
+      {
+        "id": "bd.interop.dynamic-plugin-loading",
+        "component_id": "cmp.interop.registry",
+        "property_id": "prop.interop.registry-static",
+        "attacker_control": "indirect",
+        "severity": "critical",
+        "status": "guarded",
+        "description": "A future adapter change loads framework plugins from runtime strings, remote code, or arbitrary paths.",
+        "evidence": [
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [
+          "xp.interop.remote-code"
+        ],
+        "kill_gate": "hardening:gate rejects dynamic imports, eval-style execution, and non-static registry shape."
+      },
+      {
+        "id": "bd.cdm.schema-substitution",
+        "component_id": "cmp.interop.cdm-vendor",
+        "property_id": "prop.cdm.hashes-verified-before-validation",
+        "attacker_control": "indirect",
+        "severity": "critical",
+        "status": "guarded",
+        "description": "A committed schema file changes without matching local manifest hashes or schema-set digest, weakening offline validation.",
+        "evidence": [
+          "test.interop.validate",
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [
+          "xp.cdm.false-conformance"
+        ],
+        "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration."
+      },
+      {
+        "id": "bd.interop.payload-provenance-leak",
+        "component_id": "cmp.interop.runner",
+        "property_id": "prop.interop.payloads-clean",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Passport metadata is embedded inside framework payloads instead of adapter reports.",
+        "evidence": [
+          "test.interop.validate",
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [
+          "xp.interop.dirty-framework-payload"
+        ],
+        "kill_gate": "hardening:gate scans generated CDM payload keys for Passport provenance fields."
+      },
+      {
+        "id": "bd.ci.network-fetch-default",
+        "component_id": "cmp.ci.gates",
+        "property_id": "prop.cdm.network-only-explicit-vendor",
+        "attacker_control": "indirect",
+        "severity": "critical",
+        "status": "guarded",
+        "description": "A default PR or local CI command fetches schemas, dependencies, toolchains, plugin code, or other mutable network resources.",
+        "evidence": [
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.ci.unpinned-input"
+        ],
+        "kill_gate": "hardening:gate scans workflow YAML, shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module and offline npm ci."
+      },
+      {
+        "id": "bd.ci.generated-artifact-staleness",
+        "component_id": "cmp.ci.gates",
+        "property_id": "prop.ci.generated-artifacts-current",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Generated reports, maps, or frontiers are refreshed during CI but stale committed copies still pass.",
+        "evidence": [
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.ci.stale-artifacts"
+        ],
+        "kill_gate": "npm run ci finishes with git diff --exit-code over tracked artifacts, hardening maps, and hardening frontiers."
+      }
+    ],
+    "exploit_paths": [
+      {
+        "id": "xp.agent.missed-hardening-loop",
+        "breakdown_id": "bd.agent.skill-not-discovered",
+        "impact": "Future agents make hardening-sensitive changes without using the invariant map, frontier, and change-log workflow.",
+        "preconditions": [
+          "Repo-local skills are not stored under `.agents/skills` or root AGENTS.md does not point agents to them."
+        ],
+        "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.daml.unauthorized-reservation",
+        "breakdown_id": "bd.daml.unauthorized-transition",
+        "impact": "Unauthorized reservation or disclosure of credential-derived capacity state.",
+        "preconditions": [
+          "A non-controller party can exercise a ledger choice."
+        ],
+        "status": "killed-by-tests"
+      },
+      {
+        "id": "xp.daml.capacity-inflation",
+        "breakdown_id": "bd.daml.capacity-over-reservation",
+        "impact": "Reservable collateral capacity can be inflated beyond the attested amount.",
+        "preconditions": [
+          "ReserveFromPresentation accepts reservedAmount greater than presentedReservableAmount."
+        ],
+        "status": "killed-by-tests"
+      },
+      {
+        "id": "xp.interop.remote-code",
+        "breakdown_id": "bd.interop.dynamic-plugin-loading",
+        "impact": "Interop validation executes unreviewed framework adapter code.",
+        "preconditions": [
+          "The registry accepts runtime plugin paths or code strings."
+        ],
+        "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.cdm.false-conformance",
+        "breakdown_id": "bd.cdm.schema-substitution",
+        "impact": "Generated artifacts appear conformant against altered or incomplete schemas.",
+        "preconditions": [
+          "Schema files can be changed without manifest hash verification."
+        ],
+        "status": "guarded-by-manifest"
+      },
+      {
+        "id": "xp.interop.dirty-framework-payload",
+        "breakdown_id": "bd.interop.payload-provenance-leak",
+        "impact": "Framework artifacts stop being pure CDM objects and become Passport-specific envelopes.",
+        "preconditions": [
+          "Generated payload files include Passport metadata keys."
+        ],
+        "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.ci.unpinned-input",
+        "breakdown_id": "bd.ci.network-fetch-default",
+        "impact": "Default CI depends on mutable remote data.",
+        "preconditions": [
+          "A CI command fetches network content outside explicit vendoring."
+        ],
+        "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.ci.stale-artifacts",
+        "breakdown_id": "bd.ci.generated-artifact-staleness",
+        "impact": "Reviewers merge stale generated evidence that no longer matches source-controlled generators or hardening policy.",
+        "preconditions": [
+          "A generator rewrites tracked artifacts and CI does not diff the regenerated output."
+        ],
+        "status": "guarded-by-ci-diff-gate"
+      }
+    ],
+    "trust_boundaries": [
+      {
+        "id": "tb.agent-discovery",
+        "name": "Repo-local agent skill discovery",
+        "component_ids": [
+          "cmp.agent.repo-guidance"
+        ],
+        "description": "Repository instructions and skills must be discoverable by agents launched inside the repo."
+      },
+      {
+        "id": "tb.ledger.party-authority",
+        "name": "Ledger party authority",
+        "component_ids": [
+          "cmp.daml.ledger-schema"
+        ],
+        "description": "Daml controllers and signatories decide who can mutate ledger state."
+      },
+      {
+        "id": "tb.interop.plugin-boundary",
+        "name": "Interop plugin boundary",
+        "component_ids": [
+          "cmp.interop.adapter-core",
+          "cmp.interop.registry",
+          "cmp.interop.cdm-plugin"
+        ],
+        "description": "Framework adapters convert Passport samples into external framework artifacts without runtime plugin loading."
+      },
+      {
+        "id": "tb.vendor-refresh",
+        "name": "Explicit schema vendor refresh",
+        "component_ids": [
+          "cmp.interop.cdm-vendor"
+        ],
+        "description": "Network access is isolated to an explicit schema refresh command and pinned by a manifest."
+      },
+      {
+        "id": "tb.release-review",
+        "name": "Review archive boundary",
+        "component_ids": [
+          "cmp.release.package",
+          "cmp.ci.gates"
+        ],
+        "description": "The default CI and review package should contain deterministic source and review artifacts, not stale generated output, build caches, or local logs."
+      }
+    ]
+  }
+}

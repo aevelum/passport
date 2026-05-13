@@ -48,6 +48,9 @@ Auditor receives only scoped audit metadata.
 
 ```text
 multi-package.yaml
+AGENTS.md
+.agents/
+  skills/passport-hardening-loop/SKILL.md
 packages/
   passport-core/
     daml.yaml
@@ -63,19 +66,41 @@ docs/
   03_collateral_capacity_credential.md
   04_repo_pretrade_workflow.md
   05_privacy_model.md
-  06_cdm_mapping_draft.md
+  06_interop_adapters.md
   07_non_goals.md
+  08_brand_ui_system.md
+design/
+  tokens/colors.json
+  change-log.md
+interop/
+  core/adapter.js
+  registry.js
+  runner.js
+  samples/repo-pretrade-passport-input.json
+  plugins/cdm/
+hardening/
+  maps/passport.invariants.json
+  frontiers/passport.frontier.json
+  policies/architecture-rules.json
+  rounds/round-0001.md
+  change-log.md
+  scripts/*.mjs
 scripts/
   gates.mjs
   daml-coverage-gate.mjs
   export-demo-transcript.mjs
-  export-cdm-mapping.mjs
+  interop-generate.mjs
+  interop-validate.mjs
+  interop-vendor-cdm.mjs
   run-daml-tests.sh
+  canton-smoke.sh
   ci.sh
   package.mjs
 artifacts/
   demo_transcript.json
-  cdm_mapping_draft.json
+  interop/report.json
+  hardening_report.json
+  hardening_map_report.json
   gate_report.json
 ```
 
@@ -85,13 +110,43 @@ artifacts/
 npm run ci
 ```
 
-This generates demo and CDM artifacts, runs structural gates, builds both DPM packages, runs Daml Script tests, and requires 100% coverage for Passport templates and domain choices. Generated `Archive` choices are excluded from the coverage threshold.
+This generates demo and interop artifacts, refreshes the hardening frontier, runs architecture and structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, loads the core DAR into a local Canton sandbox, builds the review package, and fails if tracked generated artifacts, hardening maps, or hardening frontiers are stale. Generated `Archive` choices are excluded from the coverage threshold.
+
+The repo-local hardening loop is discoverable to Codex agents through `.agents/skills/passport-hardening-loop/SKILL.md` and root `AGENTS.md`. To run only that lane:
+
+```bash
+npm run hardening:map
+npm run hardening:frontier
+npm run hardening:gate
+```
+
+The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates their JSON shape offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset. `CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
+
+```bash
+npm run interop:validate
+```
+
+To explicitly refresh the CDM plugin's vendored schema subset from FINOS:
+
+```bash
+npm run interop:vendor:cdm
+```
+
+To run only the local Canton sandbox smoke check:
+
+```bash
+npm run canton:smoke
+```
 
 To also create the review package:
 
 ```bash
 npm run all
 ```
+
+`npm run all` is an alias for `npm run ci` because package creation and freshness checks are now part of the default gate. Networked supply-chain checks such as `npm audit --json` are manual checks, not part of default offline PR CI.
+
+Default GitHub PR CI requires a pre-baked self-hosted runner labeled `passport-offline-ci` with Node 24.x, DPM SDK `3.5.1-rc3`, and an npm cache that can satisfy `package-lock.json` with `npm ci --offline --ignore-scripts --audit=false --fund=false`.
 
 ## Daml/Canton toolchain
 
