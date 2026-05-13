@@ -709,7 +709,7 @@
     "arch.agent.agents-md-points-to-skill AGENTS.md contains .agents/skills/passport-ui-design-system/SKILL.md",
     "arch.agent.agents-md-points-to-skill AGENTS.md contains npm run hardening:gate",
     "arch.agent.agents-md-points-to-skill AGENTS.md contains design/tokens/colors.json",
-    "arch.agent.agents-md-points-to-skill AGENTS.md contains Default CI must not fetch from the network",
+    "arch.agent.agents-md-points-to-skill AGENTS.md contains Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.",
     "arch.interop.static-registry interop/registry.js contains import { cdmPlugin } from './plugins/cdm/index.js';",
     "arch.interop.static-registry interop/registry.js contains export const adapterRegistry = Object.freeze([",
     "arch.interop.static-registry interop/registry.js contains cdmPlugin",

@@ -114,7 +114,7 @@
     "AGENTS.md contains .agents/skills/passport-ui-design-system/SKILL.md",
     "AGENTS.md contains design/tokens/colors.json",
     "AGENTS.md contains npm run hardening:gate",
-    "AGENTS.md contains Default CI must not fetch from the network",
+    "AGENTS.md contains Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.",
     ".agents/skills/passport-hardening-loop/SKILL.md contains Passport Hardening Loop",
     ".agents/skills/passport-hardening-loop/SKILL.md contains hardening/maps/passport.invariants.json",
     ".agents/skills/passport-hardening-loop/SKILL.md contains npm run hardening:gate",

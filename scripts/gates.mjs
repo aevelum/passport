@@ -182,7 +182,7 @@ checkContains('AGENTS.md', [
   '.agents/skills/passport-ui-design-system/SKILL.md',
   'design/tokens/colors.json',
   'npm run hardening:gate',
-  'Default CI must not fetch from the network'
+  'Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.'
 ]);
 
 checkContains('.agents/skills/passport-hardening-loop/SKILL.md', [

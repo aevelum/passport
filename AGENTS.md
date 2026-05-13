@@ -17,7 +17,7 @@
 
 - Keep Daml templates as the Canton ledger schema unless an explicit ADR and invariant-map update justify a change.
 - Keep interop framework-neutral: CDM is one static plugin, not repo-global special-case code.
-- Default CI must not fetch from the network.
+- Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.
 - Do not add dynamic plugin loading, eval-style execution, arbitrary plugin path resolution, or Passport provenance inside generated CDM payloads.
 
 ## Frontend And Brand
