@@ -10,4 +10,4 @@ This directory vendors the JSON Schema closure required by the Aevelum Passport 
 - Refresh command: `npm run interop:vendor:cdm`
 - Schema format: JSON Schema draft-04
 
-These files come from the FINOS Common Domain Model schema publication and are used here only for local generated-artifact validation.
+These files come from the FINOS Common Domain Model schema publication and are used here only for local generated-artifact validation. The committed manifest checks local file integrity and provides a schema-set digest for review; it is not upstream authenticity if schema files and the manifest are changed together.

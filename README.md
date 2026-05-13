@@ -110,7 +110,7 @@ artifacts/
 npm run ci
 ```
 
-This generates demo and interop artifacts, refreshes the hardening frontier, runs architecture and structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, and loads the core DAR into a local Canton sandbox. Generated `Archive` choices are excluded from the coverage threshold.
+This generates demo and interop artifacts, refreshes the hardening frontier, runs architecture and structural gates, builds both DPM packages, runs Daml Script tests, requires 100% coverage for Passport templates and domain choices, loads the core DAR into a local Canton sandbox, builds the review package, and fails if tracked generated artifacts, hardening maps, or hardening frontiers are stale. Generated `Archive` choices are excluded from the coverage threshold.
 
 The repo-local hardening loop is discoverable to Codex agents through `.agents/skills/passport-hardening-loop/SKILL.md` and root `AGENTS.md`. To run only that lane:
 
@@ -120,7 +120,7 @@ npm run hardening:frontier
 npm run hardening:gate
 ```
 
-The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates them offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset:
+The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates their JSON shape offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset. `CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
 
 ```bash
 npm run interop:validate
@@ -143,6 +143,10 @@ To also create the review package:
 ```bash
 npm run all
 ```
+
+`npm run all` is an alias for `npm run ci` because package creation and freshness checks are now part of the default gate. Networked supply-chain checks such as `npm audit --json` are manual checks, not part of default offline PR CI.
+
+Default GitHub PR CI requires a pre-baked self-hosted runner labeled `passport-offline-ci` with Node 24.x, DPM SDK `3.5.1-rc3`, and an npm cache that can satisfy `package-lock.json` with `npm ci --offline --ignore-scripts --audit=false --fund=false`.
 
 ## Daml/Canton toolchain
 

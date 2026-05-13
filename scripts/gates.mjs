@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { getGeneratedAt } from './generated-time.mjs';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const fail = [];
@@ -51,6 +52,9 @@ const damlSourceRoots = [
 
 const requiredFiles = [
   'multi-package.yaml',
+  '.github/workflows/ci.yml',
+  'package.json',
+  'package-lock.json',
   'packages/passport-core/daml.yaml',
   'packages/passport-tests/daml.yaml',
   coreTypes,
@@ -98,15 +102,19 @@ const requiredFiles = [
   'hardening/frontiers/passport.frontier.json',
   'hardening/policies/architecture-rules.json',
   'hardening/rounds/round-0001.md',
+  'hardening/rounds/round-0002.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
   'hardening/scripts/score-frontier.mjs',
   'hardening/scripts/select-round.mjs',
   'hardening/scripts/hardening-gate.mjs',
+  'scripts/generated-time.mjs',
   'scripts/interop-generate.mjs',
   'scripts/interop-validate.mjs',
   'scripts/interop-vendor-cdm.mjs',
+  'scripts/run-daml-tests.sh',
+  'scripts/daml-coverage-gate.mjs',
   'scripts/canton-smoke.sh'
 ];
 
@@ -205,7 +213,9 @@ checkContains('design/change-log.md', [
 
 checkContains('scripts/ci.sh', [
   'npm run hardening:frontier',
-  'npm run hardening:gate'
+  'npm run hardening:gate',
+  'npm run package',
+  'git diff --exit-code -- artifacts hardening/frontiers hardening/maps'
 ]);
 
 checkContains('interop/registry.js', [
@@ -273,6 +283,8 @@ try {
   else pass.push('cdm schema manifest pins CDM 6.0');
   if (!Array.isArray(manifest.files) || manifest.files.length !== manifest.schemaCount) fail.push('cdm schema manifest file count mismatch');
   else pass.push('cdm schema manifest file count matches');
+  if (!manifest.schemaSetDigest?.startsWith('sha256:')) fail.push('cdm schema manifest missing schemaSetDigest');
+  else pass.push('cdm schema manifest has schemaSetDigest review anchor');
   for (const rootSchema of ['cdm-product-collateral-EligibleCollateralSpecification.schema.json', 'cdm-product-collateral-EligibilityQuery.schema.json', 'cdm-product-collateral-CheckEligibilityResult.schema.json']) {
     if (!manifest.rootSchemas?.includes(rootSchema)) fail.push(`cdm schema manifest missing root schema ${rootSchema}`);
     else pass.push(`cdm schema manifest root schema ${rootSchema}`);
@@ -297,6 +309,13 @@ try {
   const negative = report.negativeResults?.find(result => result.name === 'negative-invalid-eligibility-query');
   if (!negative?.pass) fail.push('interop report missing passing negative-invalid-eligibility-query');
   else pass.push('interop report validates negative-invalid-eligibility-query');
+  const semanticNegative = report.negativeResults?.find(result => result.name === 'negative-passport-decision-rejected-without-cdm-engine');
+  if (!semanticNegative?.pass) fail.push('interop report missing passing negative-passport-decision-rejected-without-cdm-engine');
+  else pass.push('interop report validates negative-passport-decision-rejected-without-cdm-engine');
+  const checkEligibility = results.get('check-eligibility-result');
+  const mirrorWarning = 'CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed.';
+  if (!checkEligibility?.warnings?.includes(mirrorWarning)) fail.push('interop report missing CDM decision mirror warning');
+  else pass.push('interop report records CDM decision mirror warning');
 } catch (e) {
   fail.push(`interop report JSON parse failed: ${e.message}`);
 }
@@ -356,7 +375,7 @@ const report = {
   artifact: 'gate_report',
   package: 'aevelum-passport-foundation',
   version: '0.1.0',
-  generatedAt: new Date().toISOString(),
+  generatedAt: getGeneratedAt(),
   dpmSdk: '3.5.1-rc3',
   note: 'This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.',
   pass,

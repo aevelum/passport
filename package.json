@@ -19,7 +19,7 @@
     "canton:smoke": "./scripts/canton-smoke.sh",
     "ci": "./scripts/ci.sh",
     "package": "node scripts/package.mjs",
-    "all": "npm run ci && npm run package"
+    "all": "npm run ci"
   },
   "devDependencies": {
     "ajv": "8.20.0",

@@ -8,8 +8,9 @@
     "objective": "Harden Passport during development by keeping Canton ledger semantics, framework-neutral interop, generated artifacts, and release boundaries tied to explicit invariants and executable gates.",
     "assumptions": [
       "Daml templates remain the normative Canton ledger schema for this milestone.",
-      "FINOS CDM support means offline JSON-schema conformance for generated collateral eligibility artifacts, not FINOS certification or Rosetta Engine execution.",
-      "Default CI must not fetch remote schemas or execute dynamically loaded plugin code."
+      "FINOS CDM support means offline JSON-schema conformance for generated collateral eligibility artifacts, not FINOS certification, Rosetta Engine execution, or CDM eligibility-engine execution.",
+      "Default PR CI must not fetch network resources after GitHub platform checkout; dependency and DPM toolchains are provided by a pre-baked offline runner.",
+      "The CDM schema manifest provides committed local integrity for reviewed schema files, not upstream authenticity when schema and manifest are changed together."
     ],
     "source_inventory": [
       {
@@ -169,8 +170,8 @@
         "language": "bash",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
-        "status": "semantics",
-        "notes": "Default local CI command order."
+        "status": "breakdown",
+        "notes": "Default local CI command order, package check, and freshness diff gate."
       },
       {
         "path": "scripts/gates.mjs",
@@ -178,31 +179,232 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
-        "notes": "Repository structure and artifact gate."
+        "notes": "Repository structure and generated artifact gate."
       },
       {
         "path": "scripts/package.mjs",
         "language": "javascript",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.release.package",
+        "status": "breakdown",
+        "notes": "Review archive source selection."
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Default GitHub PR workflow and offline runner contract."
+      },
+      {
+        "path": "package.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
         "status": "semantics",
-        "notes": "Release archive source selection."
+        "notes": "NPM script graph for local and default CI commands."
+      },
+      {
+        "path": "package-lock.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned npm dependency graph and AJV transitive exception evidence."
+      },
+      {
+        "path": "multi-package.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "DPM multi-package build root used by CI."
+      },
+      {
+        "path": "packages/passport-core/daml.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned core DPM package configuration."
+      },
+      {
+        "path": "packages/passport-tests/daml.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned Daml test package configuration."
+      },
+      {
+        "path": "scripts/generated-time.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Shared deterministic generated timestamp helper."
+      },
+      {
+        "path": "scripts/run-daml-tests.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "DPM build, Daml Script, and coverage runner."
+      },
+      {
+        "path": "scripts/daml-coverage-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Daml coverage parser and threshold gate."
+      },
+      {
+        "path": "scripts/canton-smoke.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Local Canton sandbox smoke gate."
+      },
+      {
+        "path": "scripts/export-demo-transcript.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Generated demo transcript writer."
+      },
+      {
+        "path": "scripts/interop-generate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Interop artifact generation command wrapper."
+      },
+      {
+        "path": "scripts/interop-validate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Interop validation command wrapper."
+      },
+      {
+        "path": "scripts/interop-vendor-cdm.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-vendor",
+        "status": "breakdown",
+        "notes": "Explicit networked CDM schema refresh wrapper."
+      },
+      {
+        "path": "hardening/maps/passport.invariants.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Invariant/property map source of truth."
+      },
+      {
+        "path": "hardening/frontiers/passport.frontier.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Generated hardening frontier."
+      },
+      {
+        "path": "hardening/policies/architecture-rules.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Architecture rule policy consumed by hardening gate."
+      },
+      {
+        "path": "hardening/rounds/round-0001.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "First hardening round record."
+      },
+      {
+        "path": "hardening/rounds/round-0002.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Offline CI enforcement hardening round record."
+      },
+      {
+        "path": "hardening/change-log.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Hardening change log."
+      },
+      {
+        "path": "hardening/scripts/lib.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening map/frontier validation library and source-inventory coverage gate."
+      },
+      {
+        "path": "hardening/scripts/validate-map.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening map validation command."
+      },
+      {
+        "path": "hardening/scripts/score-frontier.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening frontier scoring command."
+      },
+      {
+        "path": "hardening/scripts/select-round.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Hardening round selection command."
+      },
+      {
+        "path": "hardening/scripts/hardening-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Architecture, offline CI, dependency exception, and payload purity gate."
       }
     ]
   },
   "frontier": {
-    "round_id": "round-0001",
+    "round_id": "round-0002",
     "selected_surfaces": [
-      "inv.agent.repo-local-skill-discovery",
-      "inv.interop.static-plugin-boundary",
-      "inv.cdm.schema-reproducibility",
-      "inv.release.reviewable-archive"
+      "inv.ci.default-green-bar",
+      "prop.ci.default-ci-offline",
+      "prop.ci.generated-artifacts-current",
+      "inv.cdm.schema-reproducibility"
     ],
-    "selection_reason": "The current development milestone added interop plugins and generated artifacts, so the first hardening round locks repo-local skill discovery, static adapter boundaries, offline schema reproducibility, and release packaging controls into CI.",
+    "selection_reason": "Round 0002 closes enforcement gaps found in PR review by making default CI offline, deterministic, freshness-gated, and explicitly inventoried in the hardening map.",
     "kill_gates": [
-      "hardening:gate fails if interop uses dynamic imports, eval-style execution, remote code, or unauthorized network fetches.",
-      "hardening:gate fails if generated CDM payloads contain Passport provenance keys.",
-      "hardening:gate fails if the generated frontier is stale or if high properties lack executable coverage."
+      "hardening:gate fails if workflow YAML, shell scripts, package scripts, or repo-authored JS introduce network primitives outside the explicit CDM vendor refresh module.",
+      "hardening:map fails if hardening-sensitive tracked files are absent from source_inventory.",
+      "npm run ci fails if regenerated tracked artifacts, hardening maps, or hardening frontiers differ from committed output.",
+      "hardening:gate fails if the AJV require-from-string exception is no longer pinned as the expected transitive validator dependency."
     ]
   },
   "tree": {
@@ -450,13 +652,13 @@
             "invariants": [
               {
                 "id": "inv.interop.static-plugin-boundary",
-                "statement": "Framework adapters are registered statically and cannot be loaded from remote code, arbitrary paths, or runtime strings.",
+                "statement": "Repo-authored framework adapters are registered statically and cannot be loaded from remote code, arbitrary paths, runtime strings, or dynamic execution primitives.",
                 "properties": [
                   {
                     "id": "prop.interop.registry-static",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "The adapter registry imports known plugins statically and exports a frozen registry.",
+                    "statement": "The repo-authored adapter registry imports known plugins statically, exports a frozen registry, and does not use dynamic plugin execution.",
                     "enforcing_functions": [
                       "fn.interop.list-adapters"
                     ]
@@ -470,7 +672,9 @@
             "name": "Interop artifact runner",
             "mapping_depth": "breakdown",
             "source_files": [
-              "interop/runner.js"
+              "interop/runner.js",
+              "scripts/interop-generate.mjs",
+              "scripts/interop-validate.mjs"
             ],
             "functions": [
               {
@@ -524,7 +728,7 @@
             "invariants": [
               {
                 "id": "inv.cdm.schema-conformance",
-                "statement": "The CDM plugin generates and validates Passport collateral eligibility artifacts against pinned FINOS CDM 6.0 JSON schemas.",
+                "statement": "The CDM plugin generates Passport collateral eligibility artifacts and validates their JSON shape against pinned FINOS CDM 6.0 schemas without executing a CDM eligibility engine.",
                 "properties": [
                   {
                     "id": "prop.cdm.three-root-artifacts",
@@ -543,6 +747,15 @@
                     "enforcing_functions": [
                       "fn.cdm.negative-cases"
                     ]
+                  },
+                  {
+                    "id": "prop.cdm.decision-mirror-warning",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "CheckEligibilityResult reports must warn that the Passport sample eligibility decision is mirrored and no CDM eligibility engine is executed.",
+                    "enforcing_functions": [
+                      "fn.cdm.generate"
+                    ]
                   }
                 ]
               }
@@ -553,7 +766,8 @@
             "name": "CDM schema vendor manifest",
             "mapping_depth": "breakdown",
             "source_files": [
-              "interop/plugins/cdm/vendor.js"
+              "interop/plugins/cdm/vendor.js",
+              "scripts/interop-vendor-cdm.mjs"
             ],
             "functions": [
               {
@@ -570,13 +784,13 @@
             "invariants": [
               {
                 "id": "inv.cdm.schema-reproducibility",
-                "statement": "CDM schema validation is offline and reproducible from a plugin-scoped manifest with SHA-256 hashes.",
+                "statement": "CDM schema validation is offline and reproducible from committed plugin-scoped schema files whose local manifest hashes and schema-set digest are verified before validation.",
                 "properties": [
                   {
                     "id": "prop.cdm.hashes-verified-before-validation",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Schema hashes must be verified before AJV registers schemas for validation.",
+                    "statement": "Committed schema hashes and the schema-set digest must be verified before AJV registers schemas for validation; this is local integrity, not upstream authenticity.",
                     "enforcing_functions": [
                       "fn.cdm.verify-manifest"
                     ]
@@ -585,7 +799,7 @@
                     "id": "prop.cdm.network-only-explicit-vendor",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or CI.",
+                    "statement": "Repo-authored network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or CI.",
                     "enforcing_functions": [
                       "fn.cdm.vendor-schemas"
                     ]
@@ -654,11 +868,30 @@
           },
           {
             "id": "cmp.ci.gates",
-            "name": "Local CI and gates",
+            "name": "Default CI and gates",
             "mapping_depth": "breakdown",
             "source_files": [
               "scripts/ci.sh",
-              "scripts/gates.mjs"
+              ".github/workflows/ci.yml",
+              "package.json",
+              "package-lock.json",
+              "multi-package.yaml",
+              "packages/passport-core/daml.yaml",
+              "packages/passport-tests/daml.yaml",
+              "scripts/generated-time.mjs",
+              "scripts/gates.mjs",
+              "scripts/run-daml-tests.sh",
+              "scripts/daml-coverage-gate.mjs",
+              "scripts/canton-smoke.sh",
+              "scripts/export-demo-transcript.mjs",
+              "hardening/maps/passport.invariants.json",
+              "hardening/frontiers/passport.frontier.json",
+              "hardening/policies/architecture-rules.json",
+              "hardening/scripts/lib.mjs",
+              "hardening/scripts/validate-map.mjs",
+              "hardening/scripts/score-frontier.mjs",
+              "hardening/scripts/select-round.mjs",
+              "hardening/scripts/hardening-gate.mjs"
             ],
             "functions": [
               {
@@ -670,12 +903,37 @@
                 "id": "fn.ci.local-gate",
                 "name": "npm run gate",
                 "source_ref": "scripts/gates.mjs"
+              },
+              {
+                "id": "fn.ci.github-workflow",
+                "name": "GitHub offline PR workflow",
+                "source_ref": ".github/workflows/ci.yml"
+              },
+              {
+                "id": "fn.ci.generated-time",
+                "name": "getGeneratedAt",
+                "source_ref": "scripts/generated-time.mjs"
+              },
+              {
+                "id": "fn.ci.source-inventory-gate",
+                "name": "validateMap hardening-sensitive source inventory coverage",
+                "source_ref": "hardening/scripts/lib.mjs"
+              },
+              {
+                "id": "fn.ci.network-policy-gate",
+                "name": "checkDefaultCiNetworkPolicy",
+                "source_ref": "hardening/scripts/hardening-gate.mjs"
+              },
+              {
+                "id": "fn.ci.dependency-exception-gate",
+                "name": "checkAjvDynamicExecutionDependencyException",
+                "source_ref": "hardening/scripts/hardening-gate.mjs"
               }
             ],
             "invariants": [
               {
                 "id": "inv.ci.default-green-bar",
-                "statement": "The default local CI path covers generated artifacts, hardening controls, repository gates, Daml tests, and Canton smoke.",
+                "statement": "The default PR and local CI paths run from a pre-baked offline toolchain, cover generated artifacts, hardening controls, repository gates, packaging, Daml tests, Canton smoke, and freshness checks.",
                 "properties": [
                   {
                     "id": "prop.ci.hardening-gate-in-ci",
@@ -685,6 +943,53 @@
                     "enforcing_functions": [
                       "fn.ci.local-ci"
                     ]
+                  },
+                  {
+                    "id": "prop.ci.default-ci-offline",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "Default PR CI must not run networked bootstrap, dependency install, schema refresh, or arbitrary network primitives after GitHub platform checkout.",
+                    "enforcing_functions": [
+                      "fn.ci.github-workflow",
+                      "fn.ci.network-policy-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.generated-artifacts-current",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Default CI must fail when regenerated tracked artifacts, invariant maps, or frontiers differ from committed output.",
+                    "enforcing_functions": [
+                      "fn.ci.local-ci",
+                      "fn.ci.generated-time"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.source-inventory-complete",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Every hardening-sensitive tracked workflow, package, Daml, interop, script, policy, map, frontier, round, and change-log file must appear in the invariant map source inventory.",
+                    "enforcing_functions": [
+                      "fn.ci.source-inventory-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.package-in-ci",
+                    "type": "guarantee",
+                    "severity": "medium",
+                    "statement": "npm run ci must run npm run package so release archive regressions cannot bypass the default green bar.",
+                    "enforcing_functions": [
+                      "fn.ci.local-ci"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.ajv-exception-pinned",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The AJV transitive require-from-string dependency is allowed only as the pinned package-lock edge from AJV and is not a repo-authored dynamic execution mechanism.",
+                    "enforcing_functions": [
+                      "fn.ci.dependency-exception-gate"
+                    ]
                   }
                 ]
               }
@@ -693,7 +998,7 @@
           {
             "id": "cmp.release.package",
             "name": "Review archive package",
-            "mapping_depth": "semantics",
+            "mapping_depth": "breakdown",
             "source_files": [
               "scripts/package.mjs"
             ],
@@ -756,7 +1061,8 @@
           "prop.cdm.three-root-artifacts",
           "prop.cdm.negative-case-fails",
           "inv.cdm.schema-reproducibility",
-          "prop.cdm.hashes-verified-before-validation"
+          "prop.cdm.hashes-verified-before-validation",
+          "prop.cdm.decision-mirror-warning"
         ]
       },
       {
@@ -777,7 +1083,10 @@
           "inv.ci.default-green-bar",
           "prop.ci.hardening-gate-in-ci",
           "inv.release.reviewable-archive",
-          "prop.release.git-ls-files-only"
+          "prop.release.git-ls-files-only",
+          "prop.ci.default-ci-offline",
+          "prop.ci.source-inventory-complete",
+          "prop.ci.ajv-exception-pinned"
         ]
       },
       {
@@ -789,6 +1098,21 @@
           "inv.daml.authorization",
           "inv.daml.capacity-conservation",
           "inv.ci.default-green-bar"
+        ]
+      },
+      {
+        "id": "test.ci.full",
+        "kind": "shell-script",
+        "command": "npm run ci",
+        "status": "active",
+        "covers": [
+          "inv.ci.default-green-bar",
+          "prop.ci.hardening-gate-in-ci",
+          "prop.ci.default-ci-offline",
+          "prop.ci.generated-artifacts-current",
+          "prop.ci.source-inventory-complete",
+          "prop.ci.package-in-ci",
+          "prop.release.git-ls-files-only"
         ]
       }
     ],
@@ -864,7 +1188,7 @@
         "attacker_control": "indirect",
         "severity": "critical",
         "status": "guarded",
-        "description": "A schema file changes without a matching manifest hash, weakening offline validation.",
+        "description": "A committed schema file changes without matching local manifest hashes or schema-set digest, weakening offline validation.",
         "evidence": [
           "test.interop.validate",
           "test.hardening.architecture-gate"
@@ -872,7 +1196,7 @@
         "exploit_path_ids": [
           "xp.cdm.false-conformance"
         ],
-        "kill_gate": "CDM validation verifies the plugin-scoped manifest before AJV registration."
+        "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration."
       },
       {
         "id": "bd.interop.payload-provenance-leak",
@@ -898,14 +1222,31 @@
         "attacker_control": "indirect",
         "severity": "critical",
         "status": "guarded",
-        "description": "A default CI command fetches remote schemas or other network resources.",
+        "description": "A default PR or local CI command fetches schemas, dependencies, toolchains, plugin code, or other mutable network resources.",
         "evidence": [
-          "test.hardening.architecture-gate"
+          "test.hardening.architecture-gate",
+          "test.ci.full"
         ],
         "exploit_path_ids": [
           "xp.ci.unpinned-input"
         ],
-        "kill_gate": "hardening:gate allows fetch only in the explicit CDM vendor module and verifies CI does not call interop:vendor:cdm."
+        "kill_gate": "hardening:gate scans workflow YAML, shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module and offline npm ci."
+      },
+      {
+        "id": "bd.ci.generated-artifact-staleness",
+        "component_id": "cmp.ci.gates",
+        "property_id": "prop.ci.generated-artifacts-current",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Generated reports, maps, or frontiers are refreshed during CI but stale committed copies still pass.",
+        "evidence": [
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.ci.stale-artifacts"
+        ],
+        "kill_gate": "npm run ci finishes with git diff --exit-code over tracked artifacts, hardening maps, and hardening frontiers."
       }
     ],
     "exploit_paths": [
@@ -971,6 +1312,15 @@
           "A CI command fetches network content outside explicit vendoring."
         ],
         "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.ci.stale-artifacts",
+        "breakdown_id": "bd.ci.generated-artifact-staleness",
+        "impact": "Reviewers merge stale generated evidence that no longer matches source-controlled generators or hardening policy.",
+        "preconditions": [
+          "A generator rewrites tracked artifacts and CI does not diff the regenerated output."
+        ],
+        "status": "guarded-by-ci-diff-gate"
       }
     ],
     "trust_boundaries": [
@@ -1012,9 +1362,10 @@
         "id": "tb.release-review",
         "name": "Review archive boundary",
         "component_ids": [
-          "cmp.release.package"
+          "cmp.release.package",
+          "cmp.ci.gates"
         ],
-        "description": "The review package should contain source and review artifacts, not build caches or local logs."
+        "description": "The default CI and review package should contain deterministic source and review artifacts, not stale generated output, build caches, or local logs."
       }
     ]
   }

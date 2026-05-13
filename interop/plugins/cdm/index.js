@@ -5,6 +5,7 @@ import { defineAdapterPlugin, pluginIdentity } from '../../core/adapter.js';
 import { cdmVersion, rootSchemas, schemaDir, verifySchemaManifest, walkSchemaFiles } from './vendor.js';
 
 const adapterVersion = '0.1.0';
+const decisionMirrorWarning = 'CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed.';
 const artifactSchemas = Object.freeze({
   'eligible-collateral-specification': rootSchemas[0],
   'eligibility-query': rootSchemas[1],
@@ -52,7 +53,7 @@ async function validate(result) {
   };
 }
 
-async function validateNegativeCases() {
+async function validateNegativeCases(context, input) {
   const invalidQuery = {
     maturity: 7,
     assetCountryOfOrigin: 'US',
@@ -60,12 +61,38 @@ async function validateNegativeCases() {
   };
   const validatePayload = createValidator('eligibility-query');
   const actualValid = validatePayload(invalidQuery);
+  const semanticRejectedInput = {
+    ...input,
+    collateral: {
+      ...input.collateral,
+      denominatedCurrency: 'EUR'
+    },
+    eligibilityDecision: {
+      isEligible: false
+    }
+  };
+  const semanticRejected = (await generate(semanticRejectedInput, context))
+    .find(result => result.artifactType === 'check-eligibility-result');
+  const semanticRejectedValidated = await validate(semanticRejected);
+
   return [{
     name: 'negative-invalid-eligibility-query',
     expectedValid: false,
     actualValid,
     pass: actualValid === false,
     errors: validatePayload.errors ?? []
+  }, {
+    name: 'negative-passport-decision-rejected-without-cdm-engine',
+    expectedValid: true,
+    actualValid: semanticRejectedValidated.validation.valid,
+    expectedEligible: false,
+    actualEligible: semanticRejectedValidated.payload.isEligible,
+    pass: semanticRejectedValidated.validation.valid
+      && semanticRejectedValidated.payload.isEligible === false
+      && semanticRejectedValidated.payload.matchingEligibleCriteria.length === 0,
+    warnings: semanticRejectedValidated.warnings,
+    assertion: 'A Passport sample decision can be mirrored as rejected without executing a CDM eligibility engine.',
+    errors: semanticRejectedValidated.validation.errors ?? []
   }];
 }
 
@@ -85,7 +112,7 @@ function buildResult(artifactType, payload, input, context) {
       adapterVersion,
       generatedAt: context.now
     },
-    warnings: []
+    warnings: artifactType === 'check-eligibility-result' ? [decisionMirrorWarning] : []
   };
 }
 

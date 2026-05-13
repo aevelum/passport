@@ -55,6 +55,7 @@ export function writeSchemaManifest() {
     schemaSource,
     rootSchemas,
     schemaCount: files.length,
+    schemaSetDigest: digestSchemaSet(files),
     generatedAt: new Date().toISOString(),
     files
   };
@@ -72,6 +73,7 @@ export function verifySchemaManifest() {
   if (manifest.frameworkVersion !== cdmVersion) throw new Error('CDM schema manifest has wrong version');
   if (manifest.schemaSource !== schemaSource) throw new Error('CDM schema manifest has wrong source');
   if (manifest.schemaCount !== actualFiles.length) throw new Error('CDM schema manifest schemaCount mismatch');
+  if (manifest.schemaSetDigest !== digestSchemaSet(manifest.files)) throw new Error('CDM schema manifest set digest mismatch');
 
   for (const rel of actualFiles) {
     const expected = expectedFiles.get(rel);
@@ -174,4 +176,12 @@ function escapeControlCharactersInStrings(text) {
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
+}
+
+function digestSchemaSet(files) {
+  const lines = [...files]
+    .sort((a, b) => a.path.localeCompare(b.path))
+    .map(file => `${file.path} ${file.sha256}`)
+    .join('\n');
+  return `sha256:${sha256(Buffer.from(`${lines}\n`, 'utf8'))}`;
 }

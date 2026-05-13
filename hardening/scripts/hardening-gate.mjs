@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { getGeneratedAt } from '../../scripts/generated-time.mjs';
 import {
   abs,
   readJson,
@@ -131,6 +132,8 @@ pass.push(...frontierResult.pass.map(item => `frontier: ${item}`));
 fail.push(...frontierResult.fail.map(item => `frontier: ${item}`));
 
 evaluateRules(readJson('hardening/policies/architecture-rules.json'));
+checkDefaultCiNetworkPolicy();
+checkAjvDynamicExecutionDependencyException();
 checkCdmPayloadPurity();
 checkCiOrder();
 
@@ -141,7 +144,7 @@ const report = {
   artifact: 'hardening_report',
   package: 'aevelum-passport-foundation',
   version: '0.1.0',
-  generatedAt: new Date().toISOString(),
+  generatedAt: getGeneratedAt(),
   status: fail.length ? 'failed' : 'passed',
   mapPath: 'hardening/maps/passport.invariants.json',
   frontierPath: 'hardening/frontiers/passport.frontier.json',
@@ -159,3 +162,70 @@ if (fail.length) {
 }
 
 console.log(`hardening gate passed: ${pass.length} checks`);
+
+function checkDefaultCiNetworkPolicy() {
+  const allowedNetworkFiles = new Set(['interop/plugins/cdm/vendor.js']);
+  const files = [
+    ...walkFiles('.github/workflows', { extensions: ['.yml', '.yaml'] }),
+    ...walkFiles('scripts', { extensions: ['.mjs', '.js', '.sh'] }),
+    ...walkFiles('hardening/scripts', { extensions: ['.mjs', '.js'] }),
+    ...walkFiles('interop', { extensions: ['.js', '.mjs'] })
+  ];
+
+  for (const rel of files) {
+    if (allowedNetworkFiles.has(rel)) {
+      pass.push(`default CI network scan allows explicit vendor module ${rel}`);
+      continue;
+    }
+    checkNetworkFreeText(rel, readText(rel));
+  }
+
+  const packageJson = readJson('package.json');
+  for (const [name, script] of Object.entries(packageJson.scripts ?? {})) {
+    checkNetworkFreeText(`package.json scripts.${name}`, script);
+  }
+}
+
+function checkNetworkFreeText(label, text) {
+  const patterns = [
+    ['cu' + 'rl', new RegExp('\\bcu' + 'rl\\b')],
+    ['wg' + 'et', new RegExp('\\bwg' + 'et\\b')],
+    ['dpm in' + 'stall', new RegExp('\\bdpm\\s+in' + 'stall\\b')],
+    ['online npm ' + 'ci', new RegExp('\\bnpm\\s+ci\\b(?![^\\n]*\\s--offline\\b)')],
+    ['npm in' + 'stall', new RegExp('\\bnpm\\s+(?:in' + 'stall|i)\\b')],
+    ['np' + 'x', new RegExp('\\bnp' + 'x\\b')],
+    ['fet' + 'ch(', new RegExp('\\bfet' + 'ch\\s*\\(')],
+    ['node:ht' + 'tp(s)', new RegExp('node:(?:ht' + 'tp|ht' + 'tps)')],
+    ['direct URL', /https?:\/\//],
+    ['git cl' + 'one', new RegExp('\\bgit\\s+cl' + 'one\\b')],
+    ['docker pu' + 'll', new RegExp('\\bdocker\\s+pu' + 'll\\b')]
+  ];
+
+  let clean = true;
+  for (const [name, pattern] of patterns) {
+    if (pattern.test(text)) {
+      clean = false;
+      fail.push(`${label} contains network primitive ${name}`);
+    }
+  }
+  if (clean) pass.push(`${label} contains no default-CI network primitives`);
+}
+
+function checkAjvDynamicExecutionDependencyException() {
+  const lock = readJson('package-lock.json');
+  const rootPackage = lock.packages?.[''] ?? {};
+  const rootDeps = {
+    ...(rootPackage.dependencies ?? {}),
+    ...(rootPackage.devDependencies ?? {})
+  };
+  ok(!Object.hasOwn(rootDeps, 'require-from-string'), 'root package does not directly depend on require-from-string');
+
+  const rfs = lock.packages?.['node_modules/require-from-string'];
+  ok(Boolean(rfs), 'package-lock includes AJV transitive require-from-string entry');
+  ok(rfs?.version === '2.0.2', 'require-from-string exception is pinned to 2.0.2');
+  ok(rfs?.integrity === 'sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==', 'require-from-string exception integrity is pinned');
+
+  const ajv = lock.packages?.['node_modules/ajv'];
+  ok(ajv?.version === '8.20.0', 'AJV validator dependency is pinned to 8.20.0');
+  ok(ajv?.dependencies?.['require-from-string'] === '^2.0.2', 'require-from-string is present only as the expected AJV dependency edge');
+}

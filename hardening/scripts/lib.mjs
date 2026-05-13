@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 export const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 
@@ -125,6 +126,11 @@ export function validateMap(map) {
   ok(Boolean(map.scope?.source_root), 'map has source_root');
   ok(Array.isArray(map.scope?.source_inventory) && map.scope.source_inventory.length > 0, 'map has source inventory');
 
+  const inventoryPaths = new Set((map.scope?.source_inventory ?? []).map(item => item.path));
+  for (const rel of hardeningSensitiveFiles()) {
+    ok(inventoryPaths.has(rel), `source inventory covers hardening-sensitive file ${rel}`);
+  }
+
   for (const [id, kinds] of index.ids.entries()) {
     if (kinds.includes(',')) fail.push(`duplicate id ${id} appears as ${kinds}`);
   }
@@ -200,6 +206,42 @@ export function validateMap(map) {
   ok(Array.isArray(map.frontier?.kill_gates) && map.frontier.kill_gates.length > 0, 'map frontier has kill gates');
 
   return { pass, fail, warn, index };
+}
+
+function hardeningSensitiveFiles() {
+  let files = [];
+  try {
+    files = execFileSync('git', ['ls-files', '-z'], { cwd: root })
+      .toString('utf8')
+      .split('\0')
+      .filter(Boolean);
+  } catch {
+    files = [
+      ...walkFiles('.github/workflows', { extensions: ['.yml', '.yaml'] }),
+      ...walkFiles('scripts', { extensions: ['.mjs', '.js', '.sh'] }),
+      ...walkFiles('hardening/scripts', { extensions: ['.mjs', '.js'] }),
+      ...walkFiles('hardening/policies', { extensions: ['.json'] }),
+      ...walkFiles('interop', { extensions: ['.js', '.mjs'] })
+    ];
+  }
+
+  return files
+    .filter(file => {
+      if (file === 'AGENTS.md') return true;
+      if (file === 'package.json' || file === 'package-lock.json' || file === 'multi-package.yaml') return true;
+      if (/^\.github\/workflows\/[^/]+\.ya?ml$/.test(file)) return true;
+      if (/^\.agents\/skills\/[^/]+\/(SKILL\.md|agents\/openai\.yaml)$/.test(file)) return true;
+      if (/^packages\/[^/]+\/daml\.yaml$/.test(file)) return true;
+      if (/^packages\/[^/]+\/daml\/.*\.daml$/.test(file)) return true;
+      if (/^interop\/.*\.(js|mjs)$/.test(file)) return true;
+      if (/^scripts\/.*\.(mjs|js|sh)$/.test(file)) return true;
+      if (/^hardening\/(scripts|policies)\/.*\.(mjs|js|json)$/.test(file)) return true;
+      if (/^hardening\/(maps|frontiers)\/.*\.json$/.test(file)) return true;
+      if (/^hardening\/rounds\/.*\.md$/.test(file)) return true;
+      if (file === 'hardening/change-log.md') return true;
+      return false;
+    })
+    .sort();
 }
 
 export function buildFrontier(map) {

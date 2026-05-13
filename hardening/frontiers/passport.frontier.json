@@ -5,12 +5,12 @@
   "generatedFrom": {
     "package": "aevelum-passport-foundation",
     "pinned_version": "git:HEAD",
-    "round_id": "round-0001"
+    "round_id": "round-0002"
   },
   "summary": {
-    "candidates": 7,
+    "candidates": 8,
     "widen": 0,
-    "deepen": 7,
+    "deepen": 8,
     "kill": 0,
     "package": 0,
     "top_candidate": "bd.cdm.schema-substitution"
@@ -31,12 +31,12 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "CDM validation verifies the plugin-scoped manifest before AJV registration.",
+      "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Modify a vendored CDM schema without updating manifest.json and confirm npm run interop:validate fails.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
     },
     {
       "id": "bd.ci.network-fetch-default",
@@ -53,12 +53,12 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate allows fetch only in the explicit CDM vendor module and verifies CI does not call interop:vendor:cdm.",
+      "kill_gate": "hardening:gate scans workflow YAML, shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module and offline npm ci.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add interop:vendor:cdm to scripts/ci.sh and confirm npm run hardening:gate fails.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
     },
     {
       "id": "bd.interop.dynamic-plugin-loading",
@@ -80,7 +80,29 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add import( to interop/registry.js and confirm npm run hardening:gate fails.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
+    },
+    {
+      "id": "bd.ci.generated-artifact-staleness",
+      "source_id": "bd.ci.generated-artifact-staleness",
+      "component_id": "cmp.ci.gates",
+      "property_id": "prop.ci.generated-artifacts-current",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 70,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "npm run ci finishes with git diff --exit-code over tracked artifacts, hardening maps, and hardening frontiers.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0002"
     },
     {
       "id": "bd.interop.payload-provenance-leak",
@@ -102,7 +124,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add a provenance key to a generated CDM payload and confirm npm run hardening:gate fails.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
     },
     {
       "id": "bd.agent.skill-not-discovered",
@@ -124,7 +146,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
     },
     {
       "id": "bd.daml.capacity-over-reservation",
@@ -146,7 +168,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
     },
     {
       "id": "bd.daml.unauthorized-transition",
@@ -168,7 +190,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0001"
+      "last_round": "round-0002"
     }
   ]
 }

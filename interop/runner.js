@@ -24,7 +24,7 @@ export async function generateInteropArtifacts({ validate = false } = {}) {
       results.push(resultForReport(finalResult));
     }
     if (validate && plugin.validateNegativeCases) {
-      negativeResults.push(...await plugin.validateNegativeCases(context));
+      negativeResults.push(...await plugin.validateNegativeCases(context, input));
     }
   }
 

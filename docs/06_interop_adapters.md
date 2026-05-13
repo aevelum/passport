@@ -7,7 +7,7 @@ The adapter surface is deliberately narrow:
 - static plugin registry only;
 - no dynamic plugin loading;
 - no `eval`;
-- no network access in default CI;
+- no network access in default PR or local CI after GitHub platform checkout;
 - generated standards payloads remain clean;
 - Passport provenance is reported beside payloads, not embedded into them.
 
@@ -34,6 +34,7 @@ Future candidates include ISO 20022, FIX, FpML, W3C Verifiable Credentials, and 
 ## CDM plugin
 
 The CDM plugin generates collateral eligibility artifacts from `interop/samples/repo-pretrade-passport-input.json`.
+`CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
 
 It validates generated artifacts offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset in `interop/plugins/cdm/assets/schemas/6.0/`.
 
@@ -43,7 +44,7 @@ Schema refresh is explicit:
 npm run interop:vendor:cdm
 ```
 
-Default CI does not fetch schemas. Validation first verifies the schema manifest and SHA-256 hashes, then registers the schemas with AJV draft-04.
+Default CI does not fetch schemas or bootstrap dependencies from the network. Validation first verifies the committed schema manifest, schema-set digest, and SHA-256 hashes, then registers the schemas with AJV draft-04. This is committed local schema integrity for reviewed files, not upstream authenticity if schema files and the manifest are changed together.
 
 ## Local commands
 
@@ -52,6 +53,6 @@ npm run interop:generate
 npm run interop:validate
 ```
 
-Generated CDM payloads are written to `artifacts/interop/cdm/6.0/`. Adapter metadata, provenance, validation status, and negative-case results are written to `artifacts/interop/report.json`.
+Generated CDM payloads are written to `artifacts/interop/cdm/6.0/`. Adapter metadata, provenance, validation status, warnings, and negative-case results are written to `artifacts/interop/report.json`.
 
 This is schema conformance for generated Passport collateral eligibility artifacts. It is not FINOS certification, Rosetta Engine execution, repo execution, custody, settlement, or a live external integration.

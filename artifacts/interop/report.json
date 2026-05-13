@@ -3,7 +3,7 @@
   "package": "aevelum-passport-foundation",
   "version": "0.1.0",
   "status": "passed",
-  "generatedAt": "2026-05-12T21:16:45.272Z",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
   "sourceRef": "interop/samples/repo-pretrade-passport-input.json",
   "securityPolicy": {
     "allowDynamicPlugins": false,
@@ -42,7 +42,7 @@
         "sourceType": "passport.repo-pretrade-sample",
         "sourceId": "passport-repo-pretrade-us-treasury-v1",
         "adapterVersion": "0.1.0",
-        "generatedAt": "2026-05-12T21:16:45.272Z"
+        "generatedAt": "1970-01-01T00:00:00.000Z"
       },
       "warnings": []
     },
@@ -64,7 +64,7 @@
         "sourceType": "passport.repo-pretrade-sample",
         "sourceId": "passport-repo-pretrade-us-treasury-v1",
         "adapterVersion": "0.1.0",
-        "generatedAt": "2026-05-12T21:16:45.272Z"
+        "generatedAt": "1970-01-01T00:00:00.000Z"
       },
       "warnings": []
     },
@@ -86,9 +86,11 @@
         "sourceType": "passport.repo-pretrade-sample",
         "sourceId": "passport-repo-pretrade-us-treasury-v1",
         "adapterVersion": "0.1.0",
-        "generatedAt": "2026-05-12T21:16:45.272Z"
+        "generatedAt": "1970-01-01T00:00:00.000Z"
       },
-      "warnings": []
+      "warnings": [
+        "CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed."
+      ]
     }
   ],
   "negativeResults": [
@@ -135,6 +137,19 @@
           "message": "must have required property 'issuerName'"
         }
       ]
+    },
+    {
+      "name": "negative-passport-decision-rejected-without-cdm-engine",
+      "expectedValid": true,
+      "actualValid": true,
+      "expectedEligible": false,
+      "actualEligible": false,
+      "pass": true,
+      "warnings": [
+        "CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed."
+      ],
+      "assertion": "A Passport sample decision can be mirrored as rejected without executing a CDM eligibility engine.",
+      "errors": []
     }
   ]
 }

@@ -4,21 +4,34 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   local-gates:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, passport-offline-ci]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          node-version: 24
-      - name: Install DPM
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify offline toolchain
         run: |
-          curl https://get.digitalasset.com/install/install.sh | sh
-          echo "$HOME/.dpm/bin" >> "$GITHUB_PATH"
-      - name: Install pinned Daml SDK
-        run: dpm install 3.5.1-rc3
-      - name: Install Node dependencies
-        run: npm ci
+          node_version="$(node --version)"
+          case "$node_version" in
+            v24.*) ;;
+            *)
+              echo "expected Node 24.x on passport-offline-ci runner, got $node_version" >&2
+              exit 1
+              ;;
+          esac
+
+          dpm_version="$(dpm version --active)"
+          if [[ "$dpm_version" != "3.5.1-rc3" ]]; then
+            echo "expected DPM SDK 3.5.1-rc3 on passport-offline-ci runner, got $dpm_version" >&2
+            exit 1
+          fi
+      - name: Install Node dependencies from offline cache
+        run: npm ci --offline --ignore-scripts --audit=false --fund=false
       - name: Run local CI gates
         run: npm run ci
