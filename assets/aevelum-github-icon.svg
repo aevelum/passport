@@ -1,28 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none" role="img" aria-label="Aevelum overlapping arches logo mark">
+  <title>Aevelum overlapping arches logo mark</title>
+  <desc>A refined Aevelum mark with overlapping navy and gold arches on an institutional off-white icon surface.</desc>
   <defs>
-    <linearGradient id="bg" x1="128" y1="96" x2="896" y2="928" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0B1F3A"/>
-      <stop offset="58%" stop-color="#005F9E"/>
+    <linearGradient id="surface" x1="128" y1="96" x2="896" y2="928" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#EEF2F4"/>
+    </linearGradient>
+    <linearGradient id="navy" x1="256" y1="128" x2="768" y2="888" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F3A"/>
       <stop offset="100%" stop-color="#07111A"/>
     </linearGradient>
-    <linearGradient id="mark" x1="275" y1="215" x2="749" y2="784" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#F8FAFC"/>
-      <stop offset="100%" stop-color="#DDEFEA"/>
-    </linearGradient>
-    <filter id="softShadow" x="160" y="160" width="704" height="704" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="32" flood-color="#07111A" flood-opacity="0.24" stdDeviation="28"/>
+    <filter id="markShadow" x="88" y="84" width="848" height="848" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="24" flood-color="#07111A" flood-opacity="0.16" stdDeviation="22"/>
     </filter>
   </defs>
 
-  <rect width="1024" height="1024" rx="224" fill="#07111A"/>
-  <rect x="64" y="64" width="896" height="896" rx="184" fill="url(#bg)"/>
-  <path d="M167 801C299 850 725 850 857 801" stroke="#07111A" stroke-opacity="0.18" stroke-width="56" stroke-linecap="round"/>
+  <rect width="1024" height="1024" fill="#CBD5E1"/>
+  <rect x="46" y="46" width="932" height="932" rx="182" fill="url(#surface)"/>
+  <rect x="40" y="40" width="944" height="944" rx="188" stroke="#CBD5E1" stroke-opacity="0.95" stroke-width="18"/>
 
-  <g filter="url(#softShadow)">
-    <circle cx="512" cy="512" r="258" stroke="url(#mark)" stroke-width="76"/>
-    <path d="M282 512 H742" stroke="url(#mark)" stroke-width="76" stroke-linecap="round"/>
-    <path d="M328 402 H696" stroke="url(#mark)" stroke-width="76" stroke-linecap="round"/>
-    <path d="M328 622 H696" stroke="url(#mark)" stroke-width="76" stroke-linecap="round"/>
-    <path d="M512 254 C392 374 392 650 512 770 C632 650 632 374 512 254" stroke="url(#mark)" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+  <g filter="url(#markShadow)">
+    <path
+      fill="url(#navy)"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M512 116
+         L892 848
+         H776
+         L512 344
+         L248 848
+         H132
+         L512 116Z
+         M512 260
+         L316 640
+         H708
+         L512 260Z"/>
+    <path
+      fill="#BD9B6B"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M512 452
+         L708 848
+         H608
+         L512 656
+         L416 848
+         H316
+         L512 452Z
+         M512 572
+         L424 748
+         H600
+         L512 572Z"/>
   </g>
 </svg>
