@@ -379,8 +379,6 @@ template CredentialPresentation
           holder
           attester
           verifier
-          handoffObserver = None
-          auditor = None
           reservedAmount
           currency = capacityCurrency
           policyId
@@ -430,8 +428,6 @@ template CapacityReservation
     holder : Party
     attester : Party
     verifier : Party
-    handoffObserver : Optional Party
-    auditor : Optional Party
     reservedAmount : Amount
     currency : CurrencyCode
     policyId : PolicyId
@@ -444,12 +440,6 @@ template CapacityReservation
     schemaVersion : Text
   where
     signatory holder, attester, verifier
-    observer case handoffObserver of
-      Some observer -> observer
-      None -> verifier
-    observer case auditor of
-      Some aud -> aud
-      None -> verifier
 
     ensure status == ReservationActive && positive reservedAmount
 

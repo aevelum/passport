@@ -47,9 +47,9 @@
   "privacyAssertions": [
     "Verifier receives CredentialPresentation, not raw collateral inventory",
     "CapacityCredential is visible to Holder and Attester by default",
-    "CapacityReservation is visible only to Holder, Attester, Verifier, and optional scoped observers",
-    "ReservationHandoffInstruction is metadata-only and nonconsuming",
-    "AuditDisclosureGrant reveals only allowed metadata fields",
+    "CapacityReservation is visible only to Holder, Attester, and Verifier",
+    "ReservationHandoffInstruction is metadata-only, nonconsuming, and visible to the handoff recipient",
+    "AuditDisclosureGrant is visible to the Auditor and reveals only allowed metadata fields",
     "Outsider sees no Passport state"
   ],
   "nonGoals": [

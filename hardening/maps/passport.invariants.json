@@ -14,7 +14,8 @@
       "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed.",
       "Registered adapters cannot use Level 0; Level 0 is concept-only for future adapter candidates with no registered plugin implementation.",
       "Level 3 and higher readiness cannot be self-attested by category names alone or generic existing files; higher levels require existing references in category-appropriate proof-bearing paths.",
-      "Passport records collateral readiness and may record reservation handoff metadata; it does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement proof systems, provide production identity, or provide live external integration."
+      "Passport records collateral readiness and may record reservation handoff metadata; it does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement proof systems, provide production identity, or provide live external integration.",
+      "Reservation visibility is limited to holder, attester, and verifier; handoff visibility is isolated to ReservationHandoffInstruction; audit visibility is isolated to AuditDisclosureGrant."
     ],
     "source_inventory": [
       {
@@ -516,11 +517,12 @@
       "inv.scope.passport-public-core-boundary",
       "cmp.ci.gates"
     ],
-    "selection_reason": "Round 0005 aligns Passport main with the canonical public-core scope by replacing borderline execution terminology with non-executing reservation handoff terminology and enforcing the boundary in Daml, docs, gates, and generated artifacts.",
+    "selection_reason": "Round 0005 aligns Passport main with the canonical public-core scope by replacing borderline execution terminology with non-executing reservation handoff terminology, removing dormant reservation observer/status side channels, and enforcing the boundary in Daml, docs, gates, and generated artifacts.",
     "kill_gates": [
       "hardening:gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
+      "hardening:gate fails if Passport-owned Daml contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.",
       "structural gate fails if README or docs lose canonical scope or non-goal language.",
-      "Daml tests fail if reservation handoff metadata is not covered.",
+      "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
       "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration."
     ]
@@ -650,7 +652,7 @@
                     "id": "prop.scope.no-out-of-scope-daml-language",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Passport-owned Daml must not contain implementation terminology for downstream execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system behavior.",
+                    "statement": "Passport-owned Daml must not contain implementation terminology for downstream execution, custody, settlement, wallet, optimizer, credit-decision, proof-system behavior, dormant reservation handoff observers, reservation-level optional auditors, or a handoff status transition.",
                     "enforcing_functions": [
                       "fn.ci.local-gate",
                       "fn.ci.adapter-readiness-gate"
@@ -660,7 +662,7 @@
                     "id": "prop.scope.reservation-handoff-covered",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Reservation handoff metadata must remain nonconsuming, metadata-only, and covered by Daml Script tests.",
+                    "statement": "Reservation handoff metadata must remain nonconsuming, metadata-only, covered by Daml Script tests, and visible only through ReservationHandoffInstruction rather than CapacityReservation.",
                     "enforcing_functions": [
                       "fn.test.daml-suite",
                       "fn.ci.local-gate"
@@ -1427,7 +1429,7 @@
         "attacker_control": "indirect",
         "severity": "critical",
         "status": "guarded",
-        "description": "Passport-owned Daml reintroduces execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
+        "description": "Passport-owned Daml reintroduces execution, custody, settlement, wallet, optimizer, credit-decision, proof-system implementation language, dormant reservation observer fields, or a handoff status transition.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -1435,7 +1437,7 @@
         "exploit_path_ids": [
           "xp.scope.docs-boundary-drift"
         ],
-        "kill_gate": "hardening:gate fails if Passport-owned Daml contains execution/custody/settlement/wallet/optimizer/credit/ZK implementation language."
+        "kill_gate": "hardening:gate fails if Passport-owned Daml contains execution/custody/settlement/wallet/optimizer/credit/ZK implementation language, reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant."
       },
       {
         "id": "bd.scope.canonical-docs-drift",
@@ -1461,7 +1463,7 @@
         "attacker_control": "direct",
         "severity": "high",
         "status": "guarded",
-        "description": "Reservation handoff metadata exists without Daml Script coverage proving it is nonconsuming and visible to the handoff recipient.",
+        "description": "Reservation handoff metadata exists without Daml Script coverage proving it is nonconsuming, visible to the handoff recipient, and not a reservation-level visibility path.",
         "evidence": [
           "test.daml.coverage-suite",
           "test.hardening.architecture-gate",
@@ -1470,7 +1472,7 @@
         "exploit_path_ids": [
           "xp.scope.handoff-coverage-gap"
         ],
-        "kill_gate": "tests fail if reservation handoff metadata is not covered."
+        "kill_gate": "tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer."
       },
       {
         "id": "bd.interop.dynamic-plugin-loading",

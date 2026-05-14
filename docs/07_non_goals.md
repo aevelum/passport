@@ -2,6 +2,8 @@
 
 Passport records readiness, eligibility, presentation, reservation, revocation, expiry, audit, evidence, bounded interop artifacts, and adapter readiness reports. Passport may record a reservation handoff notice.
 
+CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+
 Passport intentionally excludes:
 
 - not repo execution;

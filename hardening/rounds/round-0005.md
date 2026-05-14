@@ -4,6 +4,8 @@
 
 Align Passport main branch with the canonical public-core scope by replacing borderline execution terminology with non-executing reservation handoff terminology and enforcing the boundary in docs, Daml, gates, and generated artifacts.
 
+This round also removes dormant reservation-level observer and status surfaces so the public core has one visibility path per disclosure object.
+
 ## Selected Surfaces
 
 - Daml domain boundary.
@@ -18,13 +20,23 @@ Aevelum Passport is the public Canton/Daml foundation for private collateral-rea
 
 Passport records readiness. Passport may record a reservation handoff notice. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, or move collateral.
 
+`CapacityReservation` is visible to holder, attester, and verifier. Handoff visibility is isolated to `ReservationHandoffInstruction`. Auditor visibility is isolated to `AuditDisclosureGrant`.
+
 ## Kill Gates
 
 - Hardening gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.
+- Hardening gate fails if Passport-owned Daml contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.
 - Structural gate fails if README or docs lose the canonical scope or non-goal language.
-- Tests fail if reservation handoff metadata is not covered.
+- Tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.
 - Generated artifacts must be current.
 - CDM remains Level 2 — Artifact Conformance and does not overclaim.
+
+## Cleanup Notes
+
+- Reservation-level optional handoff and auditor observers were removed.
+- Handoff visibility is isolated to `ReservationHandoffInstruction`.
+- Auditor visibility is isolated to `AuditDisclosureGrant`.
+- The handoff status variant was removed because handoff is nonconsuming metadata, not a reservation-state transition.
 
 ## Evidence
 

@@ -141,7 +141,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate fails if Passport-owned Daml contains execution/custody/settlement/wallet/optimizer/credit/ZK implementation language.",
+      "kill_gate": "hardening:gate fails if Passport-owned Daml contains execution/custody/settlement/wallet/optimizer/credit/ZK implementation language, reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
@@ -163,7 +163,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "tests fail if reservation handoff metadata is not covered.",
+      "kill_gate": "tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],

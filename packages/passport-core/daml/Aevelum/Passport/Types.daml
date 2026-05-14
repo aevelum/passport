@@ -42,7 +42,6 @@ data ReservationStatus
   = ReservationActive
   | ReservationReleased
   | ReservationExpired
-  | ReservationHandedOff
   | ReservationDisputed
   deriving (Eq, Show)
 

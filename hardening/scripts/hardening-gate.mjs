@@ -237,6 +237,9 @@ function checkPassportScopeBoundary() {
       'instructionId',
       'instructionPurpose',
       'instructionCreatedAt',
+      'handoffObserver',
+      'ReservationHandedOff',
+      'auditor : Optional Party',
       'SettlementFinality',
       'CustodyWallet',
       'CollateralOptimizer',
@@ -283,6 +286,41 @@ function checkPassportScopeBoundary() {
     ok(nonGoalDoc.includes(required), `docs/07_non_goals.md includes non-goal ${required}`);
   }
 
+  for (const rel of [
+    'README.md',
+    'docs/02_foundation_release_scope.md',
+    'docs/05_privacy_model.md',
+    'docs/07_non_goals.md',
+    'artifacts/demo_transcript.json'
+  ]) {
+    const text = readText(rel).toLowerCase();
+    for (const needle of [
+      'capacityreservation is visible',
+      'holder',
+      'attester',
+      'verifier',
+      'reservationhandoffinstruction',
+      'handoff recipient',
+      'auditdisclosuregrant',
+      'auditor'
+    ]) {
+      ok(text.includes(needle), `${rel} includes dedicated visibility language`);
+    }
+  }
+
+  for (const rel of passportScopeDocs()) {
+    const text = readText(rel).toLowerCase();
+    for (const forbidden of [
+      'capacityreservation is visible only to holder, attester, verifier, and optional scoped observers',
+      'optional scoped observers',
+      'optional handoff observer and auditor',
+      'optional handoff observer',
+      'reservation-level auditor'
+    ]) {
+      ok(!text.includes(forbidden), `${rel} excludes stale reservation observer language`);
+    }
+  }
+
   const unsafePatterns = [
     { label: 'executing trades', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:executes?|executing|execute)\b[^.\n|;]{0,80}\b(?:trade|trades|repo|securities-lending|transaction|transactions)\b/i },
     { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
@@ -310,7 +348,8 @@ function passportScopeDocs() {
     ...walkFiles('docs', { extensions: ['.md'] }),
     ...walkFiles('design', { extensions: ['.md'] }),
     ...walkFiles('hardening', { extensions: ['.md'] }),
-    ...walkFiles('.agents/skills', { extensions: ['.md'] })
+    ...walkFiles('.agents/skills', { extensions: ['.md'] }),
+    'artifacts/demo_transcript.json'
   ]);
   return [...files].filter(file => fs.existsSync(abs(file))).sort();
 }

@@ -262,7 +262,10 @@
         "Passport records readiness.",
         "Passport may record a reservation handoff notice.",
         "Passport does not execute the downstream trade.",
-        "Passport does not custody, transfer, settle, or move collateral."
+        "Passport does not custody, transfer, settle, or move collateral.",
+        "CapacityReservation is visible to holder, attester, and verifier.",
+        "ReservationHandoffInstruction is visible to the handoff recipient.",
+        "AuditDisclosureGrant is visible to the auditor."
       ]
     },
     {
@@ -295,6 +298,9 @@
         "ExecutionInstruction",
         "ConvertToExecutionInstruction",
         "executionRailParty",
+        "handoffObserver",
+        "ReservationHandedOff",
+        "auditor : Optional Party",
         "SettlementFinality",
         "CustodyWallet",
         "CollateralOptimizer",

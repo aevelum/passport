@@ -36,5 +36,7 @@
 - Renamed Passport-owned downstream metadata into reservation handoff terminology in Daml, tests, docs, and generated demo output.
 - Added canonical scope and explicit non-goal language to README and scope docs: Passport records readiness and may record reservation handoff notices, but does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement proof systems, provide production identity, or provide live external integration.
 - Strengthened structural and hardening gates so Daml source must use `ReservationHandoffInstruction`, `CreateReservationHandoff`, and `handoffRecipient`, and must exclude out-of-scope implementation terminology.
+- Removed reservation-level optional handoff and auditor observers; handoff visibility is isolated to `ReservationHandoffInstruction`, and auditor visibility is isolated to `AuditDisclosureGrant`.
+- Removed the handoff status variant because handoff is nonconsuming metadata, not a reservation-state transition.
 - Preserved the CDM adapter at Level 2 — Artifact Conformance with the existing non-claims for certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, and production partner integration.
 - Added round-0005 hardening evidence for the Daml domain boundary, repo pre-trade workflow boundary, interop adapter boundary, non-goal documentation, and structural gates.

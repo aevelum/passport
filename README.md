@@ -10,6 +10,8 @@ It models collateral-capacity accounts, collateral policies, credential requests
 
 Passport records readiness. Passport may record a reservation handoff notice. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, or move collateral.
 
+CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+
 Aevelum Passport demonstrates a roomless Canton-native collateral credential account for repo pre-trade capacity verification and reservation.
 
 The public core proves one narrow readiness workflow:

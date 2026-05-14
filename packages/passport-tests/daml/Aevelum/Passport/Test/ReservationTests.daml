@@ -77,6 +77,7 @@ t020_create_reservation_handoff = script do
   let dealer = reserved.presented.base.actors.dealer
   let attester = reserved.presented.base.actors.attester
   let recipient = reserved.presented.base.actors.operator
+  let auditor = reserved.presented.base.actors.auditor
   _handoffCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
     exerciseCmd reserved.reservationCid CreateReservationHandoff with
       handoffId = "reservation-handoff-001"
@@ -85,8 +86,15 @@ t020_create_reservation_handoff = script do
       handoffCreatedAt = "2026-05-10T05:15:00Z"
   recipientHandoffs <- query @ReservationHandoffInstruction recipient
   dealerReservations <- query @CapacityReservation dealer
+  recipientReservations <- query @CapacityReservation recipient
+  auditorReservations <- query @CapacityReservation auditor
   assertMsg "handoff recipient should see reservation handoff instruction" (length recipientHandoffs == 1)
   assertMsg "handoff is nonconsuming and keeps reservation active" (length dealerReservations == 1)
+  case dealerReservations of
+    [(_, reservation)] -> assertMsg "handoff does not mutate reservation status" (reservation.status == ReservationActive)
+    _ -> assertMsg "dealer should see exactly one reservation after handoff" False
+  assertMsg "handoff recipient should not see reservation through reservation-level observer" (length recipientReservations == 0)
+  assertMsg "auditor should not see reservation through reservation-level observer" (length auditorReservations == 0)
   return ()
 
 t021_dispute_reservation : Script ()
