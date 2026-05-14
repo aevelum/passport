@@ -142,6 +142,7 @@ function checkAdapterReadiness() {
   }
 
   checkReadinessNegativeCases();
+  checkReadinessPositiveCases();
 }
 
 function checkInteropReportReadiness() {
@@ -429,14 +430,31 @@ function checkReadinessNegativeCases() {
     {
       id: 'level-3-category-without-proof-reference',
       run: () => {
-        const readiness = fakeReadiness({
-          level: 3,
-          name: 'Executable Conformance',
-          evidence: [
-            ...baseEvidence(),
-            evidence('fake.executable.category-only', 'canonical-engine-execution', [])
-          ]
-        });
+        const readiness = fakeLevel3Readiness([]);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
+    },
+    {
+      id: 'level-3-canonical-engine-package-json-only',
+      run: () => {
+        const readiness = fakeLevel3Readiness(['package.json']);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
+    },
+    {
+      id: 'level-3-canonical-engine-readme-only',
+      run: () => {
+        const readiness = fakeLevel3Readiness(['README.md']);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
+    },
+    {
+      id: 'level-3-canonical-engine-generic-doc-only',
+      run: () => {
+        const readiness = fakeLevel3Readiness(['docs/09_adapter_readiness_levels.md']);
         assertReadinessEvidenceBound(readiness);
         assertReadinessEvidenceReferences(readiness, { root: abs('.') });
       }
@@ -453,6 +471,14 @@ function checkReadinessNegativeCases() {
       }))
     },
     {
+      id: 'level-4-sandbox-generic-doc-only',
+      run: () => {
+        const readiness = fakeLevel4Readiness(['docs/09_adapter_readiness_levels.md']);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
+    },
+    {
       id: 'level-5-missing-production-evidence',
       run: () => assertPluginShape(fakePlugin({
         level: 5,
@@ -467,6 +493,14 @@ function checkReadinessNegativeCases() {
           evidence('fake.sandbox-test', 'sandbox-test')
         ]
       }))
+    },
+    {
+      id: 'level-5-production-generic-doc-only',
+      run: () => {
+        const readiness = fakeLevel5Readiness(['docs/09_adapter_readiness_levels.md']);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
     }
   ];
 
@@ -475,12 +509,29 @@ function checkReadinessNegativeCases() {
   }
 }
 
+function checkReadinessPositiveCases() {
+  expectSuccess('readiness positive case level-3-executable-proof-bearing-reference', () => {
+    const readiness = fakeLevel3Readiness(['package.json', 'scripts/interop-validate.mjs']);
+    assertReadinessEvidenceBound(readiness);
+    assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+  });
+}
+
 function expectFailure(label, fn) {
   try {
     fn();
     fail.push(`${label} did not fail`);
   } catch (error) {
     pass.push(`${label} failed as expected: ${error.message}`);
+  }
+}
+
+function expectSuccess(label, fn) {
+  try {
+    fn();
+    pass.push(`${label} passed`);
+  } catch (error) {
+    fail.push(`${label} failed unexpectedly: ${error.message}`);
   }
 }
 
@@ -509,6 +560,56 @@ function fakeReadiness(overrides = {}) {
     lastVerifiedBy: 'npm run gate',
     ...overrides
   };
+}
+
+function fakeLevel3Readiness(executableReferences) {
+  return fakeReadiness({
+    level: 3,
+    name: 'Executable Conformance',
+    evidence: [
+      ...baseEvidence(),
+      evidence('fake.executable', 'canonical-engine-execution', executableReferences)
+    ]
+  });
+}
+
+function fakeLevel4Readiness(sandboxReferences) {
+  return fakeReadiness({
+    level: 4,
+    name: 'Sandbox Integration',
+    evidence: [
+      ...baseEvidence(),
+      evidence('fake.executable', 'canonical-engine-execution', ['scripts/interop-validate.mjs']),
+      ...sandboxEvidence(sandboxReferences)
+    ]
+  });
+}
+
+function fakeLevel5Readiness(productionReferences) {
+  return fakeReadiness({
+    level: 5,
+    name: 'Production Integration',
+    evidence: [
+      ...baseEvidence(),
+      evidence('fake.executable', 'canonical-engine-execution', ['scripts/interop-validate.mjs']),
+      ...sandboxEvidence(['packages/passport-tests/daml.yaml']),
+      evidence('fake.production-partner', 'production-partner-evidence', productionReferences),
+      evidence('fake.security-review', 'security-review', productionReferences),
+      evidence('fake.operational-runbook', 'operational-runbook', productionReferences),
+      evidence('fake.release-control', 'release-control', productionReferences),
+      evidence('fake.sla-incident', 'sla-incident-evidence', productionReferences)
+    ]
+  });
+}
+
+function sandboxEvidence(references) {
+  return [
+    evidence('fake.sandbox-auth', 'sandbox-auth', references),
+    evidence('fake.sandbox-environment', 'sandbox-environment', references),
+    evidence('fake.operational-error-handling', 'operational-error-handling', references),
+    evidence('fake.monitoring-logging', 'monitoring-logging', references),
+    evidence('fake.sandbox-test', 'sandbox-test', references)
+  ];
 }
 
 function baseEvidence(categories = [

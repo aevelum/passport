@@ -13,7 +13,7 @@
       "The CDM schema manifest provides committed local integrity for reviewed schema files, not upstream authenticity when schema and manifest are changed together.",
       "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed.",
       "Registered adapters cannot use Level 0; Level 0 is concept-only for future adapter candidates with no registered plugin implementation.",
-      "Level 3 and higher readiness cannot be self-attested by category names alone; higher levels require existing referenced tests, scripts, fixtures, reports, or artifacts."
+      "Level 3 and higher readiness cannot be self-attested by category names alone or generic existing files; higher levels require existing references in category-appropriate proof-bearing paths."
     ],
     "source_inventory": [
       {
@@ -466,10 +466,10 @@
       "prop.interop.no-live-integration-overclaim",
       "prop.interop.readiness-reported"
     ],
-    "selection_reason": "Round 0004 tightens Adapter Readiness Level enforcement with Level 0 registration rejection, evidence reference validation, sentence-level overclaim fixtures, report consistency checks, and narrower CDM payload metadata bans.",
+    "selection_reason": "Round 0004 tightens Adapter Readiness Level enforcement with Level 0 registration rejection, category-specific proof-reference validation, sentence-level overclaim fixtures, report consistency checks, and narrower CDM payload metadata bans.",
     "kill_gates": [
       "hardening:gate fails if a registered plugin uses concept-only Level 0 readiness.",
-      "hardening:gate fails if Level 3+ readiness is self-attested by category names without existing referenced proof artifacts.",
+      "hardening:gate fails if Level 3+ readiness is self-attested by category names or generic existing files such as package.json, README, or generic docs without category-appropriate proof-bearing references.",
       "hardening:gate fails if docs or guidance contain forbidden Level 2 overclaim phrases without same-sentence negation or promotion-boundary language, and negative fixtures prove rejected examples fail.",
       "hardening:gate fails if artifacts/interop/report.json readiness drifts from registered plugin readiness summaries or includes unregistered adapters.",
       "hardening:gate fails if generated CDM payloads contain Passport provenance or readiness metadata while avoiding broad bans on future non-CDM domain keys."
@@ -734,7 +734,7 @@
                     "id": "prop.interop.adapter-level-evidence-bound",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "An adapter may not be registered, documented, reported, or marketed above the highest readiness level supported by committed tests, reports, and gates; registered plugins cannot use concept-only Level 0.",
+                    "statement": "An adapter may not be registered, documented, reported, or marketed above the highest readiness level supported by committed category-appropriate tests, reports, proof-bearing paths, and gates; registered plugins cannot use concept-only Level 0.",
                     "enforcing_functions": [
                       "fn.interop.assert-readiness-evidence-bound",
                       "fn.interop.define-plugin",
@@ -1408,7 +1408,7 @@
         "severity": "high",
         "attacker_control": "indirect",
         "status": "guarded",
-        "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing evidence references, and unknown lastVerifiedBy commands.",
+        "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing proof-bearing evidence references, generic existing-file proof references for Level 3+, and unknown lastVerifiedBy commands.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"

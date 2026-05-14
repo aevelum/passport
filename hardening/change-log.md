@@ -26,6 +26,7 @@
 
 - Tightened registered adapter validation so Level 0 remains concept-only and plugins must declare Level 1 through Level 5.
 - Normalized readiness evidence requirements, added repo-path and verification-command reference checks, and proved fake Level 3, Level 4, and Level 5 self-attestation cases fail.
+- Strengthened Level 3+ proof-reference validation so generic existing files such as `package.json`, README, and generic docs cannot satisfy executable, sandbox, or production proof categories by themselves.
 - Replaced broad prose-context overclaim scanning with sentence-level claim units and explicit positive and negative fixtures.
 - Added deep interop report consistency checks so `adapters`, `adapterReadiness`, and registered plugin readiness cannot drift.
 - Moved CDM readiness metadata into a dedicated module and kept generated CDM payload purity checks focused on provenance and readiness metadata.

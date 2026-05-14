@@ -18,7 +18,7 @@ CDM adapter: Level 2 — Artifact Conformance.
 ## Kill Gates
 
 - Registered plugins cannot be Level 0; Level 0 is concept-only for future candidates.
-- Level 3+ cannot be self-attested by category names alone; higher levels require existing referenced tests, fixtures, scripts, reports, or artifacts.
+- Level 3+ cannot be self-attested by category names alone; proof categories require existing references in accepted proof-bearing paths, and the gate rejects generic existing files such as `package.json`, README, and generic docs for Level 3+ evidence.
 - Overclaim detection is sentence-level and backed by positive and negative prose fixtures.
 - Interop report readiness is deeply consistent with registered plugin readiness.
 - Generated payloads stay clean without overbroad generic-key bans.

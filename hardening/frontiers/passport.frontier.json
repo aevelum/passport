@@ -141,7 +141,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing evidence references, and unknown lastVerifiedBy commands.",
+      "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing proof-bearing evidence references, generic existing-file proof references for Level 3+, and unknown lastVerifiedBy commands.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],

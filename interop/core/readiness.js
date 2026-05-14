@@ -120,6 +120,57 @@ const PRODUCTION_EVIDENCE_CATEGORIES = Object.freeze([
   'sla-incident-evidence'
 ]);
 
+const EXECUTABLE_PROOF_ROOTS = Object.freeze([
+  'scripts/',
+  'hardening/scripts/',
+  'artifacts/',
+  'interop/tests/',
+  'interop/fixtures/',
+  'packages/passport-tests/',
+  'test/',
+  'tests/'
+]);
+
+const SANDBOX_PROOF_ROOTS = Object.freeze([
+  'scripts/',
+  'hardening/scripts/',
+  'artifacts/',
+  'interop/tests/',
+  'interop/fixtures/',
+  'packages/passport-tests/',
+  'test/',
+  'tests/',
+  'sandbox/',
+  'auth/',
+  'environment/',
+  'env/',
+  'ops/',
+  'operations/'
+]);
+
+const SANDBOX_PROOF_PATTERN = /(^|[\/._-])(sandbox|auth|authentication|environment|env|ops|operation|operational|monitoring|logging|test|tests|fixture|fixtures|smoke)([\/._-]|$)/i;
+
+const PRODUCTION_PROOF_ROOTS = Object.freeze([
+  'scripts/',
+  'hardening/scripts/',
+  'artifacts/',
+  'interop/tests/',
+  'interop/fixtures/',
+  'packages/passport-tests/',
+  'test/',
+  'tests/',
+  'docs/',
+  'security/',
+  'runbooks/',
+  'release/',
+  'releases/',
+  'incidents/',
+  'partners/',
+  'production/'
+]);
+
+const PRODUCTION_PROOF_PATTERN = /(^|[\/._ -])(security[\/._ -]?review|runbook|release[\/._ -]?control|sla|incident|partner|live[\/._ -]?network|production[\/._ -]?evidence)([\/._ -]|$)/i;
+
 const CLAIM_BOUNDARIES = Object.freeze([
   Object.freeze({
     maxLevel: 2,
@@ -273,17 +324,17 @@ export function assertReadinessEvidenceReferences(readiness, options = {}) {
   assertLastVerifiedBy(readiness.lastVerifiedBy, root, options.explicitShellCommands ?? []);
 
   if (readiness.level >= 3) {
-    assertReferencedProofForAny(readiness, EXECUTABLE_EVIDENCE_CATEGORIES, root, 'Level 3 executable evidence');
+    assertReferencedProofForAny(readiness, EXECUTABLE_EVIDENCE_CATEGORIES, root, 'Level 3 executable evidence', isExecutableProofReference);
   }
   if (readiness.level >= 4) {
     for (const category of SANDBOX_EVIDENCE_CATEGORIES) {
-      assertReferencedProofForCategory(readiness, category, root, `Level 4 sandbox evidence ${category}`);
+      assertReferencedProofForCategory(readiness, category, root, `Level 4 sandbox evidence ${category}`, isSandboxProofReference);
     }
   }
   if (readiness.level >= 5) {
-    assertReferencedProofForAny(readiness, ['production-partner-evidence', 'live-network-evidence'], root, 'Level 5 production or live evidence');
+    assertReferencedProofForAny(readiness, ['production-partner-evidence', 'live-network-evidence'], root, 'Level 5 production or live evidence', isProductionProofReference);
     for (const category of ['security-review', 'operational-runbook', 'release-control', 'sla-incident-evidence']) {
-      assertReferencedProofForCategory(readiness, category, root, `Level 5 production evidence ${category}`);
+      assertReferencedProofForCategory(readiness, category, root, `Level 5 production evidence ${category}`, isProductionProofReference);
     }
   }
 }
@@ -341,22 +392,48 @@ function assertLastVerifiedBy(value, root, explicitShellCommands) {
   }
 }
 
-function assertReferencedProofForAny(readiness, categories, root, label) {
+function assertReferencedProofForAny(readiness, categories, root, label, isProofReference) {
   const items = readiness.evidence.filter(item => categories.includes(item.category));
-  if (!items.some(item => hasExistingProofReference(root, item))) {
-    throw new Error(`${label} must reference an existing test, fixture, script, report, or artifact`);
+  if (!items.some(item => hasExistingProofReference(root, item, isProofReference))) {
+    throw new Error(`${label} must reference an existing accepted proof-bearing path`);
   }
 }
 
-function assertReferencedProofForCategory(readiness, category, root, label) {
+function assertReferencedProofForCategory(readiness, category, root, label, isProofReference) {
   const items = readiness.evidence.filter(item => item.category === category);
-  if (!items.some(item => hasExistingProofReference(root, item))) {
-    throw new Error(`${label} must reference an existing test, fixture, script, report, or artifact`);
+  if (!items.some(item => hasExistingProofReference(root, item, isProofReference))) {
+    throw new Error(`${label} must reference an existing accepted proof-bearing path`);
   }
 }
 
-function hasExistingProofReference(root, item) {
-  return (item.references ?? []).some(reference => referenceExists(root, reference));
+function hasExistingProofReference(root, item, isProofReference) {
+  return (item.references ?? []).some(reference => referenceExists(root, reference) && isProofReference(reference));
+}
+
+export function isExecutableProofReference(reference) {
+  const normalized = normalizeReferencePath(reference);
+  return Boolean(normalized && isUnderAny(normalized, EXECUTABLE_PROOF_ROOTS));
+}
+
+export function isSandboxProofReference(reference) {
+  const normalized = normalizeReferencePath(reference);
+  return Boolean(
+    normalized
+    && isUnderAny(normalized, SANDBOX_PROOF_ROOTS)
+    && (
+      isUnderAny(normalized, ['interop/tests/', 'interop/fixtures/', 'packages/passport-tests/', 'test/', 'tests/'])
+      || SANDBOX_PROOF_PATTERN.test(normalized)
+    )
+  );
+}
+
+export function isProductionProofReference(reference) {
+  const normalized = normalizeReferencePath(reference);
+  return Boolean(
+    normalized
+    && isUnderAny(normalized, PRODUCTION_PROOF_ROOTS)
+    && PRODUCTION_PROOF_PATTERN.test(normalized)
+  );
 }
 
 function referenceExists(root, reference) {
@@ -368,4 +445,20 @@ function isPathLikeReference(reference) {
   return /^\.{1,2}\//.test(reference)
     || reference.includes('/')
     || /\.(json|js|mjs|md|yaml|yml|sh|daml|dar|txt|csv|zip)$/i.test(reference);
+}
+
+function normalizeReferencePath(reference) {
+  if (!isPathLikeReference(reference)) return null;
+  const normalized = path.posix.normalize(reference.replace(/\\/g, '/').replace(/^\.\//, ''));
+  if (normalized === '.' || normalized.startsWith('../') || normalized.startsWith('/')) return null;
+  return normalized;
+}
+
+function isUnderAny(reference, roots) {
+  return roots.some(root => isUnder(reference, root));
+}
+
+function isUnder(reference, root) {
+  const normalizedRoot = root.replace(/\/$/, '');
+  return reference === normalizedRoot || reference.startsWith(`${normalizedRoot}/`);
 }
