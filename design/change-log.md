@@ -4,6 +4,7 @@
 
 - Added light and dark Aevelum icon logo SVG sources for generic product and brand usage.
 - Regenerated matching PNG derivatives from the SVG sources.
+- Added a Telegram-ready Aevelum profile icon with a 640px square source, opaque background, centered no-text mark, circular-crop safe area, and JPG/PNG derivatives.
 
 ## 2026-05-12 - Institutional Finance Palette
 

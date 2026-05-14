@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="none" role="img" aria-label="Aevelum Telegram profile icon">
+  <title>Aevelum Telegram profile icon</title>
+  <desc>A circle-crop-safe Aevelum profile icon for Telegram, with a centered mark on an opaque institutional navy square.</desc>
+  <defs>
+    <linearGradient id="telegramSurface" x1="88" y1="72" x2="552" y2="568" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F3A"/>
+      <stop offset="100%" stop-color="#07111A"/>
+    </linearGradient>
+    <radialGradient id="telegramFocus" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 292) rotate(90) scale(292)">
+      <stop stop-color="#102A43"/>
+      <stop offset="100%" stop-color="#07111A" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="telegramMarkShadow" x="56" y="56" width="528" height="528" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="14" flood-color="#07111A" flood-opacity="0.32" stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="640" fill="url(#telegramSurface)"/>
+  <rect width="640" height="640" fill="url(#telegramFocus)"/>
+  <circle cx="320" cy="320" r="286" stroke="#5F6673" stroke-opacity="0.72" stroke-width="10"/>
+
+  <g filter="url(#telegramMarkShadow)" transform="translate(320 268.4) scale(0.96) translate(-320 -301)">
+    <path
+      fill="#F8FAFC"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M320 86
+         L535 516
+         H468
+         L320 216
+         L172 516
+         H105
+         L320 86Z
+         M320 178
+         L210 394
+         H430
+         L320 178Z"/>
+    <path
+      fill="#BD9B6B"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M320 288
+         L443 516
+         H380
+         L320 402
+         L260 516
+         H197
+         L320 288Z
+         M320 362
+         L266 470
+         H374
+         L320 362Z"/>
+  </g>
+</svg>
