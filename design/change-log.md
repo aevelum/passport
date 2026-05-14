@@ -1,5 +1,10 @@
 # Design Change Log
 
+## 2026-05-14 - Aevelum Icon Variants
+
+- Added light and dark Aevelum icon logo SVG sources for generic product and brand usage.
+- Regenerated matching PNG derivatives from the SVG sources.
+
 ## 2026-05-12 - Institutional Finance Palette
 
 - Replaced the brighter fintech teal/blue asset palette with a restrained institutional finance palette based on navy, slate, globe blue, muted teal, off-white, limited gold, and risk-only red.
