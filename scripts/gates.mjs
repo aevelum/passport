@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getGeneratedAt } from './generated-time.mjs';
+import { CDM_READINESS } from '../interop/plugins/cdm/readiness.js';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const fail = [];
@@ -22,6 +23,11 @@ function checkContains(rel, needles) {
     if (!s.includes(needle)) fail.push(`${rel} missing ${needle}`);
     else pass.push(`${rel} contains ${needle}`);
   }
+}
+
+function joinWithFinalOr(items) {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')}, or ${items[items.length - 1]}`;
 }
 
 function walk(dir, acc = []) {
@@ -86,6 +92,7 @@ const requiredFiles = [
   'interop/registry.js',
   'interop/runner.js',
   'interop/plugins/cdm/index.js',
+  'interop/plugins/cdm/readiness.js',
   'interop/plugins/cdm/vendor.js',
   interopSample,
   `${cdmSchemaRoot}/SOURCE.md`,
@@ -106,6 +113,7 @@ const requiredFiles = [
   'hardening/rounds/round-0001.md',
   'hardening/rounds/round-0002.md',
   'hardening/rounds/round-0003.md',
+  'hardening/rounds/round-0004.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -179,7 +187,7 @@ checkContains(interopDoc, [
   'FINOS CDM',
   'Adapter Readiness Levels',
   'The current FINOS CDM adapter is Level 2 — Artifact Conformance.',
-  'It is not FINOS certification, Rosetta Engine execution, CDM eligibility-engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.'
+  `It is not ${joinWithFinalOr(CDM_READINESS.nonClaims)}.`
 ]);
 
 checkContains('AGENTS.md', [
@@ -231,20 +239,27 @@ checkContains('interop/registry.js', [
 
 checkContains('interop/plugins/cdm/index.js', [
   'framework: \'cdm\'',
-  'readiness',
-  'level: 2',
-  'Artifact Conformance',
+  'CDM_READINESS',
   'eligible-collateral-specification',
   'eligibility-query',
   'check-eligibility-result',
   'verifySchemaManifest'
 ]);
 
+checkContains('interop/plugins/cdm/readiness.js', [
+  'CDM_READINESS',
+  'level: 2',
+  'Artifact Conformance',
+  'FINOS certification',
+  'Canton Token Standard integration'
+]);
+
 checkContains('interop/core/readiness.js', [
   'ADAPTER_READINESS_LEVELS',
   'assertReadinessShape',
   'readinessSummary',
-  'assertReadinessEvidenceBound'
+  'assertReadinessEvidenceBound',
+  'assertReadinessEvidenceReferences'
 ]);
 
 // Forbidden implementation concepts: these names should not appear in Daml code.
@@ -322,7 +337,7 @@ try {
   else pass.push('interop report CDM readiness level is 2');
   if (cdmAdapter?.readinessName !== 'Artifact Conformance') fail.push(`interop report CDM readiness name is ${cdmAdapter?.readinessName}`);
   else pass.push('interop report CDM readiness name is Artifact Conformance');
-  for (const nonClaim of ['FINOS certification', 'Rosetta Engine execution', 'CDM eligibility-engine execution', 'repo execution', 'custody', 'settlement', 'live external integration', 'production partner integration', 'Canton Token Standard integration']) {
+  for (const nonClaim of CDM_READINESS.nonClaims) {
     if (!cdmAdapter?.nonClaims?.includes(nonClaim)) fail.push(`interop report CDM non-claim missing ${nonClaim}`);
     else pass.push(`interop report CDM non-claim includes ${nonClaim}`);
   }

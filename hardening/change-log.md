@@ -21,3 +21,11 @@
 - Classified the current CDM adapter as Level 2 — Artifact Conformance with explicit claims, non-claims, promotion criteria, and CI evidence.
 - Added hardening gate checks for readiness metadata, CDM Level 2 overclaim language, report readiness fields, and generated payload purity.
 - Added readiness documentation, repo guidance, and the `inv.interop.adapter-readiness-claims` invariant with high and critical properties.
+
+## 2026-05-14 - round-0004
+
+- Tightened registered adapter validation so Level 0 remains concept-only and plugins must declare Level 1 through Level 5.
+- Normalized readiness evidence requirements, added repo-path and verification-command reference checks, and proved fake Level 3, Level 4, and Level 5 self-attestation cases fail.
+- Replaced broad prose-context overclaim scanning with sentence-level claim units and explicit positive and negative fixtures.
+- Added deep interop report consistency checks so `adapters`, `adapterReadiness`, and registered plugin readiness cannot drift.
+- Moved CDM readiness metadata into a dedicated module and kept generated CDM payload purity checks focused on provenance and readiness metadata.

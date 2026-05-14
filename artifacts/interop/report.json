@@ -127,8 +127,8 @@
         "custody",
         "settlement",
         "live external integration",
-        "production partner integration",
-        "Canton Token Standard integration"
+        "Canton Token Standard integration",
+        "production partner integration"
       ],
       "promotionCriteria": [
         "Level 3 requires executable CDM, Rosetta, canonical-engine, API, simulator, or round-trip conformance test evidence.",
@@ -255,8 +255,8 @@
         "custody",
         "settlement",
         "live external integration",
-        "production partner integration",
-        "Canton Token Standard integration"
+        "Canton Token Standard integration",
+        "production partner integration"
       ],
       "promotionCriteria": [
         "Level 3 requires executable CDM, Rosetta, canonical-engine, API, simulator, or round-trip conformance test evidence.",

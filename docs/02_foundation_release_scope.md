@@ -17,18 +17,18 @@ The Foundation Release proves one committee-ready workflow:
 
 ## Out of scope
 
-- Live custodian integration.
-- Live venue integration.
-- Live settlement.
-- Custody.
-- Collateral movement.
-- Collateral optimization.
-- Credit approval.
-- ZK proofs.
-- Diligence workspace UI.
-- Production identity integration.
-- Rosetta Engine execution.
-- Formal standards-body endorsement.
+- Not live custodian integration.
+- Not live venue integration.
+- Not live settlement.
+- Not custody.
+- Not collateral movement.
+- Not collateral optimization.
+- Not credit approval.
+- Not ZK proofs.
+- Not diligence workspace UI.
+- Not production identity integration.
+- Not Rosetta Engine execution.
+- Not formal standards-body endorsement.
 
 ## Acceptance definition
 

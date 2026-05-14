@@ -11,7 +11,9 @@
       "FINOS CDM support means offline JSON-schema conformance for generated collateral eligibility artifacts, not FINOS certification, Rosetta Engine execution, or CDM eligibility-engine execution.",
       "Default PR CI must not fetch network resources after GitHub platform checkout; dependency and DPM toolchains are provided by a pre-baked offline runner.",
       "The CDM schema manifest provides committed local integrity for reviewed schema files, not upstream authenticity when schema and manifest are changed together.",
-      "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed."
+      "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed.",
+      "Registered adapters cannot use Level 0; Level 0 is concept-only for future adapter candidates with no registered plugin implementation.",
+      "Level 3 and higher readiness cannot be self-attested by category names alone; higher levels require existing referenced tests, scripts, fixtures, reports, or artifacts."
     ],
     "source_inventory": [
       {
@@ -167,6 +169,14 @@
         "notes": "CDM artifact generation, validation, and negative case."
       },
       {
+        "path": "interop/plugins/cdm/readiness.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-plugin",
+        "status": "breakdown",
+        "notes": "Single source of truth for current CDM Level 2 readiness metadata, claims, non-claims, promotion criteria, and evidence references."
+      },
+      {
         "path": "interop/plugins/cdm/vendor.js",
         "language": "javascript",
         "pin": "git:HEAD",
@@ -189,6 +199,22 @@
         "primary_component_id": "cmp.interop.adapter-core",
         "status": "semantics",
         "notes": "Adapter Readiness Level ladder and promotion evidence boundaries."
+      },
+      {
+        "path": "docs/02_foundation_release_scope.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Foundation Release scope and sentence-bounded non-claim language."
+      },
+      {
+        "path": "docs/07_non_goals.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Repository non-goals and sentence-bounded overclaim exclusions."
       },
       {
         "path": "scripts/ci.sh",
@@ -375,6 +401,14 @@
         "notes": "Adapter readiness claim-control hardening round record."
       },
       {
+        "path": "hardening/rounds/round-0004.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Adapter readiness negative gates and evidence normalization hardening round record."
+      },
+      {
         "path": "hardening/change-log.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -425,19 +459,20 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0003",
+    "round_id": "round-0004",
     "selected_surfaces": [
       "inv.interop.adapter-readiness-claims",
       "prop.interop.adapter-level-evidence-bound",
       "prop.interop.no-live-integration-overclaim",
       "prop.interop.readiness-reported"
     ],
-    "selection_reason": "Round 0003 adds evidence-gated Adapter Readiness Levels so interop adapter claims cannot exceed committed tests, reports, documentation, and hardening gates.",
+    "selection_reason": "Round 0004 tightens Adapter Readiness Level enforcement with Level 0 registration rejection, evidence reference validation, sentence-level overclaim fixtures, report consistency checks, and narrower CDM payload metadata bans.",
     "kill_gates": [
-      "hardening:gate fails if any registered adapter lacks readiness metadata, uses an unknown level, or has a level/name mismatch.",
-      "hardening:gate fails if the current CDM adapter is not Level 2 Artifact Conformance or Level 2 docs overclaim live, external-engine, certification, custody, settlement, production partner, or Canton Token Standard integration.",
-      "interop:validate and hardening:gate require artifacts/interop/report.json to publish readiness evidence, claims, non-claims, and promotion criteria.",
-      "hardening:gate fails if generated CDM payloads contain Passport provenance or adapter readiness metadata keys."
+      "hardening:gate fails if a registered plugin uses concept-only Level 0 readiness.",
+      "hardening:gate fails if Level 3+ readiness is self-attested by category names without existing referenced proof artifacts.",
+      "hardening:gate fails if docs or guidance contain forbidden Level 2 overclaim phrases without same-sentence negation or promotion-boundary language, and negative fixtures prove rejected examples fail.",
+      "hardening:gate fails if artifacts/interop/report.json readiness drifts from registered plugin readiness summaries or includes unregistered adapters.",
+      "hardening:gate fails if generated CDM payloads contain Passport provenance or readiness metadata while avoiding broad bans on future non-CDM domain keys."
     ]
   },
   "tree": {
@@ -630,7 +665,9 @@
               "interop/context.js",
               "interop/core/readiness.js",
               "docs/06_interop_adapters.md",
-              "docs/09_adapter_readiness_levels.md"
+              "docs/09_adapter_readiness_levels.md",
+              "docs/02_foundation_release_scope.md",
+              "docs/07_non_goals.md"
             ],
             "functions": [
               {
@@ -656,6 +693,11 @@
               {
                 "id": "fn.interop.readiness-summary",
                 "name": "readinessSummary",
+                "source_ref": "interop/core/readiness.js"
+              },
+              {
+                "id": "fn.interop.assert-readiness-references",
+                "name": "assertReadinessEvidenceReferences",
                 "source_ref": "interop/core/readiness.js"
               }
             ],
@@ -686,24 +728,25 @@
               },
               {
                 "id": "inv.interop.adapter-readiness-claims",
-                "statement": "Adapter maturity claims are capped by machine-readable readiness metadata, committed evidence, generated reports, and hardening gates.",
+                "statement": "Adapter maturity claims are capped by machine-readable readiness metadata, committed evidence references, generated reports, sentence-bounded docs, and hardening gates.",
                 "properties": [
                   {
                     "id": "prop.interop.adapter-level-evidence-bound",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "An adapter may not be documented, reported, or marketed above the highest readiness level supported by committed tests, reports, and gates.",
+                    "statement": "An adapter may not be registered, documented, reported, or marketed above the highest readiness level supported by committed tests, reports, and gates; registered plugins cannot use concept-only Level 0.",
                     "enforcing_functions": [
                       "fn.interop.assert-readiness-evidence-bound",
                       "fn.interop.define-plugin",
-                      "fn.ci.adapter-readiness-gate"
+                      "fn.ci.adapter-readiness-gate",
+                      "fn.interop.assert-readiness-references"
                     ]
                   },
                   {
                     "id": "prop.interop.no-live-integration-overclaim",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "A Level 2 artifact-conformance adapter must not be described as live integration, external engine execution, certification, custody, settlement, production partner integration, or Canton Token Standard integration.",
+                    "statement": "A Level 2 artifact-conformance adapter must not be described in same-sentence claim units as live integration, external engine execution, certification, custody, settlement, production partner integration, or Canton Token Standard integration unless the sentence explicitly negates the claim or states the higher-level promotion boundary.",
                     "enforcing_functions": [
                       "fn.interop.assert-readiness-evidence-bound",
                       "fn.ci.adapter-readiness-gate"
@@ -713,7 +756,7 @@
                     "id": "prop.interop.readiness-reported",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Interop reports must publish adapter readiness level, evidence, claims, non-claims, and promotion criteria for every registered adapter.",
+                    "statement": "Interop reports must publish adapter readiness level, evidence, claims, non-claims, and promotion criteria for every registered adapter, and report readiness must deeply match registered plugin readiness summaries.",
                     "enforcing_functions": [
                       "fn.interop.readiness-summary",
                       "fn.interop.generate-artifacts",
@@ -781,7 +824,7 @@
                     "id": "prop.interop.payloads-clean",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Generated framework payload files must not contain Passport provenance or adapter readiness metadata keys.",
+                    "statement": "Generated framework payload files must not contain Passport provenance or adapter readiness metadata keys; generic words are banned only where they would be leaked CDM readiness report metadata.",
                     "enforcing_functions": [
                       "fn.interop.generate-artifacts"
                     ]
@@ -795,7 +838,8 @@
             "name": "CDM collateral eligibility plugin",
             "mapping_depth": "breakdown",
             "source_files": [
-              "interop/plugins/cdm/index.js"
+              "interop/plugins/cdm/index.js",
+              "interop/plugins/cdm/readiness.js"
             ],
             "functions": [
               {
@@ -812,6 +856,11 @@
                 "id": "fn.cdm.negative-cases",
                 "name": "validateNegativeCases",
                 "source_ref": "interop/plugins/cdm/index.js"
+              },
+              {
+                "id": "fn.cdm.readiness-metadata",
+                "name": "CDM_READINESS",
+                "source_ref": "interop/plugins/cdm/readiness.js"
               }
             ],
             "invariants": [
@@ -1020,7 +1069,7 @@
               },
               {
                 "id": "fn.ci.adapter-readiness-gate",
-                "name": "checkAdapterReadiness and CDM readiness claim controls",
+                "name": "checkAdapterReadiness, readiness negative cases, sentence-level prose checks, and interop report consistency",
                 "source_ref": "hardening/scripts/hardening-gate.mjs"
               }
             ],
@@ -1359,7 +1408,7 @@
         "severity": "high",
         "attacker_control": "indirect",
         "status": "guarded",
-        "kill_gate": "hardening:gate rejects missing readiness metadata, unknown levels, level/name mismatches, and evidence gaps for claimed readiness levels.",
+        "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing evidence references, and unknown lastVerifiedBy commands.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -1373,7 +1422,7 @@
         "severity": "critical",
         "attacker_control": "indirect",
         "status": "guarded",
-        "kill_gate": "hardening:gate rejects Level 2 CDM claims that present the adapter as live, executable against an external engine, certified, custody, settlement, production partner, or Canton Token Standard integration.",
+        "kill_gate": "hardening:gate rejects Level 2 overclaim sentences unless the same claim unit explicitly negates the claim or states the higher-level promotion boundary; negative prose fixtures prove bad claims fail.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -1387,7 +1436,7 @@
         "severity": "high",
         "attacker_control": "indirect",
         "status": "guarded",
-        "kill_gate": "interop:validate and hardening:gate fail when registered adapters are absent from adapterReadiness or lack readiness fields in artifacts/interop/report.json.",
+        "kill_gate": "interop:validate and hardening:gate fail when registered adapters are absent from report readiness, unregistered adapters appear, or readiness fields drift between report.adapters, report.adapterReadiness, and registered plugin summaries.",
         "evidence": [
           "test.interop.validate",
           "test.hardening.architecture-gate",

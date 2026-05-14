@@ -11,6 +11,8 @@ Adapter Readiness Levels prevent framework adapter maturity from being claimed a
 | 4 | Sandbox Integration | Authenticated sandbox environment, operational error handling, environment config, monitoring or logging, and sandbox tests. |
 | 5 | Production Integration | Live partner or network use, security review, operational runbooks, release controls, SLA, and incident evidence. |
 
+Level 0 applies to future adapter candidates only. Registered plugins must declare Level 1 through Level 5 readiness metadata.
+
 ## Current CDM Classification
 
 The current FINOS CDM adapter is Level 2 — Artifact Conformance. It generates and validates offline CDM 6.0 JSON collateral eligibility artifacts in CI.

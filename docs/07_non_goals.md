@@ -2,20 +2,20 @@
 
 The Foundation Release intentionally excludes:
 
-- repo execution;
-- securities-lending execution;
-- asset custody;
-- settlement;
-- collateral transfer;
-- collateral optimization;
-- credit approval;
-- legal-title determination;
-- ZK proofs;
-- diligence workspace UX;
-- production identity integration;
-- live external adapter integration;
-- Rosetta Engine execution;
-- formal standards-body endorsement.
+- not repo execution;
+- not securities-lending execution;
+- not asset custody;
+- not settlement;
+- not collateral transfer;
+- not collateral optimization;
+- not credit approval;
+- not legal-title determination;
+- not ZK proofs;
+- not diligence workspace UX;
+- not production identity integration;
+- not live external integration;
+- not Rosetta Engine execution;
+- not formal standards-body endorsement.
 
 ## Safe claim
 

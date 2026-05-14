@@ -38,12 +38,14 @@ Passport uses Adapter Readiness Levels to keep framework and partner claims evid
 
 | Level | Name | Evidence boundary |
 |---:|---|---|
-| 0 | Concept | Adapter idea documented, no implementation. |
+| 0 | Concept | Adapter idea documented, no registered implementation. |
 | 1 | Interface | Adapter contract, static registry, and policy boundary. |
 | 2 | Artifact Conformance | Offline generation, committed schema validation, CI evidence, and negative cases. |
 | 3 | Executable Conformance | Canonical external engine, API, or simulator execution with round-trip or execution tests. |
 | 4 | Sandbox Integration | Authenticated sandbox environment, operational handling, environment config, monitoring or logging, and sandbox tests. |
 | 5 | Production Integration | Live partner or network use with security review, operational runbooks, release controls, SLA, and incident evidence. |
+
+Level 0 applies to future adapter candidates only. Registered plugins must declare Level 1 through Level 5 readiness metadata.
 
 The current FINOS CDM adapter is Level 2 — Artifact Conformance. It generates and validates offline CDM 6.0 JSON collateral eligibility artifacts in CI.
 

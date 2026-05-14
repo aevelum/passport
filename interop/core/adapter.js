@@ -13,7 +13,7 @@ import {
  * @property {AdapterReadiness} readiness
  * @property {(input: object, context: AdapterContext) => Promise<AdapterResult[]>} generate
  * @property {(result: AdapterResult, context: AdapterContext) => Promise<AdapterResult>} validate
- * @property {((context: AdapterContext) => Promise<AdapterValidationResult[]>)=} validateNegativeCases
+ * @property {((context: AdapterContext, input: object) => Promise<AdapterValidationResult[]>)=} validateNegativeCases
  */
 
 /**
@@ -82,6 +82,9 @@ export function assertPluginShape(plugin) {
     throw new Error(`adapter plugin ${plugin.id} must declare artifactTypes`);
   }
   assertReadinessShape(plugin.readiness);
+  if (plugin.readiness.level === 0) {
+    throw new Error(`adapter plugin ${plugin.id} readiness level 0 is concept-only; registered adapters must be Level 1-5`);
+  }
   assertReadinessEvidenceBound(plugin.readiness);
   if (typeof plugin.generate !== 'function') throw new Error(`adapter plugin ${plugin.id} missing generate`);
   if (typeof plugin.validate !== 'function') throw new Error(`adapter plugin ${plugin.id} missing validate`);

@@ -5,7 +5,7 @@
   "generatedFrom": {
     "package": "aevelum-passport-foundation",
     "pinned_version": "git:HEAD",
-    "round_id": "round-0003"
+    "round_id": "round-0004"
   },
   "summary": {
     "candidates": 11,
@@ -36,7 +36,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Modify a vendored CDM schema without updating manifest.json and confirm npm run interop:validate fails.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.ci.network-fetch-default",
@@ -58,7 +58,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add interop:vendor:cdm to scripts/ci.sh and confirm npm run hardening:gate fails.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.interop.dynamic-plugin-loading",
@@ -80,7 +80,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add import( to interop/registry.js and confirm npm run hardening:gate fails.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.interop.level2-live-overclaim",
@@ -97,12 +97,12 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate rejects Level 2 CDM claims that present the adapter as live, executable against an external engine, certified, custody, settlement, production partner, or Canton Token Standard integration.",
+      "kill_gate": "hardening:gate rejects Level 2 overclaim sentences unless the same claim unit explicitly negates the claim or states the higher-level promotion boundary; negative prose fixtures prove bad claims fail.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.ci.generated-artifact-staleness",
@@ -124,7 +124,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.interop.adapter-readiness-overclaim",
@@ -141,12 +141,12 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate rejects missing readiness metadata, unknown levels, level/name mismatches, and evidence gaps for claimed readiness levels.",
+      "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing evidence references, and unknown lastVerifiedBy commands.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.interop.payload-provenance-leak",
@@ -168,7 +168,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add a provenance key to a generated CDM payload and confirm npm run hardening:gate fails.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.interop.readiness-report-omission",
@@ -185,12 +185,12 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "interop:validate and hardening:gate fail when registered adapters are absent from adapterReadiness or lack readiness fields in artifacts/interop/report.json.",
+      "kill_gate": "interop:validate and hardening:gate fail when registered adapters are absent from report readiness, unregistered adapters appear, or readiness fields drift between report.adapters, report.adapterReadiness, and registered plugin summaries.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.agent.skill-not-discovered",
@@ -212,7 +212,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.daml.capacity-over-reservation",
@@ -234,7 +234,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     },
     {
       "id": "bd.daml.unauthorized-transition",
@@ -256,7 +256,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0003"
+      "last_round": "round-0004"
     }
   ]
 }

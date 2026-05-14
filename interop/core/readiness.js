@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 export const ADAPTER_READINESS_LEVELS = Object.freeze({
   0: Object.freeze({
     level: 0,
@@ -31,50 +34,90 @@ export const ADAPTER_READINESS_LEVELS = Object.freeze({
   })
 });
 
-const REQUIRED_EVIDENCE = Object.freeze([
+const READINESS_EVIDENCE_REQUIREMENTS = Object.freeze([
   Object.freeze({
     level: 1,
-    anyOf: Object.freeze([
-      Object.freeze(['adapter-contract']),
-      Object.freeze(['static-registry']),
-      Object.freeze(['policy-boundary'])
-    ])
+    requiredCategories: Object.freeze([
+      'adapter-contract',
+      'static-registry',
+      'policy-boundary'
+    ]),
+    anyCategoryGroups: Object.freeze([])
   }),
   Object.freeze({
     level: 2,
-    anyOf: Object.freeze([
-      Object.freeze(['offline-artifact-generation']),
-      Object.freeze(['committed-schema-validation']),
-      Object.freeze(['ci-evidence']),
-      Object.freeze(['negative-case'])
-    ])
+    requiredCategories: Object.freeze([
+      'offline-artifact-generation',
+      'committed-schema-validation',
+      'ci-evidence',
+      'negative-case'
+    ]),
+    anyCategoryGroups: Object.freeze([])
   }),
+  // Schema validation is Level 2 evidence. Level 3+ requires executing a
+  // canonical external engine, external API, simulator, or round-trip test.
+  // A category string alone is not enough; gates also require an existing
+  // referenced test, script, fixture, report, or artifact.
   Object.freeze({
     level: 3,
-    anyOf: Object.freeze([
-      Object.freeze(['canonical-engine-execution', 'external-api-execution', 'simulator-execution', 'round-trip-execution'])
+    requiredCategories: Object.freeze([]),
+    anyCategoryGroups: Object.freeze([
+      Object.freeze({
+        label: 'executable external, canonical, simulator, or round-trip evidence',
+        categories: Object.freeze(['canonical-engine-execution', 'external-api-execution', 'simulator-execution', 'round-trip-execution'])
+      })
     ])
   }),
   Object.freeze({
     level: 4,
-    anyOf: Object.freeze([
-      Object.freeze(['sandbox-auth']),
-      Object.freeze(['sandbox-environment']),
-      Object.freeze(['operational-error-handling']),
-      Object.freeze(['monitoring-logging']),
-      Object.freeze(['sandbox-test'])
-    ])
+    requiredCategories: Object.freeze([
+      'sandbox-auth',
+      'sandbox-environment',
+      'operational-error-handling',
+      'monitoring-logging',
+      'sandbox-test'
+    ]),
+    anyCategoryGroups: Object.freeze([])
   }),
   Object.freeze({
     level: 5,
-    anyOf: Object.freeze([
-      Object.freeze(['production-partner-evidence', 'live-network-evidence']),
-      Object.freeze(['security-review']),
-      Object.freeze(['operational-runbook']),
-      Object.freeze(['release-control']),
-      Object.freeze(['sla-incident-evidence'])
+    requiredCategories: Object.freeze([
+      'security-review',
+      'operational-runbook',
+      'release-control',
+      'sla-incident-evidence'
+    ]),
+    anyCategoryGroups: Object.freeze([
+      Object.freeze({
+        label: 'production partner or live network evidence',
+        categories: Object.freeze(['production-partner-evidence', 'live-network-evidence'])
+      })
     ])
   })
+]);
+
+const EXECUTABLE_EVIDENCE_CATEGORIES = Object.freeze([
+  'canonical-engine-execution',
+  'external-api-execution',
+  'simulator-execution',
+  'round-trip-execution'
+]);
+
+const SANDBOX_EVIDENCE_CATEGORIES = Object.freeze([
+  'sandbox-auth',
+  'sandbox-environment',
+  'operational-error-handling',
+  'monitoring-logging',
+  'sandbox-test'
+]);
+
+const PRODUCTION_EVIDENCE_CATEGORIES = Object.freeze([
+  'production-partner-evidence',
+  'live-network-evidence',
+  'security-review',
+  'operational-runbook',
+  'release-control',
+  'sla-incident-evidence'
 ]);
 
 const CLAIM_BOUNDARIES = Object.freeze([
@@ -186,11 +229,16 @@ export function assertReadinessEvidenceBound(readiness) {
   assertReadinessShape(readiness);
 
   const categories = evidenceCategories(readiness);
-  for (const requirement of REQUIRED_EVIDENCE) {
+  for (const requirement of READINESS_EVIDENCE_REQUIREMENTS) {
     if (readiness.level < requirement.level) continue;
-    for (const group of requirement.anyOf) {
-      if (!group.some(category => categories.has(category))) {
-        throw new Error(`adapter readiness Level ${readiness.level} missing evidence category: ${group.join(' or ')}`);
+    for (const category of requirement.requiredCategories) {
+      if (!categories.has(category)) {
+        throw new Error(`adapter readiness Level ${readiness.level} missing required evidence category: ${category}`);
+      }
+    }
+    for (const group of requirement.anyCategoryGroups) {
+      if (!group.categories.some(category => categories.has(category))) {
+        throw new Error(`adapter readiness Level ${readiness.level} missing ${group.label}: ${group.categories.join(' or ')}`);
       }
     }
   }
@@ -202,6 +250,40 @@ export function assertReadinessEvidenceBound(readiness) {
       if (pattern.test(claimText)) {
         throw new Error(`adapter readiness Level ${readiness.level} overclaims ${boundary.label}`);
       }
+    }
+  }
+}
+
+/**
+ * @param {object} readiness
+ * @param {{ root?: string, explicitShellCommands?: string[] }=} options
+ */
+export function assertReadinessEvidenceReferences(readiness, options = {}) {
+  assertReadinessShape(readiness);
+
+  const root = options.root ?? process.cwd();
+  for (const item of readiness.evidence) {
+    for (const reference of item.references ?? []) {
+      if (isPathLikeReference(reference) && !referenceExists(root, reference)) {
+        throw new Error(`adapter readiness evidence ${item.id} references missing path: ${reference}`);
+      }
+    }
+  }
+
+  assertLastVerifiedBy(readiness.lastVerifiedBy, root, options.explicitShellCommands ?? []);
+
+  if (readiness.level >= 3) {
+    assertReferencedProofForAny(readiness, EXECUTABLE_EVIDENCE_CATEGORIES, root, 'Level 3 executable evidence');
+  }
+  if (readiness.level >= 4) {
+    for (const category of SANDBOX_EVIDENCE_CATEGORIES) {
+      assertReferencedProofForCategory(readiness, category, root, `Level 4 sandbox evidence ${category}`);
+    }
+  }
+  if (readiness.level >= 5) {
+    assertReferencedProofForAny(readiness, ['production-partner-evidence', 'live-network-evidence'], root, 'Level 5 production or live evidence');
+    for (const category of ['security-review', 'operational-runbook', 'release-control', 'sla-incident-evidence']) {
+      assertReferencedProofForCategory(readiness, category, root, `Level 5 production evidence ${category}`);
     }
   }
 }
@@ -233,4 +315,57 @@ function evidenceCategories(readiness) {
 
 function normalizeClaimText(text) {
   return text.replace(/\s+/g, ' ').trim();
+}
+
+function assertLastVerifiedBy(value, root, explicitShellCommands) {
+  const commands = value.split(';').map(item => item.trim()).filter(Boolean);
+  if (!commands.length) throw new Error('adapter readiness lastVerifiedBy must list at least one verification command');
+
+  const packageJsonPath = path.join(root, 'package.json');
+  const scripts = fs.existsSync(packageJsonPath)
+    ? JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).scripts ?? {}
+    : {};
+  const explicit = new Set(explicitShellCommands);
+
+  for (const command of commands) {
+    const npmRun = command.match(/^npm run ([A-Za-z0-9:_-]+)$/);
+    if (npmRun) {
+      if (!Object.hasOwn(scripts, npmRun[1])) {
+        throw new Error(`adapter readiness lastVerifiedBy references unknown npm script: ${command}`);
+      }
+      continue;
+    }
+    if (!explicit.has(command)) {
+      throw new Error(`adapter readiness lastVerifiedBy references unknown verification command: ${command}`);
+    }
+  }
+}
+
+function assertReferencedProofForAny(readiness, categories, root, label) {
+  const items = readiness.evidence.filter(item => categories.includes(item.category));
+  if (!items.some(item => hasExistingProofReference(root, item))) {
+    throw new Error(`${label} must reference an existing test, fixture, script, report, or artifact`);
+  }
+}
+
+function assertReferencedProofForCategory(readiness, category, root, label) {
+  const items = readiness.evidence.filter(item => item.category === category);
+  if (!items.some(item => hasExistingProofReference(root, item))) {
+    throw new Error(`${label} must reference an existing test, fixture, script, report, or artifact`);
+  }
+}
+
+function hasExistingProofReference(root, item) {
+  return (item.references ?? []).some(reference => referenceExists(root, reference));
+}
+
+function referenceExists(root, reference) {
+  if (!isPathLikeReference(reference)) return false;
+  return fs.existsSync(path.resolve(root, reference));
+}
+
+function isPathLikeReference(reference) {
+  return /^\.{1,2}\//.test(reference)
+    || reference.includes('/')
+    || /\.(json|js|mjs|md|yaml|yml|sh|daml|dar|txt|csv|zip)$/i.test(reference);
 }

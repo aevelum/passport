@@ -18,9 +18,11 @@
         "package-lock.json",
         "scripts/generated-time.mjs",
         "interop/core/readiness.js",
+        "interop/plugins/cdm/readiness.js",
         "docs/09_adapter_readiness_levels.md",
         "hardening/rounds/round-0002.md",
-        "hardening/rounds/round-0003.md"
+        "hardening/rounds/round-0003.md",
+        "hardening/rounds/round-0004.md"
       ]
     },
     {
@@ -53,6 +55,7 @@
         "assertReadinessShape",
         "readinessSummary",
         "assertReadinessEvidenceBound",
+        "assertReadinessEvidenceReferences",
         "Artifact Conformance"
       ]
     },
@@ -67,7 +70,8 @@
       "contains": [
         "readiness",
         "assertReadinessShape",
-        "assertReadinessEvidenceBound"
+        "assertReadinessEvidenceBound",
+        "registered adapters must be Level 1-5"
       ]
     },
     {
@@ -76,7 +80,7 @@
       "description": "The current CDM adapter must remain Level 2 until higher-level evidence exists.",
       "type": "required-substrings",
       "files": [
-        "interop/plugins/cdm/index.js"
+        "interop/plugins/cdm/readiness.js"
       ],
       "contains": [
         "level: 2",
