@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Ajv from 'ajv-draft-04';
 import { defineAdapterPlugin, pluginIdentity } from '../../core/adapter.js';
+import { CDM_READINESS } from './readiness.js';
 import { cdmVersion, rootSchemas, schemaDir, verifySchemaManifest, walkSchemaFiles } from './vendor.js';
 
 const adapterVersion = '0.1.0';
@@ -18,6 +19,7 @@ export const cdmPlugin = defineAdapterPlugin({
   frameworkVersion: cdmVersion,
   outputFormat: 'json',
   artifactTypes: Object.freeze(Object.keys(artifactSchemas)),
+  readiness: CDM_READINESS,
   generate,
   validate,
   validateNegativeCases

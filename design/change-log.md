@@ -1,5 +1,13 @@
 # Design Change Log
 
+## 2026-05-14 - Aevelum Icon Variants
+
+- Added light and dark Aevelum icon logo SVG sources for generic product and brand usage.
+- Regenerated matching PNG derivatives from the SVG sources.
+- Added a Telegram-ready Aevelum profile icon with a 640px square source, opaque background, centered no-text mark, circular-crop safe area, no visible outer ring, and JPG/PNG derivatives.
+- Added light and dark README banner PNG derivatives generated from the SVG sources.
+- Revised the repository social preview and README banners around larger billboard-style text, the "Confidential collateral. Confident execution." tagline, simplified account graphics, and regenerated 1280x640 PNGs.
+
 ## 2026-05-12 - Institutional Finance Palette
 
 - Replaced the brighter fintech teal/blue asset palette with a restrained institutional finance palette based on navy, slate, globe blue, muted teal, off-white, limited gold, and risk-only red.

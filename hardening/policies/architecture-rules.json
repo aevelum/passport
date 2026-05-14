@@ -17,7 +17,12 @@
         "package.json",
         "package-lock.json",
         "scripts/generated-time.mjs",
-        "hardening/rounds/round-0002.md"
+        "interop/core/readiness.js",
+        "interop/plugins/cdm/readiness.js",
+        "docs/09_adapter_readiness_levels.md",
+        "hardening/rounds/round-0002.md",
+        "hardening/rounds/round-0003.md",
+        "hardening/rounds/round-0004.md"
       ]
     },
     {
@@ -33,7 +38,80 @@
         ".agents/skills/passport-ui-design-system/SKILL.md",
         "npm run hardening:gate",
         "design/tokens/colors.json",
+        "Adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level changes are hardening-sensitive.",
         "Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache."
+      ]
+    },
+    {
+      "id": "arch.interop.adapter-readiness-model",
+      "severity": "high",
+      "description": "Adapter readiness levels must be machine-readable and evidence-gated.",
+      "type": "required-substrings",
+      "files": [
+        "interop/core/readiness.js"
+      ],
+      "contains": [
+        "ADAPTER_READINESS_LEVELS",
+        "assertReadinessShape",
+        "readinessSummary",
+        "assertReadinessEvidenceBound",
+        "assertReadinessEvidenceReferences",
+        "Artifact Conformance"
+      ]
+    },
+    {
+      "id": "arch.interop.adapter-contract-readiness",
+      "severity": "high",
+      "description": "The adapter contract must reject plugins without readiness metadata.",
+      "type": "required-substrings",
+      "files": [
+        "interop/core/adapter.js"
+      ],
+      "contains": [
+        "readiness",
+        "assertReadinessShape",
+        "assertReadinessEvidenceBound",
+        "registered adapters must be Level 1-5"
+      ]
+    },
+    {
+      "id": "arch.interop.cdm-readiness-level-2",
+      "severity": "high",
+      "description": "The current CDM adapter must remain Level 2 until higher-level evidence exists.",
+      "type": "required-substrings",
+      "files": [
+        "interop/plugins/cdm/readiness.js"
+      ],
+      "contains": [
+        "level: 2",
+        "Artifact Conformance",
+        "FINOS certification",
+        "Rosetta Engine execution",
+        "Canton Token Standard integration"
+      ]
+    },
+    {
+      "id": "arch.interop.registry-readiness",
+      "severity": "high",
+      "description": "The static registry must publish adapter readiness metadata.",
+      "type": "required-substrings",
+      "files": [
+        "interop/registry.js"
+      ],
+      "contains": [
+        "readinessSummary"
+      ]
+    },
+    {
+      "id": "arch.interop.report-readiness",
+      "severity": "high",
+      "description": "Interop reports must publish adapter readiness outside generated payloads.",
+      "type": "required-substrings",
+      "files": [
+        "interop/runner.js"
+      ],
+      "contains": [
+        "adapterReadiness"
       ]
     },
     {

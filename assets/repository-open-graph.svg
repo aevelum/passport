@@ -1,117 +1,85 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" fill="none" role="img" aria-label="Aevelum Passport social preview">
+  <title>Aevelum Passport social preview</title>
+  <desc>A repository social preview for Aevelum Passport with large readable headline text and a simplified credential account diagram.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
       <stop stop-color="#07111A"/>
       <stop offset="58%" stop-color="#0B1F3A"/>
       <stop offset="100%" stop-color="#102A43"/>
     </linearGradient>
-    <linearGradient id="darkSurface" x1="0" y1="0" x2="104" y2="104" gradientUnits="userSpaceOnUse">
+    <linearGradient id="iconSurface" x1="0" y1="0" x2="112" y2="112" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0B1F3A"/>
       <stop offset="100%" stop-color="#07111A"/>
     </linearGradient>
-    <linearGradient id="linkLine" x1="0" y1="0" x2="1" y2="0">
-      <stop stop-color="#BD9B6B" stop-opacity="0.64"/>
-      <stop offset="100%" stop-color="#CBD5E1" stop-opacity="0.18"/>
+    <linearGradient id="lineGold" x1="764" y1="210" x2="1180" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BD9B6B" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#CBD5E1" stop-opacity="0.24"/>
     </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" flood-color="#07111A" flood-opacity="0.32" stdDeviation="22"/>
+    </filter>
     <clipPath id="globeInterior">
-      <circle cx="52" cy="52" r="34"/>
+      <circle cx="56" cy="56" r="36"/>
     </clipPath>
   </defs>
 
   <rect width="1280" height="640" fill="url(#bg)"/>
-
-  <g stroke="#343741" stroke-width="0.6" opacity="0.44">
-    <path d="M80 80 H1200"/>
-    <path d="M80 560 H1200"/>
-    <path d="M80 80 V560"/>
-    <path d="M1200 80 V560"/>
-    <path d="M640 80 V560" opacity="0.35"/>
-  </g>
-
-  <g transform="translate(96, 138)">
-    <rect x="5" y="5" width="94" height="94" rx="19" fill="url(#darkSurface)"/>
-    <rect x="4" y="4" width="96" height="96" rx="20" stroke="#5F6673" stroke-opacity="0.95" stroke-width="2.4"/>
-    <g clip-path="url(#globeInterior)">
-      <path d="M52 14 C36 30 36 74 52 90 C68 74 68 30 52 14" stroke="#F8FAFC" stroke-opacity="0.18" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M19 52 H85" stroke="#BD9B6B" stroke-width="6"/>
-      <path d="M26 39 H78" stroke="#BD9B6B" stroke-opacity="0.82" stroke-width="5" stroke-linecap="round"/>
-      <path d="M26 65 H78" stroke="#BD9B6B" stroke-opacity="0.82" stroke-width="5" stroke-linecap="round"/>
-    </g>
-    <circle cx="52" cy="52" r="34" stroke="#F8FAFC" stroke-width="6.4"/>
-  </g>
-
-  <text x="224" y="190" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="42" font-weight="700" fill="#F8FAFC">aevelum</text>
-  <text x="414" y="190" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="42" font-weight="700" fill="#BD9B6B">passport</text>
-  <text x="226" y="228" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="15" fill="#CBD5E1" letter-spacing="0.2">
-    Daml/Canton-native collateral credential account
-  </text>
-
-  <text x="96" y="326" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="34" font-weight="750" fill="#F8FAFC">
-    Collateral capacity,
-  </text>
-  <text x="96" y="366" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="34" font-weight="750" fill="#F8FAFC">
-    credentialed before execution.
-  </text>
-
-  <g font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="19" fill="#CBD5E1">
-    <text x="98" y="424">Issue, present, reserve, revoke, and audit</text>
-    <text x="98" y="452">repo pre-trade collateral capacity on Canton.</text>
-  </g>
-
-  <g transform="translate(98, 506)" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">
-    <rect width="102" height="34" rx="8" fill="#0B1F3A" stroke="#BD9B6B" stroke-opacity="0.78"/>
-    <text x="51" y="22" text-anchor="middle" fill="#F8FAFC">DPM 3.5</text>
-
-    <rect x="120" width="134" height="34" rx="8" fill="#0B1F3A" stroke="#5F6673" stroke-opacity="0.95"/>
-    <text x="187" y="22" text-anchor="middle" fill="#CBD5E1">Daml Script</text>
-
-    <rect x="272" width="120" height="34" rx="8" fill="#0B1F3A" stroke="#BD9B6B" stroke-opacity="0.78"/>
-    <text x="332" y="22" text-anchor="middle" fill="#BD9B6B">100% gates</text>
-  </g>
-
-  <g transform="translate(728, 122)">
-    <rect x="142" y="122" width="246" height="176" rx="18" fill="#0B1F3A" stroke="#5F6673" stroke-width="1.5"/>
-    <text x="265" y="154" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="10" font-weight="800" fill="#F8FAFC" letter-spacing="1.8">PASSPORT ACCOUNT</text>
-
-    <rect x="170" y="184" width="82" height="38" rx="7" fill="#07111A" stroke="#BD9B6B"/>
-    <text x="211" y="207" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#F8FAFC">Credential</text>
-    <rect x="278" y="184" width="82" height="38" rx="7" fill="#07111A" stroke="#CBD5E1"/>
-    <text x="319" y="207" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#CBD5E1">Reserve</text>
-
-    <circle cx="265" cy="254" r="4" fill="#BD9B6B"/>
-    <text x="265" y="276" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="9" fill="#CBD5E1">scoped disclosure</text>
-
-    <g font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700">
-      <g transform="translate(38, 70)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#0B1F3A" stroke="#BD9B6B" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#F8FAFC">Holder</text>
-      </g>
-      <g transform="translate(492, 70)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#0B1F3A" stroke="#5F6673" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#CBD5E1">Dealer</text>
-      </g>
-      <g transform="translate(38, 350)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#0B1F3A" stroke="#BD9B6B" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#F8FAFC">Attester</text>
-      </g>
-      <g transform="translate(492, 350)">
-        <rect x="-48" y="-22" width="96" height="44" rx="8" fill="#0B1F3A" stroke="#5F6673" stroke-width="1.5"/>
-        <text y="4" text-anchor="middle" fill="#CBD5E1">Auditor</text>
-      </g>
-    </g>
-
-    <g stroke="url(#linkLine)" stroke-width="2">
-      <line x1="86" y1="82" x2="142" y2="154"/>
-      <line x1="444" y1="82" x2="388" y2="154"/>
-      <line x1="86" y1="338" x2="142" y2="266"/>
-      <line x1="444" y1="338" x2="388" y2="266"/>
-    </g>
-
-    <circle cx="112" cy="114" r="3" fill="#BD9B6B" opacity="0.78"/>
-    <circle cx="418" cy="114" r="3" fill="#CBD5E1" opacity="0.62"/>
-    <circle cx="112" cy="306" r="3" fill="#BD9B6B" opacity="0.64"/>
-    <circle cx="418" cy="306" r="3" fill="#CBD5E1" opacity="0.54"/>
-  </g>
-
+  <rect x="80" y="80" width="1120" height="480" stroke="#343741" stroke-opacity="0.38" stroke-width="1"/>
   <rect x="0" y="634" width="1280" height="6" fill="#BD9B6B" opacity="0.75"/>
+
+  <g transform="translate(96, 118)">
+    <rect x="4" y="4" width="104" height="104" rx="22" fill="url(#iconSurface)"/>
+    <rect x="3" y="3" width="106" height="106" rx="23" stroke="#5F6673" stroke-opacity="0.95" stroke-width="2.4"/>
+    <g clip-path="url(#globeInterior)">
+      <path d="M56 16 C39 34 39 78 56 96 C73 78 73 34 56 16" stroke="#F8FAFC" stroke-opacity="0.18" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M21 56 H91" stroke="#BD9B6B" stroke-width="6.4"/>
+      <path d="M28 42 H84" stroke="#BD9B6B" stroke-opacity="0.82" stroke-width="5.2" stroke-linecap="round"/>
+      <path d="M28 70 H84" stroke="#BD9B6B" stroke-opacity="0.82" stroke-width="5.2" stroke-linecap="round"/>
+    </g>
+    <circle cx="56" cy="56" r="36" stroke="#F8FAFC" stroke-width="6.8"/>
+  </g>
+
+  <text x="232" y="194" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="54" font-weight="700" fill="#F8FAFC">aevelum</text>
+  <text x="478" y="194" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="54" font-weight="700" fill="#BD9B6B">passport</text>
+
+  <text x="96" y="316" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="58" font-weight="800" fill="#F8FAFC">
+    Confidential collateral.
+  </text>
+  <text x="96" y="386" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="58" font-weight="800" fill="#F8FAFC">
+    Confident execution.
+  </text>
+  <text x="100" y="460" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="30" font-weight="500" fill="#CBD5E1">
+    Canton-native repo collateral credentials.
+  </text>
+
+  <g transform="translate(810, 190) scale(0.88)">
+    <g stroke="url(#lineGold)" stroke-width="3.5" stroke-linecap="round">
+      <path d="M54 84 H138"/>
+      <path d="M54 236 H138"/>
+      <path d="M292 84 H374"/>
+      <path d="M292 236 H374"/>
+    </g>
+
+    <g fill="#0B1F3A" stroke-width="2.2">
+      <rect x="0" y="50" width="96" height="68" rx="14" stroke="#BD9B6B"/>
+      <rect x="0" y="202" width="96" height="68" rx="14" stroke="#BD9B6B"/>
+      <rect x="330" y="50" width="96" height="68" rx="14" stroke="#5F6673"/>
+      <rect x="330" y="202" width="96" height="68" rx="14" stroke="#5F6673"/>
+    </g>
+
+    <g filter="url(#cardShadow)">
+      <rect x="118" y="24" width="194" height="272" rx="26" fill="#0B1F3A" stroke="#5F6673" stroke-width="2.2"/>
+      <rect x="150" y="62" width="130" height="8" rx="4" fill="#F8FAFC"/>
+      <rect x="164" y="84" width="102" height="8" rx="4" fill="#CBD5E1" opacity="0.68"/>
+      <rect x="146" y="118" width="138" height="54" rx="12" fill="#07111A" stroke="#BD9B6B" stroke-width="2.2"/>
+      <rect x="166" y="139" width="98" height="12" rx="6" fill="#BD9B6B"/>
+      <rect x="146" y="196" width="138" height="54" rx="12" fill="#07111A" stroke="#CBD5E1" stroke-width="2.2"/>
+      <rect x="166" y="217" width="98" height="12" rx="6" fill="#CBD5E1"/>
+    </g>
+
+    <circle cx="108" cy="84" r="5" fill="#BD9B6B"/>
+    <circle cx="108" cy="236" r="5" fill="#BD9B6B" opacity="0.82"/>
+    <circle cx="322" cy="84" r="5" fill="#CBD5E1" opacity="0.72"/>
+    <circle cx="322" cy="236" r="5" fill="#CBD5E1" opacity="0.62"/>
+  </g>
 </svg>
