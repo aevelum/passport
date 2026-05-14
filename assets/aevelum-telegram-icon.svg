@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="none" role="img" aria-label="Aevelum Telegram profile icon">
   <title>Aevelum Telegram profile icon</title>
-  <desc>A circle-crop-safe Aevelum profile icon for Telegram, with a centered mark on an opaque institutional navy square.</desc>
+  <desc>A circle-crop-safe Aevelum profile icon for Telegram, with a centered mark on an opaque institutional navy square and no visible crop guide.</desc>
   <defs>
     <linearGradient id="telegramSurface" x1="88" y1="72" x2="552" y2="568" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0B1F3A"/>
@@ -17,7 +17,6 @@
 
   <rect width="640" height="640" fill="url(#telegramSurface)"/>
   <rect width="640" height="640" fill="url(#telegramFocus)"/>
-  <circle cx="320" cy="320" r="286" stroke="#5F6673" stroke-opacity="0.72" stroke-width="10"/>
 
   <g filter="url(#telegramMarkShadow)" transform="translate(320 268.4) scale(0.96) translate(-320 -301)">
     <path
