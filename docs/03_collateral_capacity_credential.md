@@ -44,3 +44,5 @@ The verifier should not receive raw inventory or full account structure. The ver
 ## Reservation
 
 A verifier can reserve capacity only through a multi-party `ReserveFromPresentation` choice. The choice consumes the source credential and reissues residual capacity where applicable.
+
+The reservation can also produce a nonconsuming `ReservationHandoffInstruction`. This handoff records readiness metadata for a downstream system. It does not execute, settle, transfer, custody, or move collateral.

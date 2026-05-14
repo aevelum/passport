@@ -1,8 +1,8 @@
 # 00 Product Thesis
 
-Aevelum Passport is a Canton-native collateral credential account.
+Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.
 
-The product lets institutions issue, hold, present, reserve, revoke, and audit verified collateral-capacity credentials before repo, securities-lending, margin, or secured-credit execution.
+The product lets institutions issue, hold, present, reserve, revoke, and audit verified collateral-capacity credentials for repo pre-trade, securities-lending pre-trade, margin capacity check, and secured-credit pre-clearance readiness purposes.
 
 ## One-sentence UVP
 
@@ -10,7 +10,7 @@ Passport lets institutions present and reserve verified collateral capacity on C
 
 ## Wedge
 
-Passport occupies the pre-execution collateral-capacity credential layer:
+Passport occupies the pre-trade collateral-capacity readiness layer:
 
 ```text
 private collateral state
@@ -19,8 +19,9 @@ private collateral state
   -> CapacityCredential
   -> CredentialPresentation
   -> CapacityReservation
-  -> Revocation / audit disclosure
-  -> downstream execution workflow
+  -> ReservationHandoffInstruction
+  -> Revocation / expiry / dispute / audit disclosure
+  -> downstream system receives readiness metadata
 ```
 
 ## Participants
@@ -32,8 +33,8 @@ private collateral state
 | Verifier | Dealer, repo desk, prime broker, margin desk, credit desk, or securities lender relying on the credential. |
 | Policy Publisher | Party defining acceptable collateral rules. Usually the verifier. |
 | Auditor | Party receiving scoped disclosure only through explicit audit grants. |
-| Execution Rail | Downstream venue, credit rail, custodian workflow, or collateral mobility app. |
+| Handoff Recipient | Downstream system or party that receives readiness metadata only. |
 
 ## Design boundary
 
-Passport does not execute repo, settle transactions, custody assets, optimize collateral, make credit decisions, or prove legal title. It makes collateral capacity credentialed, presentable, reservable, revocable, and auditable on Canton.
+Passport records readiness and may record a reservation handoff notice. Passport does not execute repo, execute securities-lending trades, operate a venue, run a margin engine, settle transactions, custody assets, transfer collateral, move collateral, optimize collateral, make credit decisions, operate a wallet, integrate production identity, provide live external integration, implement ZK proofs, or prove legal title. It makes collateral capacity credentialed, presentable, reservable, revocable, expirable, disputable, and auditable on Canton.

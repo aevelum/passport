@@ -2,12 +2,14 @@
 
 Passport keeps its Daml templates as the Canton ledger schema and emits external standards artifacts through a small framework-neutral adapter surface.
 
+Interop artifacts are bounded readiness artifacts. They do not make Passport a venue, custody system, settlement system, wallet, token-transfer system, optimizer, credit decision engine, production identity system, or live external integration.
+
 The adapter surface is deliberately narrow:
 
 - static plugin registry only;
 - no dynamic plugin loading;
 - no `eval`;
-- no network access in default PR or local CI after GitHub platform checkout;
+- no adapter validation or generation network access outside explicit vendoring commands;
 - generated standards payloads remain clean;
 - Passport provenance is reported beside payloads, not embedded into them.
 
@@ -30,7 +32,7 @@ The initial registry contains one plugin:
 |---|---:|---|---|
 | FINOS CDM | `6.0` | JSON | `eligible-collateral-specification`, `eligibility-query`, `check-eligibility-result` |
 
-Future candidates include ISO 20022, FIX, FpML, W3C Verifiable Credentials, and Canton Token Standard adapters, but this release intentionally ships no stubs for them.
+Future candidates include ISO 20022, FIX, FpML, W3C Verifiable Credentials, and Canton Token Standard adapters, but this release intentionally ships no stubs for them and does not include custody, venue, settlement, token, wallet, or live integration adapters.
 
 ## Adapter Readiness Levels
 
@@ -64,7 +66,7 @@ Schema refresh is explicit:
 npm run interop:vendor:cdm
 ```
 
-Default CI does not fetch schemas or bootstrap dependencies from the network. Validation first verifies the committed schema manifest, schema-set digest, and SHA-256 hashes, then registers the schemas with AJV draft-04. This is committed local schema integrity for reviewed files, not upstream authenticity if schema files and the manifest are changed together.
+Default CI may bootstrap the standard hosted-runner toolchain, but adapter validation does not fetch schemas or plugin code from the network. Validation first verifies the committed schema manifest, schema-set digest, and SHA-256 hashes, then registers the schemas with AJV draft-04. This is committed local schema integrity for reviewed files, not upstream authenticity if schema files and the manifest are changed together.
 
 ## Local commands
 

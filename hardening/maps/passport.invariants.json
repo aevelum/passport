@@ -9,11 +9,13 @@
     "assumptions": [
       "Daml templates remain the normative Canton ledger schema for this milestone.",
       "FINOS CDM support means offline JSON-schema conformance for generated collateral eligibility artifacts, not FINOS certification, Rosetta Engine execution, or CDM eligibility-engine execution.",
-      "Default PR CI must not fetch network resources after GitHub platform checkout; dependency and DPM toolchains are provided by a pre-baked offline runner.",
+      "Default PR CI runs on standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup; repo-authored validation and generation paths do not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring commands.",
       "The CDM schema manifest provides committed local integrity for reviewed schema files, not upstream authenticity when schema and manifest are changed together.",
       "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed.",
       "Registered adapters cannot use Level 0; Level 0 is concept-only for future adapter candidates with no registered plugin implementation.",
-      "Level 3 and higher readiness cannot be self-attested by category names alone or generic existing files; higher levels require existing references in category-appropriate proof-bearing paths."
+      "Level 3 and higher readiness cannot be self-attested by category names alone or generic existing files; higher levels require existing references in category-appropriate proof-bearing paths.",
+      "Passport records collateral readiness and may record reservation handoff metadata; it does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement proof systems, provide production identity, or provide live external integration.",
+      "Reservation visibility is limited to holder, attester, and verifier; handoff visibility is isolated to ReservationHandoffInstruction; audit visibility is isolated to AuditDisclosureGrant."
     ],
     "source_inventory": [
       {
@@ -110,7 +112,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "Reservation amount, lifecycle, execution instruction, and dispute coverage."
+        "notes": "Reservation amount, lifecycle, reservation handoff metadata, and dispute coverage."
       },
       {
         "path": "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml",
@@ -185,6 +187,22 @@
         "notes": "Explicit CDM schema refresh and manifest verification."
       },
       {
+        "path": "README.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Public canonical scope, non-goals, and local gate documentation."
+      },
+      {
+        "path": "docs/00_product_thesis.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Product thesis and Passport scope boundary."
+      },
+      {
         "path": "docs/06_interop_adapters.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -206,7 +224,31 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.interop.adapter-core",
         "status": "semantics",
-        "notes": "Foundation Release scope and sentence-bounded non-claim language."
+        "notes": "Public core scope, reservation handoff boundary, and sentence-bounded non-claim language."
+      },
+      {
+        "path": "docs/03_collateral_capacity_credential.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Capacity credential, reservation, and handoff metadata semantics."
+      },
+      {
+        "path": "docs/04_repo_pretrade_workflow.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Repo pre-trade readiness workflow and non-executing handoff boundary."
+      },
+      {
+        "path": "docs/05_privacy_model.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Visibility model for credentials, reservations, handoff notices, and audit grants."
       },
       {
         "path": "docs/07_non_goals.md",
@@ -246,7 +288,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
-        "notes": "Default GitHub PR workflow and offline runner contract."
+        "notes": "Default GitHub-hosted PR workflow and explicit toolchain setup."
       },
       {
         "path": "package.json",
@@ -409,6 +451,14 @@
         "notes": "Adapter readiness negative gates and evidence normalization hardening round record."
       },
       {
+        "path": "hardening/rounds/round-0005.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Passport scope boundary alignment hardening round record."
+      },
+      {
         "path": "hardening/change-log.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -459,20 +509,22 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0004",
+    "round_id": "round-0005",
     "selected_surfaces": [
+      "inv.daml.domain-boundary",
+      "inv.daml.capacity-conservation",
       "inv.interop.adapter-readiness-claims",
-      "prop.interop.adapter-level-evidence-bound",
-      "prop.interop.no-live-integration-overclaim",
-      "prop.interop.readiness-reported"
+      "inv.scope.passport-public-core-boundary",
+      "cmp.ci.gates"
     ],
-    "selection_reason": "Round 0004 tightens Adapter Readiness Level enforcement with Level 0 registration rejection, category-specific proof-reference validation, sentence-level overclaim fixtures, report consistency checks, and narrower CDM payload metadata bans.",
+    "selection_reason": "Round 0005 aligns Passport main with the canonical public-core scope by replacing borderline execution terminology with non-executing reservation handoff terminology, removing dormant reservation observer/status side channels, and enforcing the boundary in Daml, docs, gates, and generated artifacts.",
     "kill_gates": [
-      "hardening:gate fails if a registered plugin uses concept-only Level 0 readiness.",
-      "hardening:gate fails if Level 3+ readiness is self-attested by category names or generic existing files such as package.json, README, or generic docs without category-appropriate proof-bearing references.",
-      "hardening:gate fails if docs or guidance contain forbidden Level 2 overclaim phrases without same-sentence negation or promotion-boundary language, and negative fixtures prove rejected examples fail.",
-      "hardening:gate fails if artifacts/interop/report.json readiness drifts from registered plugin readiness summaries or includes unregistered adapters.",
-      "hardening:gate fails if generated CDM payloads contain Passport provenance or readiness metadata while avoiding broad bans on future non-CDM domain keys."
+      "hardening:gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
+      "hardening:gate fails if Passport-owned Daml contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.",
+      "structural gate fails if README or docs lose canonical scope or non-goal language.",
+      "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
+      "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
+      "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration."
     ]
   },
   "tree": {
@@ -510,6 +562,11 @@
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
               },
               {
+                "id": "fn.daml.create-reservation-handoff",
+                "name": "CreateReservationHandoff",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
                 "id": "fn.daml.revoke-credential",
                 "name": "RevokeCredential",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
@@ -535,6 +592,7 @@
                       "fn.daml.issue-capacity-credential",
                       "fn.daml.present-to-verifier",
                       "fn.daml.reserve-from-presentation",
+                      "fn.daml.create-reservation-handoff",
                       "fn.daml.revoke-credential",
                       "fn.daml.grant-audit-disclosure"
                     ]
@@ -546,6 +604,7 @@
                     "statement": "Credential and audit data is visible only to signatories, intended observers, or scoped auditors.",
                     "enforcing_functions": [
                       "fn.daml.present-to-verifier",
+                      "fn.daml.create-reservation-handoff",
                       "fn.daml.grant-audit-disclosure"
                     ]
                   }
@@ -574,6 +633,42 @@
                     ]
                   }
                 ]
+              },
+              {
+                "id": "inv.scope.passport-public-core-boundary",
+                "statement": "Passport public-core scope remains readiness, eligibility, presentation, reservation, reservation handoff metadata, revocation, expiry, audit, evidence, bounded interop artifacts, and adapter readiness reports only.",
+                "properties": [
+                  {
+                    "id": "prop.scope.canonical-docs-required",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "README and scope docs must preserve the canonical scope statement, explicit non-goals, and reservation handoff boundary.",
+                    "enforcing_functions": [
+                      "fn.ci.local-gate",
+                      "fn.ci.adapter-readiness-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.scope.no-out-of-scope-daml-language",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "Passport-owned Daml must not contain implementation terminology for downstream execution, custody, settlement, wallet, optimizer, credit-decision, proof-system behavior, dormant reservation handoff observers, reservation-level optional auditors, or a handoff status transition.",
+                    "enforcing_functions": [
+                      "fn.ci.local-gate",
+                      "fn.ci.adapter-readiness-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.scope.reservation-handoff-covered",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Reservation handoff metadata must remain nonconsuming, metadata-only, covered by Daml Script tests, and visible only through ReservationHandoffInstruction rather than CapacityReservation.",
+                    "enforcing_functions": [
+                      "fn.test.daml-suite",
+                      "fn.ci.local-gate"
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -599,13 +694,13 @@
             "invariants": [
               {
                 "id": "inv.daml.domain-boundary",
-                "statement": "The foundation package models collateral capacity credentials only, without expanding into custody, settlement, legal title, credit approval, or proof systems.",
+                "statement": "The foundation package models collateral readiness credentials only, including reservation handoff metadata, without expanding into execution, custody, transfer, settlement, wallet, venue, margin-engine, optimization, credit-decision, legal-title, proof-system, production-identity, or live-integration behavior.",
                 "properties": [
                   {
                     "id": "prop.daml.non-goal-boundary-explicit",
                     "type": "assumption",
                     "severity": "medium",
-                    "statement": "New domain types must stay within the collateral credential account boundary unless an ADR updates the scope.",
+                    "statement": "New domain types must stay within the collateral-readiness credential boundary unless an ADR updates the scope.",
                     "enforcing_functions": [
                       "fn.daml.positive",
                       "fn.daml.non-negative"
@@ -719,7 +814,7 @@
                     "id": "prop.interop.security-policy-explicit",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "The adapter context must state that dynamic plugins, eval, and network access in CI are disabled.",
+                    "statement": "The adapter context must state that dynamic plugins, eval, and adapter network access during CI validation are disabled.",
                     "enforcing_functions": [
                       "fn.interop.default-context"
                     ]
@@ -937,7 +1032,7 @@
                     "id": "prop.cdm.network-only-explicit-vendor",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Repo-authored network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or CI.",
+                    "statement": "Repo-authored network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or generation.",
                     "enforcing_functions": [
                       "fn.cdm.vendor-schemas"
                     ]
@@ -1044,7 +1139,7 @@
               },
               {
                 "id": "fn.ci.github-workflow",
-                "name": "GitHub offline PR workflow",
+                "name": "GitHub hosted PR workflow",
                 "source_ref": ".github/workflows/ci.yml"
               },
               {
@@ -1059,7 +1154,7 @@
               },
               {
                 "id": "fn.ci.network-policy-gate",
-                "name": "checkDefaultCiNetworkPolicy",
+                "name": "checkRepoAuthoredNetworkPolicy",
                 "source_ref": "hardening/scripts/hardening-gate.mjs"
               },
               {
@@ -1076,7 +1171,7 @@
             "invariants": [
               {
                 "id": "inv.ci.default-green-bar",
-                "statement": "The default PR and local CI paths run from a pre-baked offline toolchain, cover generated artifacts, hardening controls, repository gates, packaging, Daml tests, Canton smoke, and freshness checks.",
+                "statement": "The default PR path uses standard hosted-runner bootstrap, and both PR and local CI cover generated artifacts, hardening controls, repository gates, packaging, Daml tests, Canton smoke, and freshness checks.",
                 "properties": [
                   {
                     "id": "prop.ci.hardening-gate-in-ci",
@@ -1088,10 +1183,10 @@
                     ]
                   },
                   {
-                    "id": "prop.ci.default-ci-offline",
+                    "id": "prop.ci.standard-hosted-toolchain",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Default PR CI must not run networked bootstrap, dependency install, schema refresh, or arbitrary network primitives after GitHub platform checkout.",
+                    "statement": "Default PR CI must use GitHub-hosted runners with explicit Node, Java, DPM, and lockfile npm setup, while repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring.",
                     "enforcing_functions": [
                       "fn.ci.github-workflow",
                       "fn.ci.network-policy-gate"
@@ -1189,7 +1284,8 @@
           "prop.daml.reservation-positive-bounded",
           "prop.daml.residual-capacity-subtractive",
           "inv.tests.external-coverage",
-          "prop.tests.coverage-gate-required"
+          "prop.tests.coverage-gate-required",
+          "prop.scope.reservation-handoff-covered"
         ]
       },
       {
@@ -1229,13 +1325,17 @@
           "prop.ci.hardening-gate-in-ci",
           "inv.release.reviewable-archive",
           "prop.release.git-ls-files-only",
-          "prop.ci.default-ci-offline",
+          "prop.ci.standard-hosted-toolchain",
           "prop.ci.source-inventory-complete",
           "prop.ci.ajv-exception-pinned",
           "inv.interop.adapter-readiness-claims",
           "prop.interop.adapter-level-evidence-bound",
           "prop.interop.no-live-integration-overclaim",
-          "prop.interop.readiness-reported"
+          "prop.interop.readiness-reported",
+          "inv.scope.passport-public-core-boundary",
+          "prop.scope.canonical-docs-required",
+          "prop.scope.no-out-of-scope-daml-language",
+          "prop.scope.reservation-handoff-covered"
         ]
       },
       {
@@ -1257,7 +1357,7 @@
         "covers": [
           "inv.ci.default-green-bar",
           "prop.ci.hardening-gate-in-ci",
-          "prop.ci.default-ci-offline",
+          "prop.ci.standard-hosted-toolchain",
           "prop.ci.generated-artifacts-current",
           "prop.ci.source-inventory-complete",
           "prop.ci.package-in-ci",
@@ -1265,7 +1365,11 @@
           "inv.interop.adapter-readiness-claims",
           "prop.interop.adapter-level-evidence-bound",
           "prop.interop.no-live-integration-overclaim",
-          "prop.interop.readiness-reported"
+          "prop.interop.readiness-reported",
+          "inv.scope.passport-public-core-boundary",
+          "prop.scope.canonical-docs-required",
+          "prop.scope.no-out-of-scope-daml-language",
+          "prop.scope.reservation-handoff-covered"
         ]
       }
     ],
@@ -1317,6 +1421,58 @@
           "xp.daml.capacity-inflation"
         ],
         "kill_gate": "Reservation negative tests must reject over-reservation."
+      },
+      {
+        "id": "bd.scope.out-of-scope-daml-language",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.scope.no-out-of-scope-daml-language",
+        "attacker_control": "indirect",
+        "severity": "critical",
+        "status": "guarded",
+        "description": "Passport-owned Daml reintroduces execution, custody, settlement, wallet, optimizer, credit-decision, proof-system implementation language, dormant reservation observer fields, or a handoff status transition.",
+        "evidence": [
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.scope.docs-boundary-drift"
+        ],
+        "kill_gate": "hardening:gate fails if Passport-owned Daml contains execution/custody/settlement/wallet/optimizer/credit/ZK implementation language, reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant."
+      },
+      {
+        "id": "bd.scope.canonical-docs-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.scope.canonical-docs-required",
+        "attacker_control": "indirect",
+        "severity": "critical",
+        "status": "guarded",
+        "description": "README or scope docs lose the canonical Passport scope, non-goals, or reservation handoff boundary.",
+        "evidence": [
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.scope.product-boundary-drift"
+        ],
+        "kill_gate": "structural and hardening gates fail if README/docs lose canonical scope or non-goal language."
+      },
+      {
+        "id": "bd.scope.handoff-coverage-gap",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.scope.reservation-handoff-covered",
+        "attacker_control": "direct",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Reservation handoff metadata exists without Daml Script coverage proving it is nonconsuming, visible to the handoff recipient, and not a reservation-level visibility path.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.scope.handoff-coverage-gap"
+        ],
+        "kill_gate": "tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer."
       },
       {
         "id": "bd.interop.dynamic-plugin-loading",
@@ -1375,7 +1531,7 @@
         "attacker_control": "indirect",
         "severity": "critical",
         "status": "guarded",
-        "description": "A default PR or local CI command fetches schemas, dependencies, toolchains, plugin code, or other mutable network resources.",
+        "description": "A repo-authored validation or generation command fetches schemas, plugin code, or other mutable runtime inputs outside explicit vendoring.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -1383,7 +1539,7 @@
         "exploit_path_ids": [
           "xp.ci.unpinned-input"
         ],
-        "kill_gate": "hardening:gate scans workflow YAML, shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module and offline npm ci."
+        "kill_gate": "hardening:gate scans shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module while permitting standard GitHub-hosted workflow bootstrap."
       },
       {
         "id": "bd.ci.generated-artifact-staleness",
@@ -1474,6 +1630,33 @@
         "status": "killed-by-tests"
       },
       {
+        "id": "xp.scope.product-boundary-drift",
+        "breakdown_id": "bd.scope.out-of-scope-daml-language",
+        "impact": "Passport public-core artifacts imply downstream execution, custody, settlement, wallet, venue, optimizer, credit-decision, proof-system, production-identity, or live-integration behavior.",
+        "preconditions": [
+          "Daml, docs, generated artifacts, or gates accept out-of-scope terminology or omit canonical non-goal language."
+        ],
+        "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.scope.docs-boundary-drift",
+        "breakdown_id": "bd.scope.canonical-docs-drift",
+        "impact": "Reviewers or downstream users see Passport represented as broader than the public collateral-readiness core.",
+        "preconditions": [
+          "README or scope docs omit canonical non-goals or describe Passport-owned handoff metadata as downstream trade behavior."
+        ],
+        "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.scope.handoff-coverage-gap",
+        "breakdown_id": "bd.scope.handoff-coverage-gap",
+        "impact": "Reservation handoff metadata could regress from nonconsuming readiness notice semantics without test failure.",
+        "preconditions": [
+          "Daml tests stop exercising CreateReservationHandoff or stop asserting the reservation remains active."
+        ],
+        "status": "guarded-by-tests"
+      },
+      {
         "id": "xp.interop.remote-code",
         "breakdown_id": "bd.interop.dynamic-plugin-loading",
         "impact": "Interop validation executes unreviewed framework adapter code.",
@@ -1503,9 +1686,9 @@
       {
         "id": "xp.ci.unpinned-input",
         "breakdown_id": "bd.ci.network-fetch-default",
-        "impact": "Default CI depends on mutable remote data.",
+        "impact": "Default validation or generation depends on mutable remote data.",
         "preconditions": [
-          "A CI command fetches network content outside explicit vendoring."
+          "A repo-authored validation or generation command fetches network content outside explicit vendoring."
         ],
         "status": "guarded-by-architecture-gate"
       },

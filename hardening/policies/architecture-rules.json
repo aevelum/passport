@@ -22,7 +22,8 @@
         "docs/09_adapter_readiness_levels.md",
         "hardening/rounds/round-0002.md",
         "hardening/rounds/round-0003.md",
-        "hardening/rounds/round-0004.md"
+        "hardening/rounds/round-0004.md",
+        "hardening/rounds/round-0005.md"
       ]
     },
     {
@@ -39,7 +40,7 @@
         "npm run hardening:gate",
         "design/tokens/colors.json",
         "Adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level changes are hardening-sensitive.",
-        "Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache."
+        "Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands."
       ]
     },
     {
@@ -184,9 +185,9 @@
       ]
     },
     {
-      "id": "arch.ci.github-workflow-offline",
+      "id": "arch.ci.github-workflow-hosted",
       "severity": "critical",
-      "description": "The default PR workflow must run on the pre-baked offline runner and install npm dependencies only from cache.",
+      "description": "The default PR workflow must use a standard GitHub-hosted runner with explicit toolchain setup and lockfile dependency installation.",
       "type": "required-substrings",
       "files": [
         ".github/workflows/ci.yml"
@@ -194,12 +195,20 @@
       "contains": [
         "permissions:",
         "contents: read",
-        "runs-on: [self-hosted, linux, passport-offline-ci]",
-        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+        "runs-on: ubuntu-latest",
+        "actions/checkout@v6",
+        "actions/setup-node@v6",
+        "node-version: 24",
+        "actions/setup-java@v5",
+        "java-version: \"17\"",
+        "actions/cache@v5",
+        "dpm-${{ runner.os }}-3.5.1-rc3",
         "fetch-depth: 1",
         "persist-credentials: false",
+        "curl -fsSL https://get.digitalasset.com/install/install.sh -o /tmp/install-dpm.sh",
+        "dpm install 3.5.1-rc3",
         "dpm version --active",
-        "npm ci --offline --ignore-scripts --audit=false --fund=false",
+        "npm ci --ignore-scripts --audit=false --fund=false",
         "npm run ci"
       ]
     },
@@ -245,6 +254,68 @@
         "scripts/validate-cdm-conformance.mjs",
         "scripts/vendor-cdm-schemas.mjs",
         "artifacts/cdm_conformance_report.json"
+      ]
+    },
+    {
+      "id": "arch.scope.canonical-docs",
+      "severity": "critical",
+      "description": "README and release scope docs must preserve the precise Passport public-core boundary.",
+      "type": "required-substrings",
+      "files": [
+        "README.md",
+        "docs/02_foundation_release_scope.md"
+      ],
+      "contains": [
+        "Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.",
+        "Passport records readiness.",
+        "Passport may record a reservation handoff notice.",
+        "Passport does not execute the downstream trade.",
+        "Passport does not custody, transfer, settle, or move collateral.",
+        "CapacityReservation is visible to holder, attester, and verifier.",
+        "ReservationHandoffInstruction is visible to the handoff recipient.",
+        "AuditDisclosureGrant is visible to the auditor."
+      ]
+    },
+    {
+      "id": "arch.scope.reservation-handoff-daml",
+      "severity": "critical",
+      "description": "Passport-owned Daml must use non-executing reservation handoff terminology.",
+      "type": "required-substrings",
+      "files": [
+        "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+      ],
+      "contains": [
+        "ReservationHandoffInstruction",
+        "CreateReservationHandoff",
+        "handoffRecipient"
+      ]
+    },
+    {
+      "id": "arch.scope.no-out-of-scope-daml-language",
+      "severity": "critical",
+      "description": "Passport-owned Daml must not introduce execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation terms.",
+      "type": "forbidden-patterns",
+      "paths": [
+        "packages/passport-core/daml",
+        "packages/passport-tests/daml"
+      ],
+      "extensions": [
+        ".daml"
+      ],
+      "forbidden": [
+        "ExecutionInstruction",
+        "ConvertToExecutionInstruction",
+        "executionRailParty",
+        "handoffObserver",
+        "ReservationHandedOff",
+        "auditor : Optional Party",
+        "SettlementFinality",
+        "CustodyWallet",
+        "CollateralOptimizer",
+        "CreditApproval",
+        "CreditDecision",
+        "ZKProof",
+        "ZeroKnowledge"
       ]
     },
     {

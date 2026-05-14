@@ -18,7 +18,7 @@ export const CDM_READINESS = Object.freeze({
     Object.freeze({
       id: 'evidence.cdm.framework-neutral-policy-boundary',
       category: 'policy-boundary',
-      summary: 'The default adapter context disables dynamic plugins, eval, and network access in CI.',
+      summary: 'The default adapter context disables dynamic plugins, eval, and adapter network access during CI validation.',
       references: Object.freeze(['interop/context.js'])
     }),
     Object.freeze({

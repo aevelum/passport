@@ -9,29 +9,56 @@ permissions:
 
 jobs:
   local-gates:
-    runs-on: [self-hosted, linux, passport-offline-ci]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
           persist-credentials: false
-      - name: Verify offline toolchain
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: actions/cache@v5
+        with:
+          path: ~/.dpm/cache
+          key: dpm-${{ runner.os }}-3.5.1-rc3
+
+      - name: Install DPM
+        run: |
+          curl -fsSL https://get.digitalasset.com/install/install.sh -o /tmp/install-dpm.sh
+          sh /tmp/install-dpm.sh
+          echo "$HOME/.dpm/bin" >> "$GITHUB_PATH"
+
+      - name: Install Daml SDK
+        run: dpm install 3.5.1-rc3
+
+      - name: Verify toolchain
         run: |
           node_version="$(node --version)"
           case "$node_version" in
             v24.*) ;;
             *)
-              echo "expected Node 24.x on passport-offline-ci runner, got $node_version" >&2
+              echo "expected Node 24.x, got $node_version" >&2
               exit 1
               ;;
           esac
 
           dpm_version="$(dpm version --active)"
           if [[ "$dpm_version" != "3.5.1-rc3" ]]; then
-            echo "expected DPM SDK 3.5.1-rc3 on passport-offline-ci runner, got $dpm_version" >&2
+            echo "expected DPM SDK 3.5.1-rc3, got $dpm_version" >&2
             exit 1
           fi
-      - name: Install Node dependencies from offline cache
-        run: npm ci --offline --ignore-scripts --audit=false --fund=false
+
+      - name: Install Node dependencies
+        run: npm ci --ignore-scripts --audit=false --fund=false
+
       - name: Run local CI gates
         run: npm run ci

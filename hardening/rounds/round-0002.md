@@ -5,7 +5,7 @@
 Selected surfaces:
 
 - `inv.ci.default-green-bar`
-- `prop.ci.default-ci-offline`
+- former `prop.ci.default-ci-offline` policy, superseded by `prop.ci.standard-hosted-toolchain`
 - `prop.ci.generated-artifacts-current`
 - `inv.cdm.schema-reproducibility`
 
@@ -32,4 +32,4 @@ Deepen the CI and generated-artifact controls after PR review found that default
 
 ## Result
 
-Current status: guarded. Default CI now assumes a pre-baked offline runner and treats networked dependency or toolchain bootstrap as outside the default PR path.
+Historical status: guarded under the former strict offline-runner policy. This policy was superseded on 2026-05-14 by standard GitHub-hosted PR CI with explicit toolchain setup; the remaining active guard is that repo-authored validation and generation paths do not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring commands.

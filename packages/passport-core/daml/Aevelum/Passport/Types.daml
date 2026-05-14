@@ -2,7 +2,7 @@ module Aevelum.Passport.Types where
 
 -- Aevelum Passport Foundation types.
 -- The package intentionally models collateral capacity credentials only.
--- It does not model custody, settlement, execution, legal title, credit approval, or ZK proofs.
+-- It does not execute, settle, transfer, custody, move collateral, decide credit, determine legal title, or implement proof systems.
 
 type AccountId = Text
 type PolicyId = Text
@@ -42,7 +42,6 @@ data ReservationStatus
   = ReservationActive
   | ReservationReleased
   | ReservationExpired
-  | ReservationConverted
   | ReservationDisputed
   deriving (Eq, Show)
 

@@ -70,23 +70,31 @@ t019_expire_reservation = script do
   assertMsg "expiring reservation consumes active reservation" (length dealerReservations == 0)
   return ()
 
-t020_convert_reservation_to_execution_instruction : Script ()
-t020_convert_reservation_to_execution_instruction = script do
+t020_create_reservation_handoff : Script ()
+t020_create_reservation_handoff = script do
   reserved <- createReservedContext
   let holder = reserved.presented.base.actors.holder
   let dealer = reserved.presented.base.actors.dealer
   let attester = reserved.presented.base.actors.attester
-  let rail = reserved.presented.base.actors.operator
-  _instructionCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
-    exerciseCmd reserved.reservationCid ConvertToExecutionInstruction with
-      instructionId = "execution-instruction-001"
-      executionRailParty = rail
-      instructionPurpose = "repo pre-trade handoff"
-      instructionCreatedAt = "2026-05-10T05:15:00Z"
-  railInstructions <- query @ExecutionInstruction rail
+  let recipient = reserved.presented.base.actors.operator
+  let auditor = reserved.presented.base.actors.auditor
+  _handoffCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
+    exerciseCmd reserved.reservationCid CreateReservationHandoff with
+      handoffId = "reservation-handoff-001"
+      handoffRecipient = recipient
+      handoffPurpose = "repo pre-trade readiness handoff"
+      handoffCreatedAt = "2026-05-10T05:15:00Z"
+  recipientHandoffs <- query @ReservationHandoffInstruction recipient
   dealerReservations <- query @CapacityReservation dealer
-  assertMsg "execution rail should see execution instruction" (length railInstructions == 1)
-  assertMsg "conversion is nonconsuming and keeps reservation active" (length dealerReservations == 1)
+  recipientReservations <- query @CapacityReservation recipient
+  auditorReservations <- query @CapacityReservation auditor
+  assertMsg "handoff recipient should see reservation handoff instruction" (length recipientHandoffs == 1)
+  assertMsg "handoff is nonconsuming and keeps reservation active" (length dealerReservations == 1)
+  case dealerReservations of
+    [(_, reservation)] -> assertMsg "handoff does not mutate reservation status" (reservation.status == ReservationActive)
+    _ -> assertMsg "dealer should see exactly one reservation after handoff" False
+  assertMsg "handoff recipient should not see reservation through reservation-level observer" (length recipientReservations == 0)
+  assertMsg "auditor should not see reservation through reservation-level observer" (length auditorReservations == 0)
   return ()
 
 t021_dispute_reservation : Script ()

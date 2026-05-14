@@ -44,7 +44,9 @@ function evaluateRules(policy) {
     if (rule.type === 'forbidden-patterns') {
       for (const file of filesForRule(rule)) {
         const text = readText(file);
-        for (const needle of rule.forbidden ?? []) ok(!text.includes(needle), `${rule.id} ${file} excludes ${needle}`);
+        for (const [index, needle] of (rule.forbidden ?? []).entries()) {
+          ok(!text.includes(needle), `${rule.id} ${file} excludes forbidden pattern ${index + 1}`);
+        }
       }
       continue;
     }
@@ -212,6 +214,150 @@ function checkCdmReadinessDocs() {
   checkCdmOverclaimLanguage();
 }
 
+function checkPassportScopeBoundary() {
+  const coreFoundation = readText('packages/passport-core/daml/Aevelum/Passport/Foundation.daml');
+  for (const token of [
+    'ReservationHandoffInstruction',
+    'CreateReservationHandoff',
+    'handoffRecipient'
+  ]) {
+    ok(coreFoundation.includes(token), `Daml foundation contains ${token}`);
+  }
+
+  for (const rel of [
+    ...walkFiles('packages/passport-core/daml', { extensions: ['.daml'] }),
+    ...walkFiles('packages/passport-tests/daml', { extensions: ['.daml'] })
+  ]) {
+    const text = readText(rel);
+    for (const [index, token] of [
+      'ExecutionInstruction',
+      'ConvertToExecutionInstruction',
+      'executionRailParty',
+      'executionRail',
+      'instructionId',
+      'instructionPurpose',
+      'instructionCreatedAt',
+      'handoffObserver',
+      'ReservationHandedOff',
+      'auditor : Optional Party',
+      'SettlementFinality',
+      'CustodyWallet',
+      'CollateralOptimizer',
+      'CreditApproval',
+      'CreditDecision',
+      'ZKProof',
+      'ZeroKnowledge'
+    ].entries()) {
+      ok(!text.includes(token), `${rel} excludes Passport out-of-scope Daml token ${index + 1}`);
+    }
+  }
+
+  const requiredScopeStatements = [
+    'Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.',
+    'Passport records readiness.',
+    'Passport may record a reservation handoff notice.',
+    'Passport does not execute the downstream trade.',
+    'Passport does not custody, transfer, settle, or move collateral.'
+  ];
+  for (const rel of ['README.md', 'docs/02_foundation_release_scope.md']) {
+    const text = readText(rel);
+    for (const statement of requiredScopeStatements) {
+      ok(text.includes(statement), `${rel} includes canonical scope statement ${statement}`);
+    }
+  }
+
+  const nonGoalDoc = readText('docs/07_non_goals.md');
+  for (const required of [
+    'not repo execution',
+    'not securities-lending execution',
+    'not venue operation',
+    'not a margin engine',
+    'not asset custody',
+    'not a wallet',
+    'not settlement',
+    'not collateral transfer',
+    'not collateral optimization',
+    'not credit decisioning',
+    'not legal-title determination',
+    'not ZK proofs',
+    'not production identity integration',
+    'not live external integration'
+  ]) {
+    ok(nonGoalDoc.includes(required), `docs/07_non_goals.md includes non-goal ${required}`);
+  }
+
+  for (const rel of [
+    'README.md',
+    'docs/02_foundation_release_scope.md',
+    'docs/05_privacy_model.md',
+    'docs/07_non_goals.md',
+    'artifacts/demo_transcript.json'
+  ]) {
+    const text = readText(rel).toLowerCase();
+    for (const needle of [
+      'capacityreservation is visible',
+      'holder',
+      'attester',
+      'verifier',
+      'reservationhandoffinstruction',
+      'handoff recipient',
+      'auditdisclosuregrant',
+      'auditor'
+    ]) {
+      ok(text.includes(needle), `${rel} includes dedicated visibility language`);
+    }
+  }
+
+  for (const rel of passportScopeDocs()) {
+    const text = readText(rel).toLowerCase();
+    for (const forbidden of [
+      'capacityreservation is visible only to holder, attester, verifier, and optional scoped observers',
+      'optional scoped observers',
+      'optional handoff observer and auditor',
+      'optional handoff observer',
+      'reservation-level auditor'
+    ]) {
+      ok(!text.includes(forbidden), `${rel} excludes stale reservation observer language`);
+    }
+  }
+
+  const unsafePatterns = [
+    { label: 'executing trades', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:executes?|executing|execute)\b[^.\n|;]{0,80}\b(?:trade|trades|repo|securities-lending|transaction|transactions)\b/i },
+    { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
+    { label: 'custodying assets', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:custodies|custodying|custody|custodian)\b[^.\n|;]{0,80}\b(?:asset|assets|collateral)\b/i },
+    { label: 'settling transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:settles?|settling|settlement)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
+    { label: 'operating a wallet', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bwallet\b/i },
+    { label: 'operating a venue', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bvenue\b/i },
+    { label: 'live external integration', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:has|provides?|providing|is)\b[^.\n|;]{0,80}\blive external integration\b/i }
+  ];
+
+  for (const rel of passportScopeDocs()) {
+    for (const unit of claimUnits(readText(rel))) {
+      for (const { label, pattern } of unsafePatterns) {
+        if (!pattern.test(unit.text)) continue;
+        ok(isSafeScopeBoundaryClaim(unit.text), `${rel}:${unit.line} bounds Passport scope claim ${label}`);
+      }
+    }
+  }
+}
+
+function passportScopeDocs() {
+  const files = new Set([
+    'README.md',
+    'AGENTS.md',
+    ...walkFiles('docs', { extensions: ['.md'] }),
+    ...walkFiles('design', { extensions: ['.md'] }),
+    ...walkFiles('hardening', { extensions: ['.md'] }),
+    ...walkFiles('.agents/skills', { extensions: ['.md'] }),
+    'artifacts/demo_transcript.json'
+  ]);
+  return [...files].filter(file => fs.existsSync(abs(file))).sort();
+}
+
+function isSafeScopeBoundaryClaim(text) {
+  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|out of scope|excludes|excluded)\b/i.test(text);
+}
+
 function visit(value, onKey) {
   if (Array.isArray(value)) {
     for (const item of value) visit(item, onKey);
@@ -252,6 +398,7 @@ for (const rel of [
   'hardening/frontiers/passport.frontier.json',
   'hardening/policies/architecture-rules.json',
   'hardening/rounds/round-0001.md',
+  'hardening/rounds/round-0005.md',
   'hardening/change-log.md'
 ]) relExists(rel);
 
@@ -266,12 +413,13 @@ pass.push(...frontierResult.pass.map(item => `frontier: ${item}`));
 fail.push(...frontierResult.fail.map(item => `frontier: ${item}`));
 
 evaluateRules(readJson('hardening/policies/architecture-rules.json'));
-checkDefaultCiNetworkPolicy();
+checkRepoAuthoredNetworkPolicy();
 checkAjvDynamicExecutionDependencyException();
 checkAdapterReadiness();
 checkInteropReportReadiness();
 checkCdmPayloadPurity();
 checkCdmReadinessDocs();
+checkPassportScopeBoundary();
 checkCiOrder();
 
 const packageScript = readText('scripts/package.mjs');
@@ -300,10 +448,9 @@ if (fail.length) {
 
 console.log(`hardening gate passed: ${pass.length} checks`);
 
-function checkDefaultCiNetworkPolicy() {
+function checkRepoAuthoredNetworkPolicy() {
   const allowedNetworkFiles = new Set(['interop/plugins/cdm/vendor.js']);
   const files = [
-    ...walkFiles('.github/workflows', { extensions: ['.yml', '.yaml'] }),
     ...walkFiles('scripts', { extensions: ['.mjs', '.js', '.sh'] }),
     ...walkFiles('hardening/scripts', { extensions: ['.mjs', '.js'] }),
     ...walkFiles('interop', { extensions: ['.js', '.mjs'] })
@@ -328,7 +475,6 @@ function checkNetworkFreeText(label, text) {
     ['cu' + 'rl', new RegExp('\\bcu' + 'rl\\b')],
     ['wg' + 'et', new RegExp('\\bwg' + 'et\\b')],
     ['dpm in' + 'stall', new RegExp('\\bdpm\\s+in' + 'stall\\b')],
-    ['online npm ' + 'ci', new RegExp('\\bnpm\\s+ci\\b(?![^\\n]*\\s--offline\\b)')],
     ['npm in' + 'stall', new RegExp('\\bnpm\\s+(?:in' + 'stall|i)\\b')],
     ['np' + 'x', new RegExp('\\bnp' + 'x\\b')],
     ['fet' + 'ch(', new RegExp('\\bfet' + 'ch\\s*\\(')],
