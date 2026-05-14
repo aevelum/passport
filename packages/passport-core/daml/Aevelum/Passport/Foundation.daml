@@ -379,7 +379,7 @@ template CredentialPresentation
           holder
           attester
           verifier
-          executionRail = None
+          handoffObserver = None
           auditor = None
           reservedAmount
           currency = capacityCurrency
@@ -430,7 +430,7 @@ template CapacityReservation
     holder : Party
     attester : Party
     verifier : Party
-    executionRail : Optional Party
+    handoffObserver : Optional Party
     auditor : Optional Party
     reservedAmount : Amount
     currency : CurrencyCode
@@ -444,8 +444,8 @@ template CapacityReservation
     schemaVersion : Text
   where
     signatory holder, attester, verifier
-    observer case executionRail of
-      Some rail -> rail
+    observer case handoffObserver of
+      Some observer -> observer
       None -> verifier
     observer case auditor of
       Some aud -> aud
@@ -496,27 +496,28 @@ template CapacityReservation
           supersedingCredentialId = None
           schemaVersion
 
-    nonconsuming choice ConvertToExecutionInstruction : ContractId ExecutionInstruction
+    -- This handoff records readiness metadata for a downstream system. It does not execute, settle, transfer, custody, or move collateral.
+    nonconsuming choice CreateReservationHandoff : ContractId ReservationHandoffInstruction
       with
-        instructionId : Text
-        executionRailParty : Party
-        instructionPurpose : Text
-        instructionCreatedAt : IsoTimestamp
+        handoffId : Text
+        handoffRecipient : Party
+        handoffPurpose : Text
+        handoffCreatedAt : IsoTimestamp
       controller holder, attester, verifier
       do
-        create ExecutionInstruction with
-          instructionId
+        create ReservationHandoffInstruction with
+          handoffId
           reservationId
           holder
           attester
           verifier
-          executionRailParty
+          handoffRecipient
           reservedAmount
           currency
           policyId
           policyVersion
-          instructionPurpose
-          instructionCreatedAt
+          handoffPurpose
+          handoffCreatedAt
           evidenceManifestHash
           schemaVersion
 
@@ -540,25 +541,26 @@ template CapacityReservation
           disputedAt
           schemaVersion
 
-template ExecutionInstruction
+-- This handoff records readiness metadata for a downstream system. It does not execute, settle, transfer, custody, or move collateral.
+template ReservationHandoffInstruction
   with
-    instructionId : Text
+    handoffId : Text
     reservationId : ReservationId
     holder : Party
     attester : Party
     verifier : Party
-    executionRailParty : Party
+    handoffRecipient : Party
     reservedAmount : Amount
     currency : CurrencyCode
     policyId : PolicyId
     policyVersion : PolicyVersion
-    instructionPurpose : Text
-    instructionCreatedAt : IsoTimestamp
+    handoffPurpose : Text
+    handoffCreatedAt : IsoTimestamp
     evidenceManifestHash : EvidenceManifestHash
     schemaVersion : Text
   where
     signatory holder, attester, verifier
-    observer executionRailParty
+    observer handoffRecipient
 
 template ReservationDispute
   with

@@ -4,11 +4,15 @@
   <img alt="Aevelum Passport Foundation - Canton-native collateral capacity credentials" src="assets/banner.svg">
 </picture>
 
-Aevelum Passport is a Daml/Canton-native collateral credential account.
+Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.
 
-It lets an institution issue, hold, present, reserve, revoke, and audit verified collateral-capacity credentials before repo, securities-lending, margin, or secured-credit execution.
+It models collateral-capacity accounts, collateral policies, credential requests, credential issuance, counterparty-scoped presentation, bounded reservation, residual capacity, revocation, expiry, dispute metadata, reservation handoff metadata, and scoped audit disclosure. Passport may emit bounded interop artifacts and adapter-readiness reports.
 
-The Foundation Release proves one narrow workflow:
+Passport records readiness. Passport may record a reservation handoff notice. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, or move collateral.
+
+Aevelum Passport demonstrates a roomless Canton-native collateral credential account for repo pre-trade capacity verification and reservation.
+
+The public core proves one narrow readiness workflow:
 
 ```text
 Dealer publishes collateral policy.
@@ -19,6 +23,7 @@ Holder presents CredentialPresentation to Dealer.
 Dealer reserves part of the capacity.
 Original capacity is consumed through the reservation flow.
 Residual capacity is reissued.
+Dealer may create a non-executing reservation handoff notice.
 Dealer releases the reservation.
 Attester revokes stale credentials when needed.
 Unauthorized parties see nothing.
@@ -30,19 +35,25 @@ Auditor receives only scoped audit metadata.
 - A Daml-as-spec package.
 - A roomless collateral capacity credential account.
 - A repo pre-trade capacity credential demo.
+- A reservation, residual-capacity, revocation, expiry, dispute, handoff, and scoped-audit model.
 - A committee-facing foundation for Canton collateral workflows.
 
 ## What this is not
 
 - Not a repo venue.
 - Not a securities-lending venue.
+- Not a margin engine.
 - Not a custody provider.
 - Not a settlement rail.
+- Not a collateral-transfer system.
 - Not a collateral optimizer.
 - Not a credit decision engine.
+- Not a wallet.
 - Not a ZK system.
 - Not a legal-title oracle.
 - Not a diligence room.
+- Not a production identity system.
+- Not a live external integration.
 
 ## Project layout
 
@@ -85,6 +96,7 @@ hardening/
   frontiers/passport.frontier.json
   policies/architecture-rules.json
   rounds/round-0001.md
+  rounds/round-0005.md
   change-log.md
   scripts/*.mjs
 scripts/

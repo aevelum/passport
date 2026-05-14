@@ -9,6 +9,8 @@ description: Use inside the Passport repo while developing to keep invariants, a
 
 Use this skill when changing Passport code, Daml templates, interop adapters, release scripts, CI, or docs that affect security or architectural invariants.
 
+Passport scope is collateral-readiness credentialing: readiness, eligibility, presentation, reservation, reservation handoff metadata, revocation, expiry, audit, evidence, bounded interop artifacts, and adapter readiness reports. Passport does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement ZK proofs, provide production identity, or provide live external integration.
+
 Adapter readiness changes are hardening-sensitive. If a change touches adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level, keep readiness metadata, the invariant map, frontier, hardening round or change log, generated interop report, and hardening gate in sync.
 
 The loop keeps development hardening evidence in the repo:

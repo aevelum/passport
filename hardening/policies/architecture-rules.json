@@ -22,7 +22,8 @@
         "docs/09_adapter_readiness_levels.md",
         "hardening/rounds/round-0002.md",
         "hardening/rounds/round-0003.md",
-        "hardening/rounds/round-0004.md"
+        "hardening/rounds/round-0004.md",
+        "hardening/rounds/round-0005.md"
       ]
     },
     {
@@ -245,6 +246,62 @@
         "scripts/validate-cdm-conformance.mjs",
         "scripts/vendor-cdm-schemas.mjs",
         "artifacts/cdm_conformance_report.json"
+      ]
+    },
+    {
+      "id": "arch.scope.canonical-docs",
+      "severity": "critical",
+      "description": "README and release scope docs must preserve the precise Passport public-core boundary.",
+      "type": "required-substrings",
+      "files": [
+        "README.md",
+        "docs/02_foundation_release_scope.md"
+      ],
+      "contains": [
+        "Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.",
+        "Passport records readiness.",
+        "Passport may record a reservation handoff notice.",
+        "Passport does not execute the downstream trade.",
+        "Passport does not custody, transfer, settle, or move collateral."
+      ]
+    },
+    {
+      "id": "arch.scope.reservation-handoff-daml",
+      "severity": "critical",
+      "description": "Passport-owned Daml must use non-executing reservation handoff terminology.",
+      "type": "required-substrings",
+      "files": [
+        "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+      ],
+      "contains": [
+        "ReservationHandoffInstruction",
+        "CreateReservationHandoff",
+        "handoffRecipient"
+      ]
+    },
+    {
+      "id": "arch.scope.no-out-of-scope-daml-language",
+      "severity": "critical",
+      "description": "Passport-owned Daml must not introduce execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation terms.",
+      "type": "forbidden-patterns",
+      "paths": [
+        "packages/passport-core/daml",
+        "packages/passport-tests/daml"
+      ],
+      "extensions": [
+        ".daml"
+      ],
+      "forbidden": [
+        "ExecutionInstruction",
+        "ConvertToExecutionInstruction",
+        "executionRailParty",
+        "SettlementFinality",
+        "CustodyWallet",
+        "CollateralOptimizer",
+        "CreditApproval",
+        "CreditDecision",
+        "ZKProof",
+        "ZeroKnowledge"
       ]
     },
     {

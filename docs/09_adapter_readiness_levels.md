@@ -2,6 +2,8 @@
 
 Adapter Readiness Levels prevent framework adapter maturity from being claimed ahead of committed evidence. They apply to adapter metadata, docs, generated interop reports, hardening gates, and release language.
 
+Readiness levels classify bounded adapter evidence only. They do not expand Passport into custody, settlement, venue operation, wallet operation, collateral transfer, optimization, credit decisioning, production identity, or live external integration.
+
 | Level | Name | Evidence required before claiming the level |
 |---:|---|---|
 | 0 | Concept | Adapter idea documented; no registered implementation. |

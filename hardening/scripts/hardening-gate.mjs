@@ -44,7 +44,9 @@ function evaluateRules(policy) {
     if (rule.type === 'forbidden-patterns') {
       for (const file of filesForRule(rule)) {
         const text = readText(file);
-        for (const needle of rule.forbidden ?? []) ok(!text.includes(needle), `${rule.id} ${file} excludes ${needle}`);
+        for (const [index, needle] of (rule.forbidden ?? []).entries()) {
+          ok(!text.includes(needle), `${rule.id} ${file} excludes forbidden pattern ${index + 1}`);
+        }
       }
       continue;
     }
@@ -212,6 +214,111 @@ function checkCdmReadinessDocs() {
   checkCdmOverclaimLanguage();
 }
 
+function checkPassportScopeBoundary() {
+  const coreFoundation = readText('packages/passport-core/daml/Aevelum/Passport/Foundation.daml');
+  for (const token of [
+    'ReservationHandoffInstruction',
+    'CreateReservationHandoff',
+    'handoffRecipient'
+  ]) {
+    ok(coreFoundation.includes(token), `Daml foundation contains ${token}`);
+  }
+
+  for (const rel of [
+    ...walkFiles('packages/passport-core/daml', { extensions: ['.daml'] }),
+    ...walkFiles('packages/passport-tests/daml', { extensions: ['.daml'] })
+  ]) {
+    const text = readText(rel);
+    for (const [index, token] of [
+      'ExecutionInstruction',
+      'ConvertToExecutionInstruction',
+      'executionRailParty',
+      'executionRail',
+      'instructionId',
+      'instructionPurpose',
+      'instructionCreatedAt',
+      'SettlementFinality',
+      'CustodyWallet',
+      'CollateralOptimizer',
+      'CreditApproval',
+      'CreditDecision',
+      'ZKProof',
+      'ZeroKnowledge'
+    ].entries()) {
+      ok(!text.includes(token), `${rel} excludes Passport out-of-scope Daml token ${index + 1}`);
+    }
+  }
+
+  const requiredScopeStatements = [
+    'Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.',
+    'Passport records readiness.',
+    'Passport may record a reservation handoff notice.',
+    'Passport does not execute the downstream trade.',
+    'Passport does not custody, transfer, settle, or move collateral.'
+  ];
+  for (const rel of ['README.md', 'docs/02_foundation_release_scope.md']) {
+    const text = readText(rel);
+    for (const statement of requiredScopeStatements) {
+      ok(text.includes(statement), `${rel} includes canonical scope statement ${statement}`);
+    }
+  }
+
+  const nonGoalDoc = readText('docs/07_non_goals.md');
+  for (const required of [
+    'not repo execution',
+    'not securities-lending execution',
+    'not venue operation',
+    'not a margin engine',
+    'not asset custody',
+    'not a wallet',
+    'not settlement',
+    'not collateral transfer',
+    'not collateral optimization',
+    'not credit decisioning',
+    'not legal-title determination',
+    'not ZK proofs',
+    'not production identity integration',
+    'not live external integration'
+  ]) {
+    ok(nonGoalDoc.includes(required), `docs/07_non_goals.md includes non-goal ${required}`);
+  }
+
+  const unsafePatterns = [
+    { label: 'executing trades', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:executes?|executing|execute)\b[^.\n|;]{0,80}\b(?:trade|trades|repo|securities-lending|transaction|transactions)\b/i },
+    { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
+    { label: 'custodying assets', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:custodies|custodying|custody|custodian)\b[^.\n|;]{0,80}\b(?:asset|assets|collateral)\b/i },
+    { label: 'settling transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:settles?|settling|settlement)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
+    { label: 'operating a wallet', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bwallet\b/i },
+    { label: 'operating a venue', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bvenue\b/i },
+    { label: 'live external integration', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:has|provides?|providing|is)\b[^.\n|;]{0,80}\blive external integration\b/i }
+  ];
+
+  for (const rel of passportScopeDocs()) {
+    for (const unit of claimUnits(readText(rel))) {
+      for (const { label, pattern } of unsafePatterns) {
+        if (!pattern.test(unit.text)) continue;
+        ok(isSafeScopeBoundaryClaim(unit.text), `${rel}:${unit.line} bounds Passport scope claim ${label}`);
+      }
+    }
+  }
+}
+
+function passportScopeDocs() {
+  const files = new Set([
+    'README.md',
+    'AGENTS.md',
+    ...walkFiles('docs', { extensions: ['.md'] }),
+    ...walkFiles('design', { extensions: ['.md'] }),
+    ...walkFiles('hardening', { extensions: ['.md'] }),
+    ...walkFiles('.agents/skills', { extensions: ['.md'] })
+  ]);
+  return [...files].filter(file => fs.existsSync(abs(file))).sort();
+}
+
+function isSafeScopeBoundaryClaim(text) {
+  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|out of scope|excludes|excluded)\b/i.test(text);
+}
+
 function visit(value, onKey) {
   if (Array.isArray(value)) {
     for (const item of value) visit(item, onKey);
@@ -252,6 +359,7 @@ for (const rel of [
   'hardening/frontiers/passport.frontier.json',
   'hardening/policies/architecture-rules.json',
   'hardening/rounds/round-0001.md',
+  'hardening/rounds/round-0005.md',
   'hardening/change-log.md'
 ]) relExists(rel);
 
@@ -272,6 +380,7 @@ checkAdapterReadiness();
 checkInteropReportReadiness();
 checkCdmPayloadPurity();
 checkCdmReadinessDocs();
+checkPassportScopeBoundary();
 checkCiOrder();
 
 const packageScript = readText('scripts/package.mjs');

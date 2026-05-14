@@ -2,6 +2,8 @@
 
 Passport keeps its Daml templates as the Canton ledger schema and emits external standards artifacts through a small framework-neutral adapter surface.
 
+Interop artifacts are bounded readiness artifacts. They do not make Passport a venue, custody system, settlement system, wallet, token-transfer system, optimizer, credit decision engine, production identity system, or live external integration.
+
 The adapter surface is deliberately narrow:
 
 - static plugin registry only;
@@ -30,7 +32,7 @@ The initial registry contains one plugin:
 |---|---:|---|---|
 | FINOS CDM | `6.0` | JSON | `eligible-collateral-specification`, `eligibility-query`, `check-eligibility-result` |
 
-Future candidates include ISO 20022, FIX, FpML, W3C Verifiable Credentials, and Canton Token Standard adapters, but this release intentionally ships no stubs for them.
+Future candidates include ISO 20022, FIX, FpML, W3C Verifiable Credentials, and Canton Token Standard adapters, but this release intentionally ships no stubs for them and does not include custody, venue, settlement, token, wallet, or live integration adapters.
 
 ## Adapter Readiness Levels
 

@@ -24,6 +24,7 @@ const transcript = {
     credentialId: 'credential-001',
     presentationId: 'presentation-001',
     reservationId: 'reservation-001',
+    handoffId: 'reservation-handoff-001',
     residualCredentialId: 'credential-residual-001',
     revocationId: 'revocation-001',
     auditGrantId: 'audit-grant-001'
@@ -45,7 +46,8 @@ const transcript = {
     'Holder presents CredentialPresentation to Dealer',
     'Holder, Attester, and Dealer reserve partial capacity',
     'Source credential is consumed and residual credential is issued',
-    'Reservation is released or handed off',
+    'ReservationHandoffInstruction records readiness metadata for a downstream system',
+    'Reservation is released',
     'Attester can revoke stale or incorrect credentials',
     'Auditor receives scoped AuditDisclosureGrant when authorized'
   ],
@@ -53,15 +55,21 @@ const transcript = {
     'Verifier receives CredentialPresentation, not raw collateral inventory',
     'CapacityCredential is visible to Holder and Attester by default',
     'CapacityReservation is visible only to Holder, Attester, Verifier, and optional scoped observers',
+    'ReservationHandoffInstruction is metadata-only and nonconsuming',
     'AuditDisclosureGrant reveals only allowed metadata fields',
     'Outsider sees no Passport state'
   ],
   nonGoals: [
     'no custody',
     'no settlement',
-    'no execution venue',
+    'no collateral transfer',
+    'no venue operation',
+    'no wallet',
+    'no margin engine',
     'no credit decision',
     'no ZK system',
+    'no production identity',
+    'no live external integration',
     'no diligence workspace'
   ]
 };

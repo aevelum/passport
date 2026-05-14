@@ -41,6 +41,93 @@ function walk(dir, acc = []) {
   return acc;
 }
 
+function checkPassportScopeBoundary() {
+  const canonicalScope = 'Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.';
+  const requiredScopeStatements = [
+    canonicalScope,
+    'Passport records readiness.',
+    'Passport may record a reservation handoff notice.',
+    'Passport does not execute the downstream trade.',
+    'Passport does not custody, transfer, settle, or move collateral.'
+  ];
+  for (const rel of ['README.md', 'docs/02_foundation_release_scope.md']) {
+    const text = read(rel);
+    for (const statement of requiredScopeStatements) {
+      if (!text.includes(statement)) fail.push(`${rel} missing scope statement: ${statement}`);
+      else pass.push(`${rel} includes scope statement: ${statement}`);
+    }
+  }
+
+  const nonGoalDoc = read('docs/07_non_goals.md');
+  for (const required of [
+    'not repo execution',
+    'not securities-lending execution',
+    'not venue operation',
+    'not a margin engine',
+    'not asset custody',
+    'not a wallet',
+    'not settlement',
+    'not collateral transfer',
+    'not collateral optimization',
+    'not credit decisioning',
+    'not legal-title determination',
+    'not ZK proofs',
+    'not production identity integration',
+    'not live external integration'
+  ]) {
+    if (!nonGoalDoc.includes(required)) fail.push(`docs/07_non_goals.md missing non-goal ${required}`);
+    else pass.push(`docs/07_non_goals.md includes non-goal ${required}`);
+  }
+
+  const unsafePatterns = [
+    { label: 'executing trades', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:executes?|executing|execute)\b[^.\n|;]{0,80}\b(?:trade|trades|repo|securities-lending|transaction|transactions)\b/i },
+    { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
+    { label: 'custodying assets', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:custodies|custodying|custody|custodian)\b[^.\n|;]{0,80}\b(?:asset|assets|collateral)\b/i },
+    { label: 'settling transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:settles?|settling|settlement)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
+    { label: 'operating a wallet', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bwallet\b/i },
+    { label: 'operating a venue', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bvenue\b/i },
+    { label: 'live external integration', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:has|provides?|providing|is)\b[^.\n|;]{0,80}\blive external integration\b/i }
+  ];
+
+  for (const rel of docsScopeFiles) {
+    const text = read(rel);
+    for (const unit of claimUnits(text)) {
+      for (const { label, pattern } of unsafePatterns) {
+        if (!pattern.test(unit.text)) continue;
+        if (!isSafeNegativeOrBoundary(unit.text)) fail.push(`${rel}:${unit.line} unsafe Passport scope claim: ${label}`);
+        else pass.push(`${rel}:${unit.line} bounds Passport scope claim: ${label}`);
+      }
+    }
+  }
+}
+
+function claimUnits(text) {
+  const units = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i += 1) {
+    const clean = lines[i]
+      .replace(/^\s*[-*]\s+/, '')
+      .replace(/^\s*\|?/, '')
+      .trim();
+    if (!clean || /^```/.test(clean) || /^#/.test(clean)) continue;
+    if (clean.includes('|')) {
+      units.push({ text: clean.replace(/\|/g, ' '), line: i + 1 });
+      continue;
+    }
+    for (const part of clean
+      .split(/(?<=[.!?])\s+|;\s*/)
+      .map(part => part.replace(/\|/g, ' ').trim())
+      .filter(Boolean)) {
+      units.push({ text: part, line: i + 1 });
+    }
+  }
+  return units;
+}
+
+function isSafeNegativeOrBoundary(text) {
+  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|out of scope|excludes|excluded)\b/i.test(text);
+}
+
 const coreFoundation = 'packages/passport-core/daml/Aevelum/Passport/Foundation.daml';
 const coreTypes = 'packages/passport-core/daml/Aevelum/Passport/Types.daml';
 const testFoundation = 'packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml';
@@ -51,6 +138,14 @@ const interopDoc = 'docs/06_interop_adapters.md';
 const interopSample = 'interop/samples/repo-pretrade-passport-input.json';
 const cdmSchemaRoot = 'interop/plugins/cdm/assets/schemas/6.0';
 const cdmArtifactRoot = 'artifacts/interop/cdm/6.0';
+const docsScopeFiles = [
+  'README.md',
+  'AGENTS.md',
+  '.agents/skills/passport-hardening-loop/SKILL.md',
+  ...walk('docs').filter(file => file.endsWith('.md')),
+  ...walk('design').filter(file => file.endsWith('.md')),
+  ...walk('hardening').filter(file => file.endsWith('.md'))
+];
 const damlSourceRoots = [
   'packages/passport-core/daml',
   'packages/passport-tests/daml'
@@ -114,6 +209,7 @@ const requiredFiles = [
   'hardening/rounds/round-0002.md',
   'hardening/rounds/round-0003.md',
   'hardening/rounds/round-0004.md',
+  'hardening/rounds/round-0005.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -143,6 +239,9 @@ checkContains(coreFoundation, [
   'PresentToVerifier',
   'ReserveFromPresentation',
   'ReleaseReservation',
+  'CreateReservationHandoff',
+  'ReservationHandoffInstruction',
+  'handoffRecipient',
   'RevokeCredential',
   'GrantAuditDisclosureFromAccount'
 ]);
@@ -170,7 +269,7 @@ checkContains(testReservation, [
   't008_consume_and_reissue_residual_capacity',
   't009_release_reservation',
   't019_expire_reservation',
-  't020_convert_reservation_to_execution_instruction',
+  't020_create_reservation_handoff',
   't021_dispute_reservation'
 ]);
 
@@ -265,6 +364,13 @@ checkContains('interop/core/readiness.js', [
 // Forbidden implementation concepts: these names should not appear in Daml code.
 const damlFiles = damlSourceRoots.flatMap(dir => walk(dir)).filter(f => f.endsWith('.daml'));
 const forbiddenDaml = [
+  'ExecutionInstruction',
+  'ConvertToExecutionInstruction',
+  'executionRailParty',
+  'executionRail',
+  'instructionId',
+  'instructionPurpose',
+  'instructionCreatedAt',
   'CounterpartyRoom',
   'DataRoom',
   'ZKProof',
@@ -283,20 +389,12 @@ for (const rel of damlFiles) {
 }
 pass.push('forbidden Daml implementation token scan completed');
 
-// Terminology gate: do not use the retired custody-oriented account term anywhere in docs or source.
-const textFiles = [...damlSourceRoots.flatMap(dir => walk(dir)), ...walk('docs'), 'README.md', 'package.json']
-  .filter(f => !f.includes('artifacts/'));
-for (const rel of textFiles) {
-  const s = read(rel).toLowerCase();
-  const retiredTerm = 'wal' + 'let';
-  if (s.includes(retiredTerm)) fail.push(`${rel} contains retired account term`);
-}
-pass.push('retired terminology scan completed');
+checkPassportScopeBoundary();
 
 // Artifact shape checks.
 try {
   const transcript = JSON.parse(read('artifacts/demo_transcript.json'));
-  for (const key of ['policyId', 'credentialId', 'presentationId', 'reservationId', 'revocationId']) {
+  for (const key of ['policyId', 'credentialId', 'presentationId', 'reservationId', 'handoffId', 'revocationId']) {
     if (!transcript.ids?.[key]) fail.push(`demo_transcript missing ids.${key}`);
     else pass.push(`demo_transcript contains ids.${key}`);
   }
