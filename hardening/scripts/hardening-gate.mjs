@@ -413,7 +413,7 @@ pass.push(...frontierResult.pass.map(item => `frontier: ${item}`));
 fail.push(...frontierResult.fail.map(item => `frontier: ${item}`));
 
 evaluateRules(readJson('hardening/policies/architecture-rules.json'));
-checkDefaultCiNetworkPolicy();
+checkRepoAuthoredNetworkPolicy();
 checkAjvDynamicExecutionDependencyException();
 checkAdapterReadiness();
 checkInteropReportReadiness();
@@ -448,10 +448,9 @@ if (fail.length) {
 
 console.log(`hardening gate passed: ${pass.length} checks`);
 
-function checkDefaultCiNetworkPolicy() {
+function checkRepoAuthoredNetworkPolicy() {
   const allowedNetworkFiles = new Set(['interop/plugins/cdm/vendor.js']);
   const files = [
-    ...walkFiles('.github/workflows', { extensions: ['.yml', '.yaml'] }),
     ...walkFiles('scripts', { extensions: ['.mjs', '.js', '.sh'] }),
     ...walkFiles('hardening/scripts', { extensions: ['.mjs', '.js'] }),
     ...walkFiles('interop', { extensions: ['.js', '.mjs'] })
@@ -476,7 +475,6 @@ function checkNetworkFreeText(label, text) {
     ['cu' + 'rl', new RegExp('\\bcu' + 'rl\\b')],
     ['wg' + 'et', new RegExp('\\bwg' + 'et\\b')],
     ['dpm in' + 'stall', new RegExp('\\bdpm\\s+in' + 'stall\\b')],
-    ['online npm ' + 'ci', new RegExp('\\bnpm\\s+ci\\b(?![^\\n]*\\s--offline\\b)')],
     ['npm in' + 'stall', new RegExp('\\bnpm\\s+(?:in' + 'stall|i)\\b')],
     ['np' + 'x', new RegExp('\\bnp' + 'x\\b')],
     ['fet' + 'ch(', new RegExp('\\bfet' + 'ch\\s*\\(')],

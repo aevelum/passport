@@ -9,7 +9,7 @@ The adapter surface is deliberately narrow:
 - static plugin registry only;
 - no dynamic plugin loading;
 - no `eval`;
-- no network access in default PR or local CI after GitHub platform checkout;
+- no adapter validation or generation network access outside explicit vendoring commands;
 - generated standards payloads remain clean;
 - Passport provenance is reported beside payloads, not embedded into them.
 
@@ -66,7 +66,7 @@ Schema refresh is explicit:
 npm run interop:vendor:cdm
 ```
 
-Default CI does not fetch schemas or bootstrap dependencies from the network. Validation first verifies the committed schema manifest, schema-set digest, and SHA-256 hashes, then registers the schemas with AJV draft-04. This is committed local schema integrity for reviewed files, not upstream authenticity if schema files and the manifest are changed together.
+Default CI may bootstrap the standard hosted-runner toolchain, but adapter validation does not fetch schemas or plugin code from the network. Validation first verifies the committed schema manifest, schema-set digest, and SHA-256 hashes, then registers the schemas with AJV draft-04. This is committed local schema integrity for reviewed files, not upstream authenticity if schema files and the manifest are changed together.
 
 ## Local commands
 

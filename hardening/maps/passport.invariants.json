@@ -9,7 +9,7 @@
     "assumptions": [
       "Daml templates remain the normative Canton ledger schema for this milestone.",
       "FINOS CDM support means offline JSON-schema conformance for generated collateral eligibility artifacts, not FINOS certification, Rosetta Engine execution, or CDM eligibility-engine execution.",
-      "Default PR CI must not fetch network resources after GitHub platform checkout; dependency and DPM toolchains are provided by a pre-baked offline runner.",
+      "Default PR CI runs on standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup; repo-authored validation and generation paths do not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring commands.",
       "The CDM schema manifest provides committed local integrity for reviewed schema files, not upstream authenticity when schema and manifest are changed together.",
       "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed.",
       "Registered adapters cannot use Level 0; Level 0 is concept-only for future adapter candidates with no registered plugin implementation.",
@@ -288,7 +288,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
-        "notes": "Default GitHub PR workflow and offline runner contract."
+        "notes": "Default GitHub-hosted PR workflow and explicit toolchain setup."
       },
       {
         "path": "package.json",
@@ -814,7 +814,7 @@
                     "id": "prop.interop.security-policy-explicit",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "The adapter context must state that dynamic plugins, eval, and network access in CI are disabled.",
+                    "statement": "The adapter context must state that dynamic plugins, eval, and adapter network access during CI validation are disabled.",
                     "enforcing_functions": [
                       "fn.interop.default-context"
                     ]
@@ -1032,7 +1032,7 @@
                     "id": "prop.cdm.network-only-explicit-vendor",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Repo-authored network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or CI.",
+                    "statement": "Repo-authored network fetches are allowed only in the explicit CDM vendor refresh path, never in default validation or generation.",
                     "enforcing_functions": [
                       "fn.cdm.vendor-schemas"
                     ]
@@ -1139,7 +1139,7 @@
               },
               {
                 "id": "fn.ci.github-workflow",
-                "name": "GitHub offline PR workflow",
+                "name": "GitHub hosted PR workflow",
                 "source_ref": ".github/workflows/ci.yml"
               },
               {
@@ -1154,7 +1154,7 @@
               },
               {
                 "id": "fn.ci.network-policy-gate",
-                "name": "checkDefaultCiNetworkPolicy",
+                "name": "checkRepoAuthoredNetworkPolicy",
                 "source_ref": "hardening/scripts/hardening-gate.mjs"
               },
               {
@@ -1171,7 +1171,7 @@
             "invariants": [
               {
                 "id": "inv.ci.default-green-bar",
-                "statement": "The default PR and local CI paths run from a pre-baked offline toolchain, cover generated artifacts, hardening controls, repository gates, packaging, Daml tests, Canton smoke, and freshness checks.",
+                "statement": "The default PR path uses standard hosted-runner bootstrap, and both PR and local CI cover generated artifacts, hardening controls, repository gates, packaging, Daml tests, Canton smoke, and freshness checks.",
                 "properties": [
                   {
                     "id": "prop.ci.hardening-gate-in-ci",
@@ -1183,10 +1183,10 @@
                     ]
                   },
                   {
-                    "id": "prop.ci.default-ci-offline",
+                    "id": "prop.ci.standard-hosted-toolchain",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Default PR CI must not run networked bootstrap, dependency install, schema refresh, or arbitrary network primitives after GitHub platform checkout.",
+                    "statement": "Default PR CI must use GitHub-hosted runners with explicit Node, Java, DPM, and lockfile npm setup, while repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring.",
                     "enforcing_functions": [
                       "fn.ci.github-workflow",
                       "fn.ci.network-policy-gate"
@@ -1325,7 +1325,7 @@
           "prop.ci.hardening-gate-in-ci",
           "inv.release.reviewable-archive",
           "prop.release.git-ls-files-only",
-          "prop.ci.default-ci-offline",
+          "prop.ci.standard-hosted-toolchain",
           "prop.ci.source-inventory-complete",
           "prop.ci.ajv-exception-pinned",
           "inv.interop.adapter-readiness-claims",
@@ -1357,7 +1357,7 @@
         "covers": [
           "inv.ci.default-green-bar",
           "prop.ci.hardening-gate-in-ci",
-          "prop.ci.default-ci-offline",
+          "prop.ci.standard-hosted-toolchain",
           "prop.ci.generated-artifacts-current",
           "prop.ci.source-inventory-complete",
           "prop.ci.package-in-ci",
@@ -1531,7 +1531,7 @@
         "attacker_control": "indirect",
         "severity": "critical",
         "status": "guarded",
-        "description": "A default PR or local CI command fetches schemas, dependencies, toolchains, plugin code, or other mutable network resources.",
+        "description": "A repo-authored validation or generation command fetches schemas, plugin code, or other mutable runtime inputs outside explicit vendoring.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -1539,7 +1539,7 @@
         "exploit_path_ids": [
           "xp.ci.unpinned-input"
         ],
-        "kill_gate": "hardening:gate scans workflow YAML, shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module and offline npm ci."
+        "kill_gate": "hardening:gate scans shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module while permitting standard GitHub-hosted workflow bootstrap."
       },
       {
         "id": "bd.ci.generated-artifact-staleness",
@@ -1686,9 +1686,9 @@
       {
         "id": "xp.ci.unpinned-input",
         "breakdown_id": "bd.ci.network-fetch-default",
-        "impact": "Default CI depends on mutable remote data.",
+        "impact": "Default validation or generation depends on mutable remote data.",
         "preconditions": [
-          "A CI command fetches network content outside explicit vendoring."
+          "A repo-authored validation or generation command fetches network content outside explicit vendoring."
         ],
         "status": "guarded-by-architecture-gate"
       },

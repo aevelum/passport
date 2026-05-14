@@ -160,9 +160,9 @@ To also create the review package:
 npm run all
 ```
 
-`npm run all` is an alias for `npm run ci` because package creation and freshness checks are now part of the default gate. Networked supply-chain checks such as `npm audit --json` are manual checks, not part of default offline PR CI.
+`npm run all` is an alias for `npm run ci` because package creation and freshness checks are now part of the default gate. Networked supply-chain checks such as `npm audit --json` are manual checks, not part of default PR CI.
 
-Default GitHub PR CI requires a pre-baked self-hosted runner labeled `passport-offline-ci` with Node 24.x, DPM SDK `3.5.1-rc3`, and an npm cache that can satisfy `package-lock.json` with `npm ci --offline --ignore-scripts --audit=false --fund=false`.
+Default GitHub PR CI runs on GitHub-hosted Ubuntu with Node 24.x, Temurin Java 17, cached DPM SDK components, and normal lockfile-based `npm ci --ignore-scripts --audit=false --fund=false`. Repo-authored validation and generation paths remain network-bounded: CDM schema refreshes are explicit vendoring commands, not part of the default gate.
 
 ## Daml/Canton toolchain
 

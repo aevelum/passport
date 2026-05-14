@@ -40,3 +40,9 @@
 - Removed the handoff status variant because handoff is nonconsuming metadata, not a reservation-state transition.
 - Preserved the CDM adapter at Level 2 — Artifact Conformance with the existing non-claims for certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, and production partner integration.
 - Added round-0005 hardening evidence for the Daml domain boundary, repo pre-trade workflow boundary, interop adapter boundary, non-goal documentation, and structural gates.
+
+## 2026-05-14 - CI normalization
+
+- Replaced the strict self-hosted offline PR runner contract with standard GitHub-hosted Ubuntu CI using explicit Node 24, Java 17, DPM SDK `3.5.1-rc3`, npm lockfile install, and cached DPM components.
+- Kept repo-authored validation and generation network-bounded: CDM schema refreshes remain explicit vendoring commands, while default gates do not fetch schemas, plugin code, or mutable runtime inputs.
+- Updated repo guidance, architecture policy, and invariant-map CI properties so future changes enforce standard hosted CI rather than a custom `passport-offline-ci` runner.

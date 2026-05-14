@@ -19,7 +19,7 @@
 - Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials; it records readiness and may record reservation handoff notices.
 - Keep Daml templates as the Canton ledger schema unless an explicit ADR and invariant-map update justify a change.
 - Keep interop framework-neutral: CDM is one static plugin, not repo-global special-case code.
-- Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.
+- Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands.
 - Do not add dynamic plugin loading, eval-style execution, arbitrary plugin path resolution, or Passport provenance inside generated CDM payloads.
 - Do not add custody, wallet, settlement, collateral transfer, venue, margin engine, optimizer, credit decision, legal-title, ZK, production identity, or live external integration code.
 

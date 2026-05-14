@@ -40,7 +40,7 @@
         "npm run hardening:gate",
         "design/tokens/colors.json",
         "Adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level changes are hardening-sensitive.",
-        "Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache."
+        "Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands."
       ]
     },
     {
@@ -185,9 +185,9 @@
       ]
     },
     {
-      "id": "arch.ci.github-workflow-offline",
+      "id": "arch.ci.github-workflow-hosted",
       "severity": "critical",
-      "description": "The default PR workflow must run on the pre-baked offline runner and install npm dependencies only from cache.",
+      "description": "The default PR workflow must use a standard GitHub-hosted runner with explicit toolchain setup and lockfile dependency installation.",
       "type": "required-substrings",
       "files": [
         ".github/workflows/ci.yml"
@@ -195,12 +195,20 @@
       "contains": [
         "permissions:",
         "contents: read",
-        "runs-on: [self-hosted, linux, passport-offline-ci]",
-        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+        "runs-on: ubuntu-latest",
+        "actions/checkout@v6",
+        "actions/setup-node@v6",
+        "node-version: 24",
+        "actions/setup-java@v5",
+        "java-version: \"17\"",
+        "actions/cache@v5",
+        "dpm-${{ runner.os }}-3.5.1-rc3",
         "fetch-depth: 1",
         "persist-credentials: false",
+        "curl -fsSL https://get.digitalasset.com/install/install.sh -o /tmp/install-dpm.sh",
+        "dpm install 3.5.1-rc3",
         "dpm version --active",
-        "npm ci --offline --ignore-scripts --audit=false --fund=false",
+        "npm ci --ignore-scripts --audit=false --fund=false",
         "npm run ci"
       ]
     },

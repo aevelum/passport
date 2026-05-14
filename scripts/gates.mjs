@@ -333,7 +333,7 @@ checkContains('AGENTS.md', [
   '.agents/skills/passport-ui-design-system/SKILL.md',
   'design/tokens/colors.json',
   'npm run hardening:gate',
-  'Default PR and local CI must not fetch from the network after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.'
+  'Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands.'
 ]);
 
 checkContains('.agents/skills/passport-hardening-loop/SKILL.md', [

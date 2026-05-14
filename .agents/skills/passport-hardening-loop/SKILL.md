@@ -80,7 +80,7 @@ Default to `package` only when the frontier state is already a clean, evidence-b
 
 ## Hard Requirements
 
-- Do not add dynamic plugin loading, `eval`, remote code, arbitrary path resolution, or network fetches to default PR or local CI after GitHub platform checkout; dependency/toolchain/bootstrap material must come from the pre-baked offline runner and offline npm cache.
+- Do not add dynamic plugin loading, `eval`, remote code, arbitrary path resolution, or repo-authored network fetches to validation and generation paths. Default PR CI may bootstrap standard hosted-runner dependencies explicitly, while schema or plugin refreshes must stay behind explicit vendoring commands.
 - Keep CDM as a plugin under the framework-neutral adapter surface.
 - Keep Passport provenance outside generated CDM payloads.
 - Keep Daml templates as the Canton ledger schema unless an explicit architectural decision updates the map.
