@@ -14,3 +14,10 @@
 - Added deterministic generated timestamps, package execution in `npm run ci`, and a final freshness diff over tracked artifacts, hardening maps, and hardening frontiers.
 - Expanded the hardening source inventory and gates to cover workflow YAML, package/toolchain files, Daml/Canton scripts, interop wrappers, and hardening helper scripts.
 - Clarified CDM output as schema-valid Passport decision mirroring, not CDM eligibility-engine execution, and documented the schema manifest as committed local integrity rather than upstream authenticity.
+
+## 2026-05-13 - round-0003
+
+- Added Adapter Readiness Levels as a first-class interop claim-control model with evidence-bound plugin validation and report output.
+- Classified the current CDM adapter as Level 2 — Artifact Conformance with explicit claims, non-claims, promotion criteria, and CI evidence.
+- Added hardening gate checks for readiness metadata, CDM Level 2 overclaim language, report readiness fields, and generated payload purity.
+- Added readiness documentation, repo guidance, and the `inv.interop.adapter-readiness-claims` invariant with high and critical properties.

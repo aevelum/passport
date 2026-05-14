@@ -1,6 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getGeneratedAt } from '../../scripts/generated-time.mjs';
+import { adapterRegistry, listAdapters } from '../../interop/registry.js';
+import {
+  ADAPTER_READINESS_LEVELS,
+  assertReadinessEvidenceBound,
+  assertReadinessShape
+} from '../../interop/core/readiness.js';
 import {
   abs,
   readJson,
@@ -66,7 +72,7 @@ function filesForRule(rule) {
 }
 
 function checkCdmPayloadPurity() {
-  const forbiddenKey = /^(passport|sourceRef|sourceType|sourceId|provenance|generatedAt|adapterVersion)$/i;
+  const forbiddenKey = /^(passport|sourceRef|sourceType|sourceId|provenance|generatedAt|adapterVersion|readiness|adapterReadiness|readinessLevel|readinessName|readinessSummary|evidence|claims|nonClaims|promotionCriteria|lastVerifiedBy)$/i;
   const artifactRoot = 'artifacts/interop/cdm/6.0';
   for (const rel of walkFiles(artifactRoot, { extensions: ['.json'] })) {
     const payload = readJson(rel);
@@ -76,6 +82,90 @@ function checkCdmPayloadPurity() {
     });
     ok(hits.length === 0, `${rel} has no Passport provenance keys in payload`);
   }
+}
+
+function checkAdapterReadiness() {
+  const knownLevels = new Set(Object.keys(ADAPTER_READINESS_LEVELS).map(Number));
+  for (const plugin of adapterRegistry) {
+    ok(Boolean(plugin.readiness), `${plugin.id} declares readiness metadata`);
+    if (!plugin.readiness) continue;
+
+    try {
+      assertReadinessShape(plugin.readiness);
+      pass.push(`${plugin.id} readiness shape is valid`);
+    } catch (error) {
+      fail.push(`${plugin.id} readiness shape invalid: ${error.message}`);
+    }
+
+    try {
+      assertReadinessEvidenceBound(plugin.readiness);
+      pass.push(`${plugin.id} readiness evidence is bound to claimed level`);
+    } catch (error) {
+      fail.push(`${plugin.id} readiness evidence invalid: ${error.message}`);
+    }
+
+    ok(knownLevels.has(plugin.readiness.level), `${plugin.id} readiness level is in 0-5`);
+    const expected = ADAPTER_READINESS_LEVELS[plugin.readiness.level];
+    ok(plugin.readiness.name === expected?.name, `${plugin.id} readiness level/name match`);
+  }
+
+  const cdm = adapterRegistry.find(plugin => plugin.id === 'cdm-collateral-eligibility');
+  ok(Boolean(cdm), 'CDM adapter is registered');
+  if (cdm?.readiness) {
+    ok(cdm.readiness.level === 2, 'CDM adapter readiness is Level 2');
+    ok(cdm.readiness.name === 'Artifact Conformance', 'CDM adapter readiness name is Artifact Conformance');
+    for (const nonClaim of requiredCdmNonClaims()) {
+      ok(cdm.readiness.nonClaims.includes(nonClaim), `CDM readiness non-claim includes ${nonClaim}`);
+    }
+  }
+
+  for (const adapter of listAdapters()) {
+    for (const field of adapterReadinessFields()) {
+      ok(Object.hasOwn(adapter, field), `registry adapter ${adapter.id} exposes ${field}`);
+    }
+  }
+}
+
+function checkInteropReportReadiness() {
+  const report = readJson('artifacts/interop/report.json');
+  ok(Array.isArray(report.adapterReadiness), 'interop report includes top-level adapterReadiness');
+
+  for (const adapter of report.adapters ?? []) {
+    for (const field of adapterReadinessFields()) {
+      ok(Object.hasOwn(adapter, field), `interop report adapter ${adapter.id} includes ${field}`);
+    }
+  }
+
+  for (const adapter of report.adapterReadiness ?? []) {
+    for (const field of adapterReadinessFields()) {
+      ok(Object.hasOwn(adapter, field), `adapterReadiness entry ${adapter.id} includes ${field}`);
+    }
+  }
+
+  const cdm = (report.adapterReadiness ?? []).find(adapter => adapter.id === 'cdm-collateral-eligibility');
+  ok(Boolean(cdm), 'interop report adapterReadiness includes CDM adapter');
+  if (cdm) {
+    ok(cdm.readinessLevel === 2, 'interop report CDM readiness level is 2');
+    ok(cdm.readinessName === 'Artifact Conformance', 'interop report CDM readiness name is Artifact Conformance');
+    ok(Array.isArray(cdm.evidence) && cdm.evidence.length > 0, 'interop report CDM readiness evidence is non-empty');
+    ok(Array.isArray(cdm.promotionCriteria) && cdm.promotionCriteria.length > 0, 'interop report CDM promotion criteria is non-empty');
+    for (const nonClaim of requiredCdmNonClaims()) {
+      ok(cdm.nonClaims?.includes(nonClaim), `interop report CDM non-claim includes ${nonClaim}`);
+    }
+  }
+}
+
+function checkCdmReadinessDocs() {
+  const doc = readText('docs/06_interop_adapters.md');
+  const exactLevel = 'The current FINOS CDM adapter is Level 2 — Artifact Conformance.';
+  const exactNonClaims = 'It is not FINOS certification, Rosetta Engine execution, CDM eligibility-engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.';
+  ok(doc.includes('## Adapter Readiness Levels'), 'interop docs include Adapter Readiness Levels section');
+  ok(doc.includes(exactLevel), 'interop docs state current CDM Level 2 readiness');
+  ok(doc.includes(exactNonClaims), 'interop docs include explicit Level 2 CDM non-claims');
+  for (const nonClaim of requiredCdmNonClaims()) {
+    ok(doc.includes(nonClaim), `interop docs include non-claim ${nonClaim}`);
+  }
+  checkCdmOverclaimLanguage();
 }
 
 function visit(value, onKey) {
@@ -134,7 +224,10 @@ fail.push(...frontierResult.fail.map(item => `frontier: ${item}`));
 evaluateRules(readJson('hardening/policies/architecture-rules.json'));
 checkDefaultCiNetworkPolicy();
 checkAjvDynamicExecutionDependencyException();
+checkAdapterReadiness();
+checkInteropReportReadiness();
 checkCdmPayloadPurity();
+checkCdmReadinessDocs();
 checkCiOrder();
 
 const packageScript = readText('scripts/package.mjs');
@@ -228,4 +321,76 @@ function checkAjvDynamicExecutionDependencyException() {
   const ajv = lock.packages?.['node_modules/ajv'];
   ok(ajv?.version === '8.20.0', 'AJV validator dependency is pinned to 8.20.0');
   ok(ajv?.dependencies?.['require-from-string'] === '^2.0.2', 'require-from-string is present only as the expected AJV dependency edge');
+}
+
+function adapterReadinessFields() {
+  return [
+    'id',
+    'framework',
+    'frameworkVersion',
+    'outputFormat',
+    'artifactTypes',
+    'readinessLevel',
+    'readinessName',
+    'readinessSummary',
+    'evidence',
+    'claims',
+    'nonClaims',
+    'promotionCriteria',
+    'lastVerifiedBy'
+  ];
+}
+
+function requiredCdmNonClaims() {
+  return [
+    'FINOS certification',
+    'Rosetta Engine execution',
+    'CDM eligibility-engine execution',
+    'repo execution',
+    'custody',
+    'settlement',
+    'live external integration',
+    'production partner integration',
+    'Canton Token Standard integration'
+  ];
+}
+
+function checkCdmOverclaimLanguage() {
+  const files = ['README.md', ...walkFiles('docs', { extensions: ['.md'] })];
+  const patterns = [
+    ['live external integration', /\blive external integration\b/i],
+    ['live integration', /\blive integration\b/i],
+    ['production integration', /\bproduction integration\b/i],
+    ['production partner integration', /\bproduction partner integration\b/i],
+    ['FINOS certification', /\bfinos certification\b/i],
+    ['certified', /\bcertified\b/i],
+    ['Rosetta Engine execution', /\brosetta engine execution\b/i],
+    ['CDM eligibility-engine execution', /\bcdm eligibility[- ]engine execution\b/i],
+    ['CDM engine execution', /\bcdm engine execution\b/i],
+    ['custody', /\bcustody\b/i],
+    ['settlement', /\bsettlement\b/i],
+    ['Canton Token Standard integration', /\bcanton token standard integration\b/i],
+    ['sandbox partner integration', /\bsandbox partner integration\b/i]
+  ];
+
+  for (const rel of files) {
+    const lines = readText(rel).split('\n');
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i].trim();
+      if (!line || !mentionsCurrentCdmAdapter(line)) continue;
+      for (const [label, pattern] of patterns) {
+        if (!pattern.test(line)) continue;
+        ok(isBoundedCdmNonClaim(line, lines, i), `${rel}:${i + 1} bounds CDM ${label} language`);
+      }
+    }
+  }
+}
+
+function mentionsCurrentCdmAdapter(text) {
+  return /\b(cdm|finos|rosetta|canton token standard|checkeligibilityresult|current adapter|current finos adapter)\b/i.test(text);
+}
+
+function isBoundedCdmNonClaim(text, lines, index) {
+  const localContext = lines.slice(Math.max(0, index - 16), index + 1).join(' ');
+  return /\b(not|no|without|does not|must not|non-claim|non-claims|non-goal|non-goals|excluded|out of scope|future|requires|promotion|next frontier)\b/i.test(`${localContext} ${text}`);
 }

@@ -15,6 +15,7 @@ export async function generateInteropArtifacts({ validate = false } = {}) {
 
   const results = [];
   const negativeResults = [];
+  const adapters = listAdapters();
 
   for (const plugin of adapterRegistry) {
     const generated = await plugin.generate(input, context);
@@ -40,7 +41,8 @@ export async function generateInteropArtifacts({ validate = false } = {}) {
     generatedAt: context.now,
     sourceRef: context.sourceRef,
     securityPolicy: context.securityPolicy,
-    adapters: listAdapters(),
+    adapters,
+    adapterReadiness: adapters,
     results,
     negativeResults
   };

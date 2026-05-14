@@ -5,7 +5,8 @@
 - Use the repo skill at `.agents/skills/passport-hardening-loop/SKILL.md` for changes that touch Daml templates, Daml tests, interop adapters, CDM plugin behavior, CI, packaging, release artifacts, security boundaries, or architecture decisions.
 - Use the repo skill at `.agents/skills/passport-ui-design-system/SKILL.md` for frontend, UX, UI, icon, logo, Open Graph, README visual header, or brand/color changes.
 - Keep repo skills under `.agents/skills` so Codex CLI, IDE extension, and app agents can discover them from the repository root.
-- If a hardening-sensitive change modifies behavior, update `hardening/maps/passport.invariants.json`, regenerate `hardening/frontiers/passport.frontier.json`, and record the result in `hardening/change-log.md` or `hardening/rounds/`.
+- Adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level changes are hardening-sensitive.
+- If a hardening-sensitive change modifies behavior or claims, update readiness metadata as needed, update `hardening/maps/passport.invariants.json`, regenerate `hardening/frontiers/passport.frontier.json`, and record the result in `hardening/change-log.md` or `hardening/rounds/`.
 
 ## Required Checks
 

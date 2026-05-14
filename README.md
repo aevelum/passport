@@ -69,11 +69,13 @@ docs/
   06_interop_adapters.md
   07_non_goals.md
   08_brand_ui_system.md
+  09_adapter_readiness_levels.md
 design/
   tokens/colors.json
   change-log.md
 interop/
   core/adapter.js
+  core/readiness.js
   registry.js
   runner.js
   samples/repo-pretrade-passport-input.json
@@ -120,7 +122,7 @@ npm run hardening:frontier
 npm run hardening:gate
 ```
 
-The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates their JSON shape offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset. `CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
+The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates their JSON shape offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset. CDM adapter readiness is Level 2 — Artifact Conformance. `CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
 
 ```bash
 npm run interop:validate

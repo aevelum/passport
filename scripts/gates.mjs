@@ -72,6 +72,7 @@ const requiredFiles = [
   interopDoc,
   'docs/07_non_goals.md',
   'docs/08_brand_ui_system.md',
+  'docs/09_adapter_readiness_levels.md',
   'design/tokens/colors.json',
   'design/change-log.md',
   'AGENTS.md',
@@ -80,6 +81,7 @@ const requiredFiles = [
   '.agents/skills/passport-ui-design-system/SKILL.md',
   '.agents/skills/passport-ui-design-system/agents/openai.yaml',
   'interop/core/adapter.js',
+  'interop/core/readiness.js',
   'interop/context.js',
   'interop/registry.js',
   'interop/runner.js',
@@ -103,6 +105,7 @@ const requiredFiles = [
   'hardening/policies/architecture-rules.json',
   'hardening/rounds/round-0001.md',
   'hardening/rounds/round-0002.md',
+  'hardening/rounds/round-0003.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -174,7 +177,9 @@ checkContains(interopDoc, [
   'framework-neutral adapter surface',
   'static plugin registry only',
   'FINOS CDM',
-  'not FINOS certification'
+  'Adapter Readiness Levels',
+  'The current FINOS CDM adapter is Level 2 — Artifact Conformance.',
+  'It is not FINOS certification, Rosetta Engine execution, CDM eligibility-engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.'
 ]);
 
 checkContains('AGENTS.md', [
@@ -220,15 +225,26 @@ checkContains('scripts/ci.sh', [
 
 checkContains('interop/registry.js', [
   'adapterRegistry',
-  'cdmPlugin'
+  'cdmPlugin',
+  'readinessSummary'
 ]);
 
 checkContains('interop/plugins/cdm/index.js', [
   'framework: \'cdm\'',
+  'readiness',
+  'level: 2',
+  'Artifact Conformance',
   'eligible-collateral-specification',
   'eligibility-query',
   'check-eligibility-result',
   'verifySchemaManifest'
+]);
+
+checkContains('interop/core/readiness.js', [
+  'ADAPTER_READINESS_LEVELS',
+  'assertReadinessShape',
+  'readinessSummary',
+  'assertReadinessEvidenceBound'
 ]);
 
 // Forbidden implementation concepts: these names should not appear in Daml code.
@@ -297,9 +313,19 @@ try {
   const report = JSON.parse(read('artifacts/interop/report.json'));
   if (report.status !== 'passed') fail.push(`interop report status is ${report.status}`);
   else pass.push('interop report passed');
+  if (!Array.isArray(report.adapterReadiness)) fail.push('interop report missing adapterReadiness');
+  else pass.push('interop report includes adapterReadiness');
   const cdmAdapter = report.adapters?.find(adapter => adapter.framework === 'cdm' && adapter.frameworkVersion === '6.0');
   if (!cdmAdapter) fail.push('interop report missing CDM 6.0 adapter');
   else pass.push('interop report includes CDM 6.0 adapter');
+  if (cdmAdapter?.readinessLevel !== 2) fail.push(`interop report CDM readiness level is ${cdmAdapter?.readinessLevel}`);
+  else pass.push('interop report CDM readiness level is 2');
+  if (cdmAdapter?.readinessName !== 'Artifact Conformance') fail.push(`interop report CDM readiness name is ${cdmAdapter?.readinessName}`);
+  else pass.push('interop report CDM readiness name is Artifact Conformance');
+  for (const nonClaim of ['FINOS certification', 'Rosetta Engine execution', 'CDM eligibility-engine execution', 'repo execution', 'custody', 'settlement', 'live external integration', 'production partner integration', 'Canton Token Standard integration']) {
+    if (!cdmAdapter?.nonClaims?.includes(nonClaim)) fail.push(`interop report CDM non-claim missing ${nonClaim}`);
+    else pass.push(`interop report CDM non-claim includes ${nonClaim}`);
+  }
   const results = new Map(report.results?.map(r => [r.artifactType, r]));
   for (const name of ['eligible-collateral-specification', 'eligibility-query', 'check-eligibility-result']) {
     const result = results.get(name);
