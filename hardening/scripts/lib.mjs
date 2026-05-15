@@ -236,6 +236,7 @@ function hardeningSensitiveFiles() {
       if (/^interop\/.*\.(js|mjs)$/.test(file)) return true;
       if (/^scripts\/.*\.(mjs|js|sh)$/.test(file)) return true;
       if (/^hardening\/(scripts|policies)\/.*\.(mjs|js|json)$/.test(file)) return true;
+      if (/^hardening\/formal\/.*\.(md|json|mjs|tla)$/.test(file)) return true;
       if (/^hardening\/(maps|frontiers)\/.*\.json$/.test(file)) return true;
       if (/^hardening\/rounds\/.*\.md$/.test(file)) return true;
       if (file === 'hardening/change-log.md') return true;

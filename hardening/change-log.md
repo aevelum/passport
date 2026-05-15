@@ -46,3 +46,11 @@
 - Replaced the strict self-hosted offline PR runner contract with standard GitHub-hosted Ubuntu CI using explicit Node 24, Java 17, DPM SDK `3.5.1-rc3`, npm lockfile install, and cached DPM components.
 - Kept repo-authored validation and generation network-bounded: CDM schema refreshes remain explicit vendoring commands, while default gates do not fetch schemas, plugin code, or mutable runtime inputs.
 - Updated repo guidance, architecture policy, and invariant-map CI properties so future changes enforce standard hosted CI rather than a custom `passport-offline-ci` runner.
+
+## 2026-05-15 - round-0006
+
+- Added a bounded formal Daml ledger core lane under `hardening/formal/daml-ledger-core/` with an S0-S6 ladder, proof-obligation registry, TLA-style reservation model, and executable bounded reference model.
+- Added `npm run hardening:formal` and wired it into default CI before `npm run hardening:gate`, Daml tests, and Canton smoke.
+- Mapped formal obligations into the invariant map through `inv.daml.formal-ledger-core` and guarded them with `test.hardening.formal-ledger-core`.
+- Added `inv.daml.reservation-lineage` and `prop.daml.release-preserves-policy-publisher` so reservation release preserves the original policy publisher when publisher and verifier differ.
+- Updated `CapacityReservation` to carry `policyPublisher`, updated `ReleaseReservation` to reuse it, and added a Daml Script regression test with distinct policy publisher and verifier parties.

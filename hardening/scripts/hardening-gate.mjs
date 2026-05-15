@@ -377,6 +377,7 @@ function checkCiOrder() {
     'npm run interop:validate',
     'npm run hardening:map',
     'npm run hardening:frontier',
+    'npm run hardening:formal',
     'npm run hardening:gate',
     'npm run gate',
     'npm run daml:test',
@@ -397,8 +398,13 @@ for (const rel of [
   'hardening/maps/passport.invariants.json',
   'hardening/frontiers/passport.frontier.json',
   'hardening/policies/architecture-rules.json',
+  'hardening/formal/daml-ledger-core/FORMAL_LADDER.md',
+  'hardening/formal/daml-ledger-core/obligations.json',
+  'hardening/formal/daml-ledger-core/reference-model.mjs',
+  'hardening/formal/daml-ledger-core/reservation-core.tla',
   'hardening/rounds/round-0001.md',
   'hardening/rounds/round-0005.md',
+  'hardening/rounds/round-0006.md',
   'hardening/change-log.md'
 ]) relExists(rel);
 

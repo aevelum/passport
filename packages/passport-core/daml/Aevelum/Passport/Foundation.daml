@@ -379,6 +379,7 @@ template CredentialPresentation
           holder
           attester
           verifier
+          policyPublisher
           reservedAmount
           currency = capacityCurrency
           policyId
@@ -428,6 +429,7 @@ template CapacityReservation
     holder : Party
     attester : Party
     verifier : Party
+    policyPublisher : Party
     reservedAmount : Amount
     currency : CurrencyCode
     policyId : PolicyId
@@ -453,7 +455,7 @@ template CapacityReservation
           credentialId = releasedCredentialId
           holder
           attester
-          policyPublisher = verifier
+          policyPublisher
           policyId
           policyVersion
           capacityAmount = reservedAmount

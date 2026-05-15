@@ -123,6 +123,46 @@
         "notes": "Revocation, expiry, and supersession coverage."
       },
       {
+        "path": "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "S0-S6 bounded formal ladder for the Daml ledger core."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/obligations.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Machine-readable proof obligations mapped to invariant properties, source references, and evidence commands."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/reference-model.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Bounded executable reference model for reservation, handoff, audit, and release lineage obligations."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/reservation-core.tla",
+        "language": "tla",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "semantics",
+        "notes": "TLA-style abstract state-machine specification for the reservation core."
+      },
+      {
+        "path": "hardening/scripts/validate-formal.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Formal obligation validator and bounded reference-model gate."
+      },
+      {
         "path": "interop/core/adapter.js",
         "language": "javascript",
         "pin": "git:HEAD",
@@ -459,6 +499,14 @@
         "notes": "Passport scope boundary alignment hardening round record."
       },
       {
+        "path": "hardening/rounds/round-0006.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "semantics",
+        "notes": "Bounded formal Daml ledger core proof-obligation round record."
+      },
+      {
         "path": "hardening/change-log.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -509,16 +557,21 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0005",
+    "round_id": "round-0006",
     "selected_surfaces": [
       "inv.daml.domain-boundary",
       "inv.daml.capacity-conservation",
+      "inv.daml.reservation-lineage",
+      "inv.daml.formal-ledger-core",
+      "prop.daml.release-preserves-policy-publisher",
       "inv.interop.adapter-readiness-claims",
       "inv.scope.passport-public-core-boundary",
       "cmp.ci.gates"
     ],
-    "selection_reason": "Round 0005 aligns Passport main with the canonical public-core scope by replacing borderline execution terminology with non-executing reservation handoff terminology, removing dormant reservation observer/status side channels, and enforcing the boundary in Daml, docs, gates, and generated artifacts.",
+    "selection_reason": "Round 0006 starts a bounded formal proof-obligation layer for the Daml ledger core and uses it to guard reservation release lineage where policy publisher and verifier may differ.",
     "kill_gates": [
+      "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
+      "Daml tests fail if ReleaseReservation does not preserve the original policy publisher when publisher and verifier differ.",
       "hardening:gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
       "hardening:gate fails if Passport-owned Daml contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.",
       "structural gate fails if README or docs lose canonical scope or non-goal language.",
@@ -562,6 +615,11 @@
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
               },
               {
+                "id": "fn.daml.release-reservation",
+                "name": "ReleaseReservation",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
                 "id": "fn.daml.create-reservation-handoff",
                 "name": "CreateReservationHandoff",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
@@ -592,6 +650,7 @@
                       "fn.daml.issue-capacity-credential",
                       "fn.daml.present-to-verifier",
                       "fn.daml.reserve-from-presentation",
+                      "fn.daml.release-reservation",
                       "fn.daml.create-reservation-handoff",
                       "fn.daml.revoke-credential",
                       "fn.daml.grant-audit-disclosure"
@@ -630,6 +689,22 @@
                     "statement": "Residual credentials are minted only for presented reservable amount minus reserved amount.",
                     "enforcing_functions": [
                       "fn.daml.reserve-from-presentation"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "inv.daml.reservation-lineage",
+                "statement": "Reservation lifecycle transitions preserve credential lineage fields that bind released or residual capacity to the policy originally evaluated.",
+                "properties": [
+                  {
+                    "id": "prop.daml.release-preserves-policy-publisher",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "ReleaseReservation must create a released credential with the original policy publisher recorded through presentation and reservation, even when the verifier is a different party.",
+                    "enforcing_functions": [
+                      "fn.daml.reserve-from-presentation",
+                      "fn.daml.release-reservation"
                     ]
                   }
                 ]
@@ -739,6 +814,48 @@
                     "statement": "The Daml test command must fail if external template or domain-choice coverage drops below 100%.",
                     "enforcing_functions": [
                       "fn.test.daml-suite"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.daml.formal-ledger-core",
+            "name": "Daml ledger core formal proof layer",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
+              "hardening/formal/daml-ledger-core/obligations.json",
+              "hardening/formal/daml-ledger-core/reference-model.mjs",
+              "hardening/formal/daml-ledger-core/reservation-core.tla",
+              "hardening/scripts/validate-formal.mjs"
+            ],
+            "functions": [
+              {
+                "id": "fn.formal.validate-ledger-core",
+                "name": "npm run hardening:formal",
+                "source_ref": "hardening/scripts/validate-formal.mjs"
+              },
+              {
+                "id": "fn.formal.bounded-reservation-model",
+                "name": "runBoundedReservationModel",
+                "source_ref": "hardening/formal/daml-ledger-core/reference-model.mjs"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.daml.formal-ledger-core",
+                "statement": "The Daml ledger core has stable bounded proof obligations mapped to invariant properties, implementation references, assumptions, and executable evidence.",
+                "properties": [
+                  {
+                    "id": "prop.daml.formal-obligations-mapped",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Every bounded Daml ledger proof obligation must map to an invariant property, source reference, active evidence command, explicit result status, and assumption register entry.",
+                    "enforcing_functions": [
+                      "fn.formal.validate-ledger-core",
+                      "fn.formal.bounded-reservation-model"
                     ]
                   }
                 ]
@@ -1177,7 +1294,7 @@
                     "id": "prop.ci.hardening-gate-in-ci",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "npm run ci must execute npm run hardening:gate before Daml and Canton smoke tests.",
+                    "statement": "npm run ci must execute npm run hardening:formal and npm run hardening:gate before Daml and Canton smoke tests.",
                     "enforcing_functions": [
                       "fn.ci.local-ci"
                     ]
@@ -1206,7 +1323,7 @@
                     "id": "prop.ci.source-inventory-complete",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Every hardening-sensitive tracked workflow, package, Daml, interop, script, policy, map, frontier, round, and change-log file must appear in the invariant map source inventory.",
+                    "statement": "Every hardening-sensitive tracked workflow, package, Daml, interop, formal artifact, script, policy, map, frontier, round, and change-log file must appear in the invariant map source inventory.",
                     "enforcing_functions": [
                       "fn.ci.source-inventory-gate"
                     ]
@@ -1283,9 +1400,30 @@
           "inv.daml.capacity-conservation",
           "prop.daml.reservation-positive-bounded",
           "prop.daml.residual-capacity-subtractive",
+          "inv.daml.reservation-lineage",
+          "prop.daml.release-preserves-policy-publisher",
           "inv.tests.external-coverage",
           "prop.tests.coverage-gate-required",
           "prop.scope.reservation-handoff-covered"
+        ]
+      },
+      {
+        "id": "test.hardening.formal-ledger-core",
+        "kind": "node-script",
+        "command": "npm run hardening:formal",
+        "status": "active",
+        "covers": [
+          "inv.daml.authorization",
+          "prop.daml.controllers-match-authority",
+          "inv.daml.capacity-conservation",
+          "prop.daml.reservation-positive-bounded",
+          "prop.daml.residual-capacity-subtractive",
+          "inv.daml.reservation-lineage",
+          "prop.daml.release-preserves-policy-publisher",
+          "inv.scope.passport-public-core-boundary",
+          "prop.scope.reservation-handoff-covered",
+          "inv.daml.formal-ledger-core",
+          "prop.daml.formal-obligations-mapped"
         ]
       },
       {
@@ -1362,6 +1500,10 @@
           "prop.ci.source-inventory-complete",
           "prop.ci.package-in-ci",
           "prop.release.git-ls-files-only",
+          "inv.daml.reservation-lineage",
+          "prop.daml.release-preserves-policy-publisher",
+          "inv.daml.formal-ledger-core",
+          "prop.daml.formal-obligations-mapped",
           "inv.interop.adapter-readiness-claims",
           "prop.interop.adapter-level-evidence-bound",
           "prop.interop.no-live-integration-overclaim",
@@ -1421,6 +1563,39 @@
           "xp.daml.capacity-inflation"
         ],
         "kill_gate": "Reservation negative tests must reject over-reservation."
+      },
+      {
+        "id": "bd.daml.release-policy-publisher-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.release-preserves-policy-publisher",
+        "attacker_control": "direct",
+        "severity": "high",
+        "status": "covered",
+        "description": "A reservation release reconstructs the released credential with verifier as policy publisher instead of preserving the original policy publisher carried through presentation and reservation.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.release-policy-publisher-drift"
+        ],
+        "kill_gate": "Daml regression tests and hardening:formal fail if ReleaseReservation uses verifier as policy publisher or loses the reservation policyPublisher field."
+      },
+      {
+        "id": "bd.daml.formal-obligation-drift",
+        "component_id": "cmp.daml.formal-ledger-core",
+        "property_id": "prop.daml.formal-obligations-mapped",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Formal proof obligations drift from the invariant map, source references, assumption register, bounded model, or active evidence commands.",
+        "evidence": [
+          "test.hardening.formal-ledger-core"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.formal-obligation-drift"
+        ],
+        "kill_gate": "hardening:formal fails on missing sections, invalid result statuses, unmapped invariant properties, inactive evidence tests, stale source snippets, or bounded model counterexamples."
       },
       {
         "id": "bd.scope.out-of-scope-daml-language",
@@ -1630,6 +1805,25 @@
         "status": "killed-by-tests"
       },
       {
+        "id": "xp.daml.release-policy-publisher-drift",
+        "breakdown_id": "bd.daml.release-policy-publisher-drift",
+        "impact": "Released capacity can be attributed to the verifier's policy publisher identity rather than the policy publisher originally evaluated for the credential.",
+        "preconditions": [
+          "A reservation is created from a presentation where policy publisher and verifier are distinct.",
+          "ReleaseReservation reconstructs the released credential using verifier as policy publisher."
+        ],
+        "status": "killed-by-tests-and-formal-gate"
+      },
+      {
+        "id": "xp.daml.formal-obligation-drift",
+        "breakdown_id": "bd.daml.formal-obligation-drift",
+        "impact": "The formal layer stops constraining Daml ledger invariants and becomes stale documentation.",
+        "preconditions": [
+          "Proof obligations, model checks, source references, or evidence commands can drift without a failing gate."
+        ],
+        "status": "guarded-by-formal-gate"
+      },
+      {
         "id": "xp.scope.product-boundary-drift",
         "breakdown_id": "bd.scope.out-of-scope-daml-language",
         "impact": "Passport public-core artifacts imply downstream execution, custody, settlement, wallet, venue, optimizer, credit-decision, proof-system, production-identity, or live-integration behavior.",
@@ -1715,9 +1909,20 @@
         "id": "tb.ledger.party-authority",
         "name": "Ledger party authority",
         "component_ids": [
-          "cmp.daml.ledger-schema"
+          "cmp.daml.ledger-schema",
+          "cmp.daml.formal-ledger-core"
         ],
         "description": "Daml controllers and signatories decide who can mutate ledger state."
+      },
+      {
+        "id": "tb.formal-ledger-evidence",
+        "name": "Formal ledger evidence boundary",
+        "component_ids": [
+          "cmp.daml.ledger-schema",
+          "cmp.daml.tests",
+          "cmp.daml.formal-ledger-core"
+        ],
+        "description": "Formal obligations must stay mapped to Daml source, Daml Script evidence, bounded checker results, and explicit assumptions."
       },
       {
         "id": "tb.interop.plugin-boundary",

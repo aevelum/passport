@@ -5,12 +5,12 @@
   "generatedFrom": {
     "package": "aevelum-passport-foundation",
     "pinned_version": "git:HEAD",
-    "round_id": "round-0005"
+    "round_id": "round-0006"
   },
   "summary": {
-    "candidates": 14,
+    "candidates": 16,
     "widen": 0,
-    "deepen": 14,
+    "deepen": 16,
     "kill": 0,
     "package": 0,
     "top_candidate": "bd.cdm.schema-substitution"
@@ -36,7 +36,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Modify a vendored CDM schema without updating manifest.json and confirm npm run interop:validate fails.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.ci.network-fetch-default",
@@ -58,7 +58,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add interop:vendor:cdm to scripts/ci.sh and confirm npm run hardening:gate fails.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.interop.dynamic-plugin-loading",
@@ -80,7 +80,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add import( to interop/registry.js and confirm npm run hardening:gate fails.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.interop.level2-live-overclaim",
@@ -102,7 +102,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.scope.canonical-docs-drift",
@@ -124,7 +124,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.scope.out-of-scope-daml-language",
@@ -146,7 +146,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.scope.handoff-coverage-gap",
@@ -168,7 +168,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.ci.generated-artifact-staleness",
@@ -190,7 +190,29 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
+    },
+    {
+      "id": "bd.daml.formal-obligation-drift",
+      "source_id": "bd.daml.formal-obligation-drift",
+      "component_id": "cmp.daml.formal-ledger-core",
+      "property_id": "prop.daml.formal-obligations-mapped",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 70,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "hardening:formal fails on missing sections, invalid result statuses, unmapped invariant properties, inactive evidence tests, stale source snippets, or bounded model counterexamples.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0006"
     },
     {
       "id": "bd.interop.adapter-readiness-overclaim",
@@ -212,7 +234,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.interop.payload-provenance-leak",
@@ -234,7 +256,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add a provenance key to a generated CDM payload and confirm npm run hardening:gate fails.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.interop.readiness-report-omission",
@@ -256,7 +278,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.agent.skill-not-discovered",
@@ -278,7 +300,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     },
     {
       "id": "bd.daml.capacity-over-reservation",
@@ -300,7 +322,29 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
+    },
+    {
+      "id": "bd.daml.release-policy-publisher-drift",
+      "source_id": "bd.daml.release-policy-publisher-drift",
+      "component_id": "cmp.daml.ledger-schema",
+      "property_id": "prop.daml.release-preserves-policy-publisher",
+      "action": "deepen",
+      "status": "covered",
+      "priority_score": 60,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 20,
+        "missing_tests": 0,
+        "architecture_drift": 5,
+        "status": 0
+      },
+      "kill_gate": "Daml regression tests and hardening:formal fail if ReleaseReservation uses verifier as policy publisher or loses the reservation policyPublisher field.",
+      "evidence_needed": [
+        "No new evidence needed unless the linked source changes."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0006"
     },
     {
       "id": "bd.daml.unauthorized-transition",
@@ -322,7 +366,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0005"
+      "last_round": "round-0006"
     }
   ]
 }
