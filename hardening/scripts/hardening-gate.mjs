@@ -191,6 +191,16 @@ function checkInteropReportReadiness() {
       ok(cdm.nonClaims?.includes(nonClaim), `interop report CDM non-claim includes ${nonClaim}`);
     }
   }
+
+  for (const name of [
+    'negative-invalid-eligibility-query',
+    'negative-passport-decision-rejected-without-cdm-engine',
+    'negative-cdm-schema-manifest-tamper'
+  ]) {
+    const negative = (report.negativeResults ?? []).find(result => result.name === name);
+    ok(Boolean(negative), `interop report includes ${name}`);
+    ok(negative?.pass === true, `interop report ${name} passes`);
+  }
 }
 
 function checkCdmReadinessDocs() {
@@ -405,6 +415,7 @@ for (const rel of [
   'hardening/rounds/round-0001.md',
   'hardening/rounds/round-0005.md',
   'hardening/rounds/round-0006.md',
+  'hardening/rounds/round-0007.md',
   'hardening/change-log.md'
 ]) relExists(rel);
 

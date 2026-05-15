@@ -54,3 +54,11 @@
 - Mapped formal obligations into the invariant map through `inv.daml.formal-ledger-core` and guarded them with `test.hardening.formal-ledger-core`.
 - Added `inv.daml.reservation-lineage` and `prop.daml.release-preserves-policy-publisher` so reservation release preserves the original policy publisher when publisher and verifier differ.
 - Updated `CapacityReservation` to carry `policyPublisher`, updated `ReleaseReservation` to reuse it, and added a Daml Script regression test with distinct policy publisher and verifier parties.
+
+## 2026-05-15 - round-0007
+
+- Added a CDM schema tamper negative case to `validateNegativeCases`: validation copies the committed schema set, mutates a schema without updating `manifest.json`, and requires manifest verification to reject it before AJV registration.
+- Exposed `verifySchemaManifestAt` so the tamper falsifier can run against a temporary schema set without mutating committed vendor files.
+- Tightened `npm run hardening:gate` and `npm run gate` so generated interop reports must include passing `negative-cdm-schema-manifest-tamper` evidence.
+- Updated CDM readiness metadata, the invariant map, and the hardening frontier to mark the schema-substitution path as covered by an executable falsifier.
+- Updated the repo-local Passport hardening skill and root instructions with a non-theatre filter: formal artifacts, ADRs, and policy text must map to executable evidence or stay as follow-up assumptions.

@@ -507,6 +507,14 @@
         "notes": "Bounded formal Daml ledger core proof-obligation round record."
       },
       {
+        "path": "hardening/rounds/round-0007.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "CDM schema tamper falsifier and non-theatre hardening process round record."
+      },
+      {
         "path": "hardening/change-log.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -557,19 +565,23 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0006",
+    "round_id": "round-0007",
     "selected_surfaces": [
       "inv.daml.domain-boundary",
       "inv.daml.capacity-conservation",
       "inv.daml.reservation-lineage",
       "inv.daml.formal-ledger-core",
       "prop.daml.release-preserves-policy-publisher",
+      "inv.cdm.schema-reproducibility",
+      "prop.cdm.hashes-verified-before-validation",
+      "cmp.agent.repo-guidance",
       "inv.interop.adapter-readiness-claims",
       "inv.scope.passport-public-core-boundary",
       "cmp.ci.gates"
     ],
-    "selection_reason": "Round 0006 starts a bounded formal proof-obligation layer for the Daml ledger core and uses it to guard reservation release lineage where policy publisher and verifier may differ.",
+    "selection_reason": "Round 0007 closes the top non-theatre frontier item by adding an executable CDM schema tamper falsifier and updating repo-local hardening guidance so future rounds require executable evidence rather than formal or policy ceremony.",
     "kill_gates": [
+      "interop:validate fails if a vendored CDM schema changes without a matching manifest update; the report must include the negative-cdm-schema-manifest-tamper case.",
       "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
       "Daml tests fail if ReleaseReservation does not preserve the original policy publisher when publisher and verifier differ.",
       "hardening:gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
@@ -1140,9 +1152,10 @@
                     "id": "prop.cdm.hashes-verified-before-validation",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Committed schema hashes and the schema-set digest must be verified before AJV registers schemas for validation; this is local integrity, not upstream authenticity.",
+                    "statement": "Committed schema hashes and the schema-set digest must be verified before AJV registers schemas for validation, with a tamper negative case proving schema edits without manifest updates fail; this is local integrity, not upstream authenticity.",
                     "enforcing_functions": [
-                      "fn.cdm.verify-manifest"
+                      "fn.cdm.verify-manifest",
+                      "fn.cdm.negative-cases"
                     ]
                   },
                   {
@@ -1671,8 +1684,8 @@
         "property_id": "prop.cdm.hashes-verified-before-validation",
         "attacker_control": "indirect",
         "severity": "critical",
-        "status": "guarded",
-        "description": "A committed schema file changes without matching local manifest hashes or schema-set digest, weakening offline validation.",
+        "status": "covered",
+        "description": "A committed schema file changes without matching local manifest hashes or schema-set digest, weakening offline validation; the validation lane now carries an explicit schema tamper negative case.",
         "evidence": [
           "test.interop.validate",
           "test.hardening.architecture-gate"
@@ -1680,7 +1693,7 @@
         "exploit_path_ids": [
           "xp.cdm.false-conformance"
         ],
-        "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration."
+        "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration, and negative-cdm-schema-manifest-tamper must pass in the interop report."
       },
       {
         "id": "bd.interop.payload-provenance-leak",
@@ -1866,7 +1879,7 @@
         "preconditions": [
           "Schema files can be changed without manifest hash verification."
         ],
-        "status": "guarded-by-manifest"
+        "status": "killed-by-tamper-falsifier"
       },
       {
         "id": "xp.interop.dirty-framework-payload",

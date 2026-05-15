@@ -7,10 +7,11 @@
 - Keep repo skills under `.agents/skills` so Codex CLI, IDE extension, and app agents can discover them from the repository root.
 - Adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level changes are hardening-sensitive.
 - If a hardening-sensitive change modifies behavior or claims, update readiness metadata as needed, update `hardening/maps/passport.invariants.json`, regenerate `hardening/frontiers/passport.frontier.json`, and record the result in `hardening/change-log.md` or `hardening/rounds/`.
+- Prefer executable hardening over ceremony: new formal artifacts, ADRs, or policy text should map to a negative test, tamper falsifier, Daml Script check, interop validation case, static gate, or bounded formal checker with explicit assumptions.
 
 ## Required Checks
 
-- Run `npm run hardening:frontier` and `npm run hardening:gate` after hardening-sensitive changes.
+- Run `npm run hardening:frontier`, `npm run hardening:formal`, and `npm run hardening:gate` after hardening-sensitive changes.
 - Run `npm run ci` before handoff when code, generated artifacts, Daml, CI, package scripts, or hardening policy changes.
 - For visual asset changes, validate SVG XML and regenerate PNG derivatives from SVG sources.
 

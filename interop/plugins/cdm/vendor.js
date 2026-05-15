@@ -65,9 +65,14 @@ export function writeSchemaManifest() {
 }
 
 export function verifySchemaManifest() {
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  return verifySchemaManifestAt(schemaDir);
+}
+
+export function verifySchemaManifestAt(targetSchemaDir) {
+  const targetManifestPath = path.join(targetSchemaDir, 'manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(targetManifestPath, 'utf8'));
   const expectedFiles = new Map(manifest.files.map(file => [file.path, file.sha256]));
-  const actualFiles = walkSchemaFiles(schemaDir).map(abs => path.relative(schemaDir, abs));
+  const actualFiles = walkSchemaFiles(targetSchemaDir).map(abs => path.relative(targetSchemaDir, abs));
 
   if (manifest.framework !== 'cdm') throw new Error('CDM schema manifest has wrong framework');
   if (manifest.frameworkVersion !== cdmVersion) throw new Error('CDM schema manifest has wrong version');
@@ -78,7 +83,7 @@ export function verifySchemaManifest() {
   for (const rel of actualFiles) {
     const expected = expectedFiles.get(rel);
     if (!expected) throw new Error(`CDM schema manifest missing file: ${rel}`);
-    const actual = sha256(fs.readFileSync(path.join(schemaDir, rel)));
+    const actual = sha256(fs.readFileSync(path.join(targetSchemaDir, rel)));
     if (actual !== expected) throw new Error(`CDM schema hash mismatch: ${rel}`);
   }
   for (const rel of expectedFiles.keys()) {

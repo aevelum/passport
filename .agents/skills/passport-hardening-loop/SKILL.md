@@ -17,8 +17,10 @@ The loop keeps development hardening evidence in the repo:
 
 - `hardening/maps/passport.invariants.json` is the invariant/property source of truth.
 - `hardening/frontiers/passport.frontier.json` ranks what to widen, deepen, kill, or package.
+- `hardening/formal/` records bounded proof-obligation layers when a property needs formalization.
 - `hardening/rounds/` records bounded hardening rounds.
 - `hardening/change-log.md` records hardening-relevant changes.
+- `npm run hardening:formal` enforces current formal proof-obligation mappings and bounded checker results.
 - `npm run hardening:gate` enforces non-negotiable architecture rules.
 
 ## Workflow
@@ -47,24 +49,39 @@ npm run hardening:select
 
 The selected target must have a kill gate, evidence needs, fastest falsifier, and writeback path.
 
-5. Implement the smallest useful hardening change.
+5. Apply the non-theatre filter.
+
+Do not add a formal artifact, ADR, policy, or prose-only rule unless it is tied to at least one of:
+
+- a failing negative test or tamper falsifier;
+- a Daml Script authorization, visibility, lifecycle, or state-transition check;
+- an interop validation negative case;
+- a static gate that scans the relevant source or generated artifact;
+- a bounded formal checker with explicit assumptions and `bounded-pass`, `counterexample`, `inconclusive`, `not-run`, or `out-of-scope` result discipline.
+
+If none of those can be added, record the idea as a follow-up or assumption instead of presenting it as hardening.
+
+6. Implement the smallest useful hardening change.
 
 Prefer executable controls over prose:
 
 - Daml Script negative tests for ledger authorization and state transitions
 - interop validation for generated framework artifacts
 - static gates for architectural boundaries
+- tamper falsifiers for committed manifests, generated artifacts, and readiness reports
+- bounded formal obligations only when they map to invariant properties, source references, evidence commands, and assumptions
 - package inspection for release integrity
 - ADRs when an invariant intentionally changes
 
-6. Validate.
+7. Validate.
 
 ```bash
+npm run hardening:formal
 npm run hardening:gate
 npm run ci
 ```
 
-7. Record the round.
+8. Record the round.
 
 Update `hardening/rounds/` and `hardening/change-log.md` with the decision, evidence, and next frontier state.
 
@@ -73,6 +90,8 @@ Update `hardening/rounds/` and `hardening/change-log.md` with the decision, evid
 Default to `widen` when a touched file is not assigned to a component, a component is below `semantics`, or a new trust boundary appears.
 
 Default to `deepen` when a coherent breakdown has code-local evidence but needs stronger tests, static gates, or negative cases.
+
+Default to `deepen` the highest frontier candidate before adding new formal surfaces, unless the new formal surface directly creates executable evidence for that candidate.
 
 Default to `kill` when the fastest falsifier closes the path or an existing gate makes the candidate non-actionable.
 
@@ -85,3 +104,4 @@ Default to `package` only when the frontier state is already a clean, evidence-b
 - Keep Passport provenance outside generated CDM payloads.
 - Keep Daml templates as the Canton ledger schema unless an explicit architectural decision updates the map.
 - Keep hardening changes executable: every high or critical property must map to tests or gates.
+- Keep formal claims bounded and honest: do not call a bounded model check, Daml Script suite, mocked checker, or source assertion a full proof.

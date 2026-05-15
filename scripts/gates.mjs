@@ -254,6 +254,7 @@ const requiredFiles = [
   'hardening/rounds/round-0004.md',
   'hardening/rounds/round-0005.md',
   'hardening/rounds/round-0006.md',
+  'hardening/rounds/round-0007.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -524,6 +525,9 @@ try {
   const semanticNegative = report.negativeResults?.find(result => result.name === 'negative-passport-decision-rejected-without-cdm-engine');
   if (!semanticNegative?.pass) fail.push('interop report missing passing negative-passport-decision-rejected-without-cdm-engine');
   else pass.push('interop report validates negative-passport-decision-rejected-without-cdm-engine');
+  const schemaTamperNegative = report.negativeResults?.find(result => result.name === 'negative-cdm-schema-manifest-tamper');
+  if (!schemaTamperNegative?.pass) fail.push('interop report missing passing negative-cdm-schema-manifest-tamper');
+  else pass.push('interop report validates negative-cdm-schema-manifest-tamper');
   const checkEligibility = results.get('check-eligibility-result');
   const mirrorWarning = 'CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed.';
   if (!checkEligibility?.warnings?.includes(mirrorWarning)) fail.push('interop report missing CDM decision mirror warning');
