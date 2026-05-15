@@ -29,7 +29,7 @@ jobs:
       - uses: actions/cache@v5
         with:
           path: ~/.dpm/cache
-          key: dpm-${{ runner.os }}-3.5.1-rc3
+          key: dpm-${{ runner.os }}-3.4.11
 
       - name: Install DPM
         run: |
@@ -38,7 +38,7 @@ jobs:
           echo "$HOME/.dpm/bin" >> "$GITHUB_PATH"
 
       - name: Install Daml SDK
-        run: dpm install 3.5.1-rc3
+        run: dpm install 3.4.11
 
       - name: Verify toolchain
         run: |
@@ -52,8 +52,8 @@ jobs:
           esac
 
           dpm_version="$(dpm version --active)"
-          if [[ "$dpm_version" != "3.5.1-rc3" ]]; then
-            echo "expected DPM SDK 3.5.1-rc3, got $dpm_version" >&2
+          if [[ "$dpm_version" != "3.4.11" ]]; then
+            echo "expected DPM SDK 3.4.11, got $dpm_version" >&2
             exit 1
           fi
 

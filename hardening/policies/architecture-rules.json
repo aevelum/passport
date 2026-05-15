@@ -202,11 +202,11 @@
         "actions/setup-java@v5",
         "java-version: \"17\"",
         "actions/cache@v5",
-        "dpm-${{ runner.os }}-3.5.1-rc3",
+        "dpm-${{ runner.os }}-3.4.11",
         "fetch-depth: 1",
         "persist-credentials: false",
         "curl -fsSL https://get.digitalasset.com/install/install.sh -o /tmp/install-dpm.sh",
-        "dpm install 3.5.1-rc3",
+        "dpm install 3.4.11",
         "dpm version --active",
         "npm ci --ignore-scripts --audit=false --fund=false",
         "npm run ci"

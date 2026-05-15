@@ -515,6 +515,14 @@
         "notes": "CDM schema tamper falsifier and non-theatre hardening process round record."
       },
       {
+        "path": "hardening/rounds/round-0008.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "DPM latest stable pin migration and SDK pin-consistency gate round record."
+      },
+      {
         "path": "hardening/change-log.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -565,7 +573,7 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0007",
+    "round_id": "round-0008",
     "selected_surfaces": [
       "inv.daml.domain-boundary",
       "inv.daml.capacity-conservation",
@@ -577,10 +585,13 @@
       "cmp.agent.repo-guidance",
       "inv.interop.adapter-readiness-claims",
       "inv.scope.passport-public-core-boundary",
+      "inv.ci.default-green-bar",
+      "prop.ci.dpm-sdk-pins-consistent",
       "cmp.ci.gates"
     ],
-    "selection_reason": "Round 0007 closes the top non-theatre frontier item by adding an executable CDM schema tamper falsifier and updating repo-local hardening guidance so future rounds require executable evidence rather than formal or policy ceremony.",
+    "selection_reason": "Round 0008 stress-tests the hardening loop by moving DPM pins from the 3.5.1 RC line to the latest stable DPM release and adding an executable DPM SDK pin-consistency gate.",
     "kill_gates": [
+      "hardening:gate fails if package daml.yaml files, GitHub workflow install/cache/verification, README docs, run-daml-tests messaging or package-local test invocation, architecture policy, or gate report drift to different DPM SDK versions or brittle DPM test invocation.",
       "interop:validate fails if a vendored CDM schema changes without a matching manifest update; the report must include the negative-cdm-schema-manifest-tamper case.",
       "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
       "Daml tests fail if ReleaseReservation does not preserve the original policy publisher when publisher and verifier differ.",
@@ -1296,6 +1307,11 @@
                 "id": "fn.ci.adapter-readiness-gate",
                 "name": "checkAdapterReadiness, readiness negative cases, sentence-level prose checks, and interop report consistency",
                 "source_ref": "hardening/scripts/hardening-gate.mjs"
+              },
+              {
+                "id": "fn.ci.dpm-sdk-pin-gate",
+                "name": "checkDpmSdkPins",
+                "source_ref": "hardening/scripts/hardening-gate.mjs"
               }
             ],
             "invariants": [
@@ -1319,7 +1335,17 @@
                     "statement": "Default PR CI must use GitHub-hosted runners with explicit Node, Java, DPM, and lockfile npm setup, while repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring.",
                     "enforcing_functions": [
                       "fn.ci.github-workflow",
-                      "fn.ci.network-policy-gate"
+                      "fn.ci.network-policy-gate",
+                      "fn.ci.dpm-sdk-pin-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.dpm-sdk-pins-consistent",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Package daml.yaml files, GitHub workflow install/cache/verification, README toolchain docs, run-daml-tests messaging and package-local test invocation, architecture policy, and gate report metadata must pin the same stable DPM SDK version with no RC or snapshot suffix.",
+                    "enforcing_functions": [
+                      "fn.ci.dpm-sdk-pin-gate"
                     ]
                   },
                   {
@@ -1477,6 +1503,7 @@
           "inv.release.reviewable-archive",
           "prop.release.git-ls-files-only",
           "prop.ci.standard-hosted-toolchain",
+          "prop.ci.dpm-sdk-pins-consistent",
           "prop.ci.source-inventory-complete",
           "prop.ci.ajv-exception-pinned",
           "inv.interop.adapter-readiness-claims",
@@ -1509,6 +1536,7 @@
           "inv.ci.default-green-bar",
           "prop.ci.hardening-gate-in-ci",
           "prop.ci.standard-hosted-toolchain",
+          "prop.ci.dpm-sdk-pins-consistent",
           "prop.ci.generated-artifacts-current",
           "prop.ci.source-inventory-complete",
           "prop.ci.package-in-ci",
@@ -1730,6 +1758,23 @@
         "kill_gate": "hardening:gate scans shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module while permitting standard GitHub-hosted workflow bootstrap."
       },
       {
+        "id": "bd.ci.dpm-sdk-pin-drift",
+        "component_id": "cmp.ci.gates",
+        "property_id": "prop.ci.dpm-sdk-pins-consistent",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "A future DPM SDK migration updates package daml.yaml files, GitHub Actions, README docs, test runner behavior, architecture policy, or gate metadata inconsistently, pins an RC/snapshot as the default stable toolchain, or reintroduces a brittle DPM test invocation.",
+        "evidence": [
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.ci.dpm-sdk-pin-drift"
+        ],
+        "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version."
+      },
+      {
         "id": "bd.ci.generated-artifact-staleness",
         "component_id": "cmp.ci.gates",
         "property_id": "prop.ci.generated-artifacts-current",
@@ -1898,6 +1943,15 @@
           "A repo-authored validation or generation command fetches network content outside explicit vendoring."
         ],
         "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.ci.dpm-sdk-pin-drift",
+        "breakdown_id": "bd.ci.dpm-sdk-pin-drift",
+        "impact": "Default CI, local Daml builds, documentation, and hardening policy can silently test different DPM SDK versions.",
+        "preconditions": [
+          "A DPM SDK version migration updates only part of the repo or pins a release candidate as the default stable toolchain."
+        ],
+        "status": "guarded-by-dpm-pin-gate"
       },
       {
         "id": "xp.ci.stale-artifacts",

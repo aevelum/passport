@@ -62,3 +62,12 @@
 - Tightened `npm run hardening:gate` and `npm run gate` so generated interop reports must include passing `negative-cdm-schema-manifest-tamper` evidence.
 - Updated CDM readiness metadata, the invariant map, and the hardening frontier to mark the schema-substitution path as covered by an executable falsifier.
 - Updated the repo-local Passport hardening skill and root instructions with a non-theatre filter: formal artifacts, ADRs, and policy text must map to executable evidence or stay as follow-up assumptions.
+
+## 2026-05-15 - round-0008
+
+- Migrated the default DPM SDK pin from active RC `3.5.1-rc3` to the latest stable release returned by Digital Asset's stable installer endpoint, `3.4.11`.
+- Updated package `daml.yaml` files, GitHub Actions DPM install/cache/verification, README toolchain docs, architecture policy, and gate metadata to use the same stable SDK pin.
+- Added `prop.ci.dpm-sdk-pins-consistent` to the invariant map so DPM migrations are treated as hardening-sensitive CI/toolchain changes rather than ad hoc version edits.
+- Tightened `npm run hardening:gate` with `checkDpmSdkPins`, which rejects mismatched package/workflow/docs/policy/gate SDK pins and rejects default RC or snapshot DPM pins.
+- Changed `scripts/run-daml-tests.sh` to run Daml Script tests from `packages/passport-tests` after SDK `3.4.11` exposed that the previous `dpm test --package-root` path could build packages but fail test dependency resolution.
+- Recorded the stress-test result in `hardening/rounds/round-0008.md`: the hardening loop surfaced a real drift class and converted it into an executable static gate.

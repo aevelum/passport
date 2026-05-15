@@ -401,6 +401,42 @@ function checkCiOrder() {
   }
 }
 
+function checkDpmSdkPins() {
+  const packageConfigFiles = [
+    'packages/passport-core/daml.yaml',
+    'packages/passport-tests/daml.yaml'
+  ];
+  const versions = packageConfigFiles.map(rel => {
+    const match = readText(rel).match(/^sdk-version:\s*(\S+)\s*$/m);
+    ok(Boolean(match), `${rel} declares sdk-version`);
+    return match?.[1] ?? null;
+  });
+  const expected = versions[0];
+  ok(Boolean(expected), 'DPM SDK pin is discoverable from package configs');
+  ok(versions.every(version => version === expected), `DPM package sdk-version pins are consistent at ${expected}`);
+  ok(!/(?:rc|snapshot)/i.test(expected ?? ''), `DPM SDK pin ${expected} is stable, not RC or snapshot`);
+
+  const workflow = readText('.github/workflows/ci.yml');
+  const readme = readText('README.md');
+  const runDamlTests = readText('scripts/run-daml-tests.sh');
+  const policy = readText('hardening/policies/architecture-rules.json');
+  const gate = readText('scripts/gates.mjs');
+  const docsMinor = (expected ?? '').split('.').slice(0, 2).join('.');
+  const installNeedle = ['dpm', 'install', expected].join(' ');
+
+  ok(workflow.includes(`dpm-${'${{ runner.os }}'}-${expected}`), `.github workflow cache key pins DPM SDK ${expected}`);
+  ok(workflow.includes(installNeedle), `.github workflow installs DPM SDK ${expected}`);
+  ok(workflow.includes(`expected DPM SDK ${expected}`), `.github workflow verifies DPM SDK ${expected}`);
+  ok(readme.includes(`SDK \`${expected}\``), `README documents DPM SDK ${expected}`);
+  ok(readme.includes(`/build/${docsMinor}/dpm/dpm.html`), `README links DPM docs for ${docsMinor}`);
+  ok(runDamlTests.includes(`pin SDK ${expected}`), `run-daml-tests missing-DPM message pins ${expected}`);
+  ok(runDamlTests.includes('cd "$ROOT/packages/passport-tests"'), 'run-daml-tests enters passport-tests package before dpm test');
+  ok(!runDamlTests.includes('--package-root'), 'run-daml-tests avoids brittle dpm test --package-root invocation');
+  ok(policy.includes(`dpm-${'${{ runner.os }}'}-${expected}`), `architecture policy cache key pins DPM SDK ${expected}`);
+  ok(policy.includes(installNeedle), `architecture policy install command pins DPM SDK ${expected}`);
+  ok(gate.includes(`dpmSdk: '${expected}'`), `gate report pins DPM SDK ${expected}`);
+}
+
 for (const rel of [
   'AGENTS.md',
   '.agents/skills/passport-hardening-loop/SKILL.md',
@@ -416,6 +452,7 @@ for (const rel of [
   'hardening/rounds/round-0005.md',
   'hardening/rounds/round-0006.md',
   'hardening/rounds/round-0007.md',
+  'hardening/rounds/round-0008.md',
   'hardening/change-log.md'
 ]) relExists(rel);
 
@@ -438,6 +475,7 @@ checkCdmPayloadPurity();
 checkCdmReadinessDocs();
 checkPassportScopeBoundary();
 checkCiOrder();
+checkDpmSdkPins();
 
 const packageScript = readText('scripts/package.mjs');
 ok(packageScript.includes("file !== 'artifacts/daml_test_coverage.txt'"), 'package excludes Daml coverage artifact');

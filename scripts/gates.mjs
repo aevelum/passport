@@ -255,6 +255,7 @@ const requiredFiles = [
   'hardening/rounds/round-0005.md',
   'hardening/rounds/round-0006.md',
   'hardening/rounds/round-0007.md',
+  'hardening/rounds/round-0008.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -592,7 +593,7 @@ const report = {
   package: 'aevelum-passport-foundation',
   version: '0.1.0',
   generatedAt: getGeneratedAt(),
-  dpmSdk: '3.5.1-rc3',
+  dpmSdk: '3.4.11',
   note: 'This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.',
   pass,
   fail

@@ -5,12 +5,12 @@
   "generatedFrom": {
     "package": "aevelum-passport-foundation",
     "pinned_version": "git:HEAD",
-    "round_id": "round-0007"
+    "round_id": "round-0008"
   },
   "summary": {
-    "candidates": 16,
+    "candidates": 17,
     "widen": 0,
-    "deepen": 16,
+    "deepen": 17,
     "kill": 0,
     "package": 0,
     "top_candidate": "bd.ci.network-fetch-default"
@@ -36,7 +36,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add interop:vendor:cdm to scripts/ci.sh and confirm npm run hardening:gate fails.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.interop.dynamic-plugin-loading",
@@ -58,7 +58,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add import( to interop/registry.js and confirm npm run hardening:gate fails.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.interop.level2-live-overclaim",
@@ -80,7 +80,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.scope.canonical-docs-drift",
@@ -102,7 +102,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.scope.out-of-scope-daml-language",
@@ -124,7 +124,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.scope.handoff-coverage-gap",
@@ -146,7 +146,29 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
+    },
+    {
+      "id": "bd.ci.dpm-sdk-pin-drift",
+      "source_id": "bd.ci.dpm-sdk-pin-drift",
+      "component_id": "cmp.ci.gates",
+      "property_id": "prop.ci.dpm-sdk-pins-consistent",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 70,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 10,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0008"
     },
     {
       "id": "bd.ci.generated-artifact-staleness",
@@ -168,7 +190,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.daml.formal-obligation-drift",
@@ -190,7 +212,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.interop.adapter-readiness-overclaim",
@@ -212,7 +234,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.interop.payload-provenance-leak",
@@ -234,7 +256,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Add a provenance key to a generated CDM payload and confirm npm run hardening:gate fails.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.interop.readiness-report-omission",
@@ -256,7 +278,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.cdm.schema-substitution",
@@ -278,7 +300,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Modify a vendored CDM schema without updating manifest.json and confirm npm run interop:validate fails.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.agent.skill-not-discovered",
@@ -300,7 +322,7 @@
         "Keep the guard executable and fail-closed in CI."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.daml.capacity-over-reservation",
@@ -322,7 +344,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.daml.release-policy-publisher-drift",
@@ -344,7 +366,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     },
     {
       "id": "bd.daml.unauthorized-transition",
@@ -366,7 +388,7 @@
         "No new evidence needed unless the linked source changes."
       ],
       "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
-      "last_round": "round-0007"
+      "last_round": "round-0008"
     }
   ]
 }
