@@ -28,6 +28,7 @@
     "source inventory covers hardening-sensitive file hardening/rounds/round-0005.md",
     "source inventory covers hardening-sensitive file hardening/rounds/round-0006.md",
     "source inventory covers hardening-sensitive file hardening/rounds/round-0007.md",
+    "source inventory covers hardening-sensitive file hardening/rounds/round-0008.md",
     "source inventory covers hardening-sensitive file hardening/scripts/hardening-gate.mjs",
     "source inventory covers hardening-sensitive file hardening/scripts/lib.mjs",
     "source inventory covers hardening-sensitive file hardening/scripts/score-frontier.mjs",
