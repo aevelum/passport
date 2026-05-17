@@ -114,3 +114,95 @@ t021_dispute_reservation = script do
   assertMsg "dealer should see reservation dispute" (length dealerDisputes == 1)
   assertMsg "holder should see reservation dispute" (length holderDisputes == 1)
   return ()
+
+t023_release_preserves_policy_publisher : Script ()
+t023_release_preserves_policy_publisher = script do
+  actors <- mkActors
+  let holder = actors.holder
+  let verifier = actors.dealer
+  let attester = actors.attester
+  let policyPublisher = actors.operator
+
+  accountCid <- submit holder do
+    createCmd PassportAccount with
+      accountId = "acct-policy-publisher-release-001"
+      holder
+      operator = Some policyPublisher
+      displayName = "Policy Publisher Preservation Account"
+      schemaVersion = "foundation-0.1"
+      createdAt = "2026-05-10T00:00:00Z"
+      status = AccountActive
+
+  _policyCid <- submit policyPublisher do
+    createCmd CollateralPolicy with
+      policyId = "repo-policy-separate-publisher-001"
+      policyVersion = "v1"
+      policyPublisher
+      approvedHolders = [holder]
+      approvedAttesters = [attester]
+      eligibleAssetClasses = [USTreasury]
+      eligibleCurrencies = ["USD"]
+      minimumCapacity = 40000000.0
+      haircutScheduleRef = "haircut-separate-publisher-v1"
+      concentrationLimitRef = "concentration-separate-publisher-v1"
+      freshnessWindowHours = 24
+      reservationAllowed = True
+      validFrom = "2026-05-10T00:00:00Z"
+      validUntil = "2026-05-11T00:00:00Z"
+      schemaVersion = "foundation-0.1"
+      status = PolicyActive
+
+  requestCid <- submit holder do
+    exerciseCmd accountCid RequestCapacityCredential with
+      requestId = "request-separate-publisher-001"
+      policyId = "repo-policy-separate-publisher-001"
+      policyVersion = "v1"
+      policyPublisher
+      attester
+      requestedMinimumCapacity = 40000000.0
+      capacityCurrency = "USD"
+      purpose = RepoPreTrade
+      requestedAt = "2026-05-10T00:01:00Z"
+
+  credentialCid <- submit (actAs holder <> actAs attester) do
+    exerciseCmd requestCid IssueCapacityCredential with
+      credentialId = "credential-separate-publisher-001"
+      capacityAmount = 40000000.0
+      capacityBand = AtLeast 40000000.0
+      haircutScheduleRef = "haircut-separate-publisher-v1"
+      valuationTime = "2026-05-10T00:02:00Z"
+      validFrom = "2026-05-10T00:02:00Z"
+      validUntil = "2026-05-11T00:02:00Z"
+      evidenceManifestHash = "sha256:evidence-separate-publisher-001"
+      calculationMethodHash = "sha256:calculation-separate-publisher-001"
+      reservableAmount = 40000000.0
+      schemaVersion = "foundation-0.1"
+
+  presentationCid <- submit holder do
+    exerciseCmd credentialCid PresentToVerifier with
+      presentationId = "presentation-separate-publisher-001"
+      verifier
+      presentationPurpose = RepoPreTrade
+      presentedAt = "2026-05-10T00:03:00Z"
+
+  outcome <- submit (actAs holder <> actAs attester <> actAs verifier) do
+    exerciseCmd presentationCid ReserveFromPresentation with
+      reservationId = "reservation-separate-publisher-001"
+      reservedAmount = 20000000.0
+      reservationPurpose = RepoPreTradeReservation
+      reservationValidUntil = "2026-05-10T04:03:00Z"
+      residualCredentialId = "credential-residual-separate-publisher-001"
+
+  _releasedCredentialCid <- submit (actAs holder <> actAs attester <> actAs verifier) do
+    exerciseCmd outcome.reservationCid ReleaseReservation with
+      releasedCredentialId = "credential-released-separate-publisher-001"
+      releasedAt = "2026-05-10T01:00:00Z"
+
+  holderCredentials <- query @CapacityCredential holder
+  let releasedCredentials = filter (\(_, credential) -> credential.credentialId == "credential-released-separate-publisher-001") holderCredentials
+  case releasedCredentials of
+    [(_, credential)] -> do
+      assertMsg "test setup keeps policy publisher distinct from verifier" (policyPublisher /= verifier)
+      assertMsg "released credential should preserve original policy publisher" (credential.policyPublisher == policyPublisher)
+    _ -> assertMsg "holder should see exactly one released credential" False
+  return ()

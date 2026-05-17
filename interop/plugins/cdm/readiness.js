@@ -46,6 +46,12 @@ export const CDM_READINESS = Object.freeze({
       references: Object.freeze(['interop/plugins/cdm/index.js', 'artifacts/interop/report.json'])
     }),
     Object.freeze({
+      id: 'evidence.cdm.schema-manifest-tamper-negative-case',
+      category: 'negative-case',
+      summary: 'The validation lane includes a schema tamper negative case proving manifest hash mismatches fail before AJV registration.',
+      references: Object.freeze(['interop/plugins/cdm/index.js', 'interop/plugins/cdm/vendor.js', 'artifacts/interop/report.json'])
+    }),
+    Object.freeze({
       id: 'evidence.cdm.passport-decision-mirror-warning',
       category: 'claim-boundary-warning',
       summary: 'CheckEligibilityResult reports warn that the Passport sample decision is mirrored without CDM engine execution.',

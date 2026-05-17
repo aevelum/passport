@@ -244,14 +244,22 @@ const requiredFiles = [
   'hardening/maps/passport.invariants.json',
   'hardening/frontiers/passport.frontier.json',
   'hardening/policies/architecture-rules.json',
+  'hardening/formal/daml-ledger-core/FORMAL_LADDER.md',
+  'hardening/formal/daml-ledger-core/obligations.json',
+  'hardening/formal/daml-ledger-core/reference-model.mjs',
+  'hardening/formal/daml-ledger-core/reservation-core.tla',
   'hardening/rounds/round-0001.md',
   'hardening/rounds/round-0002.md',
   'hardening/rounds/round-0003.md',
   'hardening/rounds/round-0004.md',
   'hardening/rounds/round-0005.md',
+  'hardening/rounds/round-0006.md',
+  'hardening/rounds/round-0007.md',
+  'hardening/rounds/round-0008.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
+  'hardening/scripts/validate-formal.mjs',
   'hardening/scripts/score-frontier.mjs',
   'hardening/scripts/select-round.mjs',
   'hardening/scripts/hardening-gate.mjs',
@@ -309,7 +317,8 @@ checkContains(testReservation, [
   't009_release_reservation',
   't019_expire_reservation',
   't020_create_reservation_handoff',
-  't021_dispute_reservation'
+  't021_dispute_reservation',
+  't023_release_preserves_policy_publisher'
 ]);
 
 checkContains(testRevocation, [
@@ -364,9 +373,33 @@ checkContains('design/change-log.md', [
 
 checkContains('scripts/ci.sh', [
   'npm run hardening:frontier',
+  'npm run hardening:formal',
   'npm run hardening:gate',
   'npm run package',
   'git diff --exit-code -- artifacts hardening/frontiers hardening/maps'
+]);
+
+checkContains('package.json', [
+  '"hardening:formal": "node hardening/scripts/validate-formal.mjs"'
+]);
+
+checkContains('hardening/formal/daml-ledger-core/FORMAL_LADDER.md', [
+  '## S0. Security Objective',
+  '## S6. Assumption Register',
+  'result_status: bounded-pass',
+  'command: npm run hardening:formal'
+]);
+
+checkContains('hardening/formal/daml-ledger-core/obligations.json', [
+  '"artifact": "passport_formal_obligations"',
+  '"PO-DAML-004"',
+  '"prop.daml.release-preserves-policy-publisher"'
+]);
+
+checkContains('hardening/scripts/validate-formal.mjs', [
+  'runBoundedReservationModel',
+  'passport_formal_obligations',
+  'bounded-pass'
 ]);
 
 checkContains('interop/registry.js', [
@@ -493,6 +526,9 @@ try {
   const semanticNegative = report.negativeResults?.find(result => result.name === 'negative-passport-decision-rejected-without-cdm-engine');
   if (!semanticNegative?.pass) fail.push('interop report missing passing negative-passport-decision-rejected-without-cdm-engine');
   else pass.push('interop report validates negative-passport-decision-rejected-without-cdm-engine');
+  const schemaTamperNegative = report.negativeResults?.find(result => result.name === 'negative-cdm-schema-manifest-tamper');
+  if (!schemaTamperNegative?.pass) fail.push('interop report missing passing negative-cdm-schema-manifest-tamper');
+  else pass.push('interop report validates negative-cdm-schema-manifest-tamper');
   const checkEligibility = results.get('check-eligibility-result');
   const mirrorWarning = 'CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed.';
   if (!checkEligibility?.warnings?.includes(mirrorWarning)) fail.push('interop report missing CDM decision mirror warning');
@@ -557,7 +593,7 @@ const report = {
   package: 'aevelum-passport-foundation',
   version: '0.1.0',
   generatedAt: getGeneratedAt(),
-  dpmSdk: '3.5.1-rc3',
+  dpmSdk: '3.4.11',
   note: 'This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.',
   pass,
   fail

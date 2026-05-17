@@ -123,6 +123,46 @@
         "notes": "Revocation, expiry, and supersession coverage."
       },
       {
+        "path": "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "S0-S6 bounded formal ladder for the Daml ledger core."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/obligations.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Machine-readable proof obligations mapped to invariant properties, source references, and evidence commands."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/reference-model.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Bounded executable reference model for reservation, handoff, audit, and release lineage obligations."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/reservation-core.tla",
+        "language": "tla",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "semantics",
+        "notes": "TLA-style abstract state-machine specification for the reservation core."
+      },
+      {
+        "path": "hardening/scripts/validate-formal.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Formal obligation validator and bounded reference-model gate."
+      },
+      {
         "path": "interop/core/adapter.js",
         "language": "javascript",
         "pin": "git:HEAD",
@@ -459,6 +499,30 @@
         "notes": "Passport scope boundary alignment hardening round record."
       },
       {
+        "path": "hardening/rounds/round-0006.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "semantics",
+        "notes": "Bounded formal Daml ledger core proof-obligation round record."
+      },
+      {
+        "path": "hardening/rounds/round-0007.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "CDM schema tamper falsifier and non-theatre hardening process round record."
+      },
+      {
+        "path": "hardening/rounds/round-0008.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "DPM latest stable pin migration and SDK pin-consistency gate round record."
+      },
+      {
         "path": "hardening/change-log.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -509,16 +573,28 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0005",
+    "round_id": "round-0008",
     "selected_surfaces": [
       "inv.daml.domain-boundary",
       "inv.daml.capacity-conservation",
+      "inv.daml.reservation-lineage",
+      "inv.daml.formal-ledger-core",
+      "prop.daml.release-preserves-policy-publisher",
+      "inv.cdm.schema-reproducibility",
+      "prop.cdm.hashes-verified-before-validation",
+      "cmp.agent.repo-guidance",
       "inv.interop.adapter-readiness-claims",
       "inv.scope.passport-public-core-boundary",
+      "inv.ci.default-green-bar",
+      "prop.ci.dpm-sdk-pins-consistent",
       "cmp.ci.gates"
     ],
-    "selection_reason": "Round 0005 aligns Passport main with the canonical public-core scope by replacing borderline execution terminology with non-executing reservation handoff terminology, removing dormant reservation observer/status side channels, and enforcing the boundary in Daml, docs, gates, and generated artifacts.",
+    "selection_reason": "Round 0008 stress-tests the hardening loop by moving DPM pins from the 3.5.1 RC line to the latest stable DPM release and adding an executable DPM SDK pin-consistency gate.",
     "kill_gates": [
+      "hardening:gate fails if package daml.yaml files, GitHub workflow install/cache/verification, README docs, run-daml-tests messaging or package-local test invocation, architecture policy, or gate report drift to different DPM SDK versions or brittle DPM test invocation.",
+      "interop:validate fails if a vendored CDM schema changes without a matching manifest update; the report must include the negative-cdm-schema-manifest-tamper case.",
+      "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
+      "Daml tests fail if ReleaseReservation does not preserve the original policy publisher when publisher and verifier differ.",
       "hardening:gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
       "hardening:gate fails if Passport-owned Daml contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.",
       "structural gate fails if README or docs lose canonical scope or non-goal language.",
@@ -562,6 +638,11 @@
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
               },
               {
+                "id": "fn.daml.release-reservation",
+                "name": "ReleaseReservation",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
                 "id": "fn.daml.create-reservation-handoff",
                 "name": "CreateReservationHandoff",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
@@ -592,6 +673,7 @@
                       "fn.daml.issue-capacity-credential",
                       "fn.daml.present-to-verifier",
                       "fn.daml.reserve-from-presentation",
+                      "fn.daml.release-reservation",
                       "fn.daml.create-reservation-handoff",
                       "fn.daml.revoke-credential",
                       "fn.daml.grant-audit-disclosure"
@@ -630,6 +712,22 @@
                     "statement": "Residual credentials are minted only for presented reservable amount minus reserved amount.",
                     "enforcing_functions": [
                       "fn.daml.reserve-from-presentation"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "inv.daml.reservation-lineage",
+                "statement": "Reservation lifecycle transitions preserve credential lineage fields that bind released or residual capacity to the policy originally evaluated.",
+                "properties": [
+                  {
+                    "id": "prop.daml.release-preserves-policy-publisher",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "ReleaseReservation must create a released credential with the original policy publisher recorded through presentation and reservation, even when the verifier is a different party.",
+                    "enforcing_functions": [
+                      "fn.daml.reserve-from-presentation",
+                      "fn.daml.release-reservation"
                     ]
                   }
                 ]
@@ -739,6 +837,48 @@
                     "statement": "The Daml test command must fail if external template or domain-choice coverage drops below 100%.",
                     "enforcing_functions": [
                       "fn.test.daml-suite"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "cmp.daml.formal-ledger-core",
+            "name": "Daml ledger core formal proof layer",
+            "mapping_depth": "breakdown",
+            "source_files": [
+              "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
+              "hardening/formal/daml-ledger-core/obligations.json",
+              "hardening/formal/daml-ledger-core/reference-model.mjs",
+              "hardening/formal/daml-ledger-core/reservation-core.tla",
+              "hardening/scripts/validate-formal.mjs"
+            ],
+            "functions": [
+              {
+                "id": "fn.formal.validate-ledger-core",
+                "name": "npm run hardening:formal",
+                "source_ref": "hardening/scripts/validate-formal.mjs"
+              },
+              {
+                "id": "fn.formal.bounded-reservation-model",
+                "name": "runBoundedReservationModel",
+                "source_ref": "hardening/formal/daml-ledger-core/reference-model.mjs"
+              }
+            ],
+            "invariants": [
+              {
+                "id": "inv.daml.formal-ledger-core",
+                "statement": "The Daml ledger core has stable bounded proof obligations mapped to invariant properties, implementation references, assumptions, and executable evidence.",
+                "properties": [
+                  {
+                    "id": "prop.daml.formal-obligations-mapped",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Every bounded Daml ledger proof obligation must map to an invariant property, source reference, active evidence command, explicit result status, and assumption register entry.",
+                    "enforcing_functions": [
+                      "fn.formal.validate-ledger-core",
+                      "fn.formal.bounded-reservation-model"
                     ]
                   }
                 ]
@@ -1023,9 +1163,10 @@
                     "id": "prop.cdm.hashes-verified-before-validation",
                     "type": "guarantee",
                     "severity": "critical",
-                    "statement": "Committed schema hashes and the schema-set digest must be verified before AJV registers schemas for validation; this is local integrity, not upstream authenticity.",
+                    "statement": "Committed schema hashes and the schema-set digest must be verified before AJV registers schemas for validation, with a tamper negative case proving schema edits without manifest updates fail; this is local integrity, not upstream authenticity.",
                     "enforcing_functions": [
-                      "fn.cdm.verify-manifest"
+                      "fn.cdm.verify-manifest",
+                      "fn.cdm.negative-cases"
                     ]
                   },
                   {
@@ -1166,6 +1307,11 @@
                 "id": "fn.ci.adapter-readiness-gate",
                 "name": "checkAdapterReadiness, readiness negative cases, sentence-level prose checks, and interop report consistency",
                 "source_ref": "hardening/scripts/hardening-gate.mjs"
+              },
+              {
+                "id": "fn.ci.dpm-sdk-pin-gate",
+                "name": "checkDpmSdkPins",
+                "source_ref": "hardening/scripts/hardening-gate.mjs"
               }
             ],
             "invariants": [
@@ -1177,7 +1323,7 @@
                     "id": "prop.ci.hardening-gate-in-ci",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "npm run ci must execute npm run hardening:gate before Daml and Canton smoke tests.",
+                    "statement": "npm run ci must execute npm run hardening:formal and npm run hardening:gate before Daml and Canton smoke tests.",
                     "enforcing_functions": [
                       "fn.ci.local-ci"
                     ]
@@ -1189,7 +1335,17 @@
                     "statement": "Default PR CI must use GitHub-hosted runners with explicit Node, Java, DPM, and lockfile npm setup, while repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs outside explicit vendoring.",
                     "enforcing_functions": [
                       "fn.ci.github-workflow",
-                      "fn.ci.network-policy-gate"
+                      "fn.ci.network-policy-gate",
+                      "fn.ci.dpm-sdk-pin-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.ci.dpm-sdk-pins-consistent",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Package daml.yaml files, GitHub workflow install/cache/verification, README toolchain docs, run-daml-tests messaging and package-local test invocation, architecture policy, and gate report metadata must pin the same stable DPM SDK version with no RC or snapshot suffix.",
+                    "enforcing_functions": [
+                      "fn.ci.dpm-sdk-pin-gate"
                     ]
                   },
                   {
@@ -1206,7 +1362,7 @@
                     "id": "prop.ci.source-inventory-complete",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Every hardening-sensitive tracked workflow, package, Daml, interop, script, policy, map, frontier, round, and change-log file must appear in the invariant map source inventory.",
+                    "statement": "Every hardening-sensitive tracked workflow, package, Daml, interop, formal artifact, script, policy, map, frontier, round, and change-log file must appear in the invariant map source inventory.",
                     "enforcing_functions": [
                       "fn.ci.source-inventory-gate"
                     ]
@@ -1283,9 +1439,30 @@
           "inv.daml.capacity-conservation",
           "prop.daml.reservation-positive-bounded",
           "prop.daml.residual-capacity-subtractive",
+          "inv.daml.reservation-lineage",
+          "prop.daml.release-preserves-policy-publisher",
           "inv.tests.external-coverage",
           "prop.tests.coverage-gate-required",
           "prop.scope.reservation-handoff-covered"
+        ]
+      },
+      {
+        "id": "test.hardening.formal-ledger-core",
+        "kind": "node-script",
+        "command": "npm run hardening:formal",
+        "status": "active",
+        "covers": [
+          "inv.daml.authorization",
+          "prop.daml.controllers-match-authority",
+          "inv.daml.capacity-conservation",
+          "prop.daml.reservation-positive-bounded",
+          "prop.daml.residual-capacity-subtractive",
+          "inv.daml.reservation-lineage",
+          "prop.daml.release-preserves-policy-publisher",
+          "inv.scope.passport-public-core-boundary",
+          "prop.scope.reservation-handoff-covered",
+          "inv.daml.formal-ledger-core",
+          "prop.daml.formal-obligations-mapped"
         ]
       },
       {
@@ -1326,6 +1503,7 @@
           "inv.release.reviewable-archive",
           "prop.release.git-ls-files-only",
           "prop.ci.standard-hosted-toolchain",
+          "prop.ci.dpm-sdk-pins-consistent",
           "prop.ci.source-inventory-complete",
           "prop.ci.ajv-exception-pinned",
           "inv.interop.adapter-readiness-claims",
@@ -1358,10 +1536,15 @@
           "inv.ci.default-green-bar",
           "prop.ci.hardening-gate-in-ci",
           "prop.ci.standard-hosted-toolchain",
+          "prop.ci.dpm-sdk-pins-consistent",
           "prop.ci.generated-artifacts-current",
           "prop.ci.source-inventory-complete",
           "prop.ci.package-in-ci",
           "prop.release.git-ls-files-only",
+          "inv.daml.reservation-lineage",
+          "prop.daml.release-preserves-policy-publisher",
+          "inv.daml.formal-ledger-core",
+          "prop.daml.formal-obligations-mapped",
           "inv.interop.adapter-readiness-claims",
           "prop.interop.adapter-level-evidence-bound",
           "prop.interop.no-live-integration-overclaim",
@@ -1421,6 +1604,39 @@
           "xp.daml.capacity-inflation"
         ],
         "kill_gate": "Reservation negative tests must reject over-reservation."
+      },
+      {
+        "id": "bd.daml.release-policy-publisher-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.release-preserves-policy-publisher",
+        "attacker_control": "direct",
+        "severity": "high",
+        "status": "covered",
+        "description": "A reservation release reconstructs the released credential with verifier as policy publisher instead of preserving the original policy publisher carried through presentation and reservation.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.release-policy-publisher-drift"
+        ],
+        "kill_gate": "Daml regression tests and hardening:formal fail if ReleaseReservation uses verifier as policy publisher or loses the reservation policyPublisher field."
+      },
+      {
+        "id": "bd.daml.formal-obligation-drift",
+        "component_id": "cmp.daml.formal-ledger-core",
+        "property_id": "prop.daml.formal-obligations-mapped",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Formal proof obligations drift from the invariant map, source references, assumption register, bounded model, or active evidence commands.",
+        "evidence": [
+          "test.hardening.formal-ledger-core"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.formal-obligation-drift"
+        ],
+        "kill_gate": "hardening:formal fails on missing sections, invalid result statuses, unmapped invariant properties, inactive evidence tests, stale source snippets, or bounded model counterexamples."
       },
       {
         "id": "bd.scope.out-of-scope-daml-language",
@@ -1496,8 +1712,8 @@
         "property_id": "prop.cdm.hashes-verified-before-validation",
         "attacker_control": "indirect",
         "severity": "critical",
-        "status": "guarded",
-        "description": "A committed schema file changes without matching local manifest hashes or schema-set digest, weakening offline validation.",
+        "status": "covered",
+        "description": "A committed schema file changes without matching local manifest hashes or schema-set digest, weakening offline validation; the validation lane now carries an explicit schema tamper negative case.",
         "evidence": [
           "test.interop.validate",
           "test.hardening.architecture-gate"
@@ -1505,7 +1721,7 @@
         "exploit_path_ids": [
           "xp.cdm.false-conformance"
         ],
-        "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration."
+        "kill_gate": "CDM validation verifies committed plugin-scoped manifest hashes and schema-set digest before AJV registration, and negative-cdm-schema-manifest-tamper must pass in the interop report."
       },
       {
         "id": "bd.interop.payload-provenance-leak",
@@ -1540,6 +1756,23 @@
           "xp.ci.unpinned-input"
         ],
         "kill_gate": "hardening:gate scans shell scripts, package scripts, and repo-authored JS for network primitives, allowing only the explicit CDM vendor refresh module while permitting standard GitHub-hosted workflow bootstrap."
+      },
+      {
+        "id": "bd.ci.dpm-sdk-pin-drift",
+        "component_id": "cmp.ci.gates",
+        "property_id": "prop.ci.dpm-sdk-pins-consistent",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "A future DPM SDK migration updates package daml.yaml files, GitHub Actions, README docs, test runner behavior, architecture policy, or gate metadata inconsistently, pins an RC/snapshot as the default stable toolchain, or reintroduces a brittle DPM test invocation.",
+        "evidence": [
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [
+          "xp.ci.dpm-sdk-pin-drift"
+        ],
+        "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version."
       },
       {
         "id": "bd.ci.generated-artifact-staleness",
@@ -1630,6 +1863,25 @@
         "status": "killed-by-tests"
       },
       {
+        "id": "xp.daml.release-policy-publisher-drift",
+        "breakdown_id": "bd.daml.release-policy-publisher-drift",
+        "impact": "Released capacity can be attributed to the verifier's policy publisher identity rather than the policy publisher originally evaluated for the credential.",
+        "preconditions": [
+          "A reservation is created from a presentation where policy publisher and verifier are distinct.",
+          "ReleaseReservation reconstructs the released credential using verifier as policy publisher."
+        ],
+        "status": "killed-by-tests-and-formal-gate"
+      },
+      {
+        "id": "xp.daml.formal-obligation-drift",
+        "breakdown_id": "bd.daml.formal-obligation-drift",
+        "impact": "The formal layer stops constraining Daml ledger invariants and becomes stale documentation.",
+        "preconditions": [
+          "Proof obligations, model checks, source references, or evidence commands can drift without a failing gate."
+        ],
+        "status": "guarded-by-formal-gate"
+      },
+      {
         "id": "xp.scope.product-boundary-drift",
         "breakdown_id": "bd.scope.out-of-scope-daml-language",
         "impact": "Passport public-core artifacts imply downstream execution, custody, settlement, wallet, venue, optimizer, credit-decision, proof-system, production-identity, or live-integration behavior.",
@@ -1672,7 +1924,7 @@
         "preconditions": [
           "Schema files can be changed without manifest hash verification."
         ],
-        "status": "guarded-by-manifest"
+        "status": "killed-by-tamper-falsifier"
       },
       {
         "id": "xp.interop.dirty-framework-payload",
@@ -1691,6 +1943,15 @@
           "A repo-authored validation or generation command fetches network content outside explicit vendoring."
         ],
         "status": "guarded-by-architecture-gate"
+      },
+      {
+        "id": "xp.ci.dpm-sdk-pin-drift",
+        "breakdown_id": "bd.ci.dpm-sdk-pin-drift",
+        "impact": "Default CI, local Daml builds, documentation, and hardening policy can silently test different DPM SDK versions.",
+        "preconditions": [
+          "A DPM SDK version migration updates only part of the repo or pins a release candidate as the default stable toolchain."
+        ],
+        "status": "guarded-by-dpm-pin-gate"
       },
       {
         "id": "xp.ci.stale-artifacts",
@@ -1715,9 +1976,20 @@
         "id": "tb.ledger.party-authority",
         "name": "Ledger party authority",
         "component_ids": [
-          "cmp.daml.ledger-schema"
+          "cmp.daml.ledger-schema",
+          "cmp.daml.formal-ledger-core"
         ],
         "description": "Daml controllers and signatories decide who can mutate ledger state."
+      },
+      {
+        "id": "tb.formal-ledger-evidence",
+        "name": "Formal ledger evidence boundary",
+        "component_ids": [
+          "cmp.daml.ledger-schema",
+          "cmp.daml.tests",
+          "cmp.daml.formal-ledger-core"
+        ],
+        "description": "Formal obligations must stay mapped to Daml source, Daml Script evidence, bounded checker results, and explicit assumptions."
       },
       {
         "id": "tb.interop.plugin-boundary",

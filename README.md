@@ -166,13 +166,13 @@ Default GitHub PR CI runs on GitHub-hosted Ubuntu with Node 24.x, Temurin Java 1
 
 ## Daml/Canton toolchain
 
-This repo uses DPM, not the removed `daml` assistant. The package is pinned to SDK `3.5.1-rc3` because that is the active local DPM SDK in this workspace.
+This repo uses DPM, not the deprecated `daml` assistant. The package `sdk-version` pins are the source of truth and are set to SDK `3.4.11`, the latest stable DPM SDK release reported by Digital Asset's stable installer endpoint during the hardening round.
 
 ```bash
-dpm version --active
+dpm install 3.4.11
 dpm build --all
 ./scripts/run-daml-tests.sh
 ```
 
-DPM install docs: <https://docs.digitalasset.com/build/3.5/dpm/dpm.html>
-Canton app development docs: <https://docs.digitalasset.com/build/3.5/overview/introduction.html>
+DPM install docs: <https://docs.digitalasset.com/build/3.4/dpm/dpm.html>
+Canton app development docs: <https://docs.digitalasset.com/build/3.4/overview/introduction.html>

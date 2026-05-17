@@ -1,0 +1,300 @@
+{
+  "artifact": "passport_formal_obligations",
+  "schemaVersion": "0.1.0",
+  "target": "Passport Daml ledger core",
+  "pinnedSource": "git:HEAD",
+  "surface": "cmp.daml.ledger-schema",
+  "checker": "npm run hardening:formal",
+  "result_status": "bounded-pass",
+  "model": {
+    "path": "hardening/formal/daml-ledger-core/reference-model.mjs",
+    "status": "bounded-pass",
+    "bounds": {
+      "presentedReservableAmounts": [
+        "1.0",
+        "20.0",
+        "50.0"
+      ],
+      "reservedAmountDeltas": [
+        "-1.0",
+        "0.0",
+        "1.0",
+        "full",
+        "over-by-1.0"
+      ],
+      "actorShape": "holder, attester, verifier, policyPublisher, handoffRecipient, auditor, outsider are distinct in lineage and visibility checks"
+    }
+  },
+  "proof_obligations": [
+    {
+      "id": "PO-DAML-001",
+      "statement": "Reservations are positive and cannot exceed the presented reservable amount.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.daml.capacity-conservation"
+        ],
+        "properties": [
+          "prop.daml.reservation-positive-bounded"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run daml:test",
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:372",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:373",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:374",
+          "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml:17"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "contains": [
+            "assertMsg \"reserved amount must be positive\" (positive reservedAmount)",
+            "assertMsg \"cannot reserve more than presented reservable amount\" (reservedAmount <= presentedReservableAmount)"
+          ]
+        },
+        {
+          "file": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+          "contains": [
+            "t007_reject_over_reservation",
+            "submitMustFail"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO-DAML-002",
+      "statement": "Residual capacity is subtractive and cannot create more capacity than the presentation supplied.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.daml.capacity-conservation"
+        ],
+        "properties": [
+          "prop.daml.residual-capacity-subtractive"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run daml:test",
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:392",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:401",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:410",
+          "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml:34"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "contains": [
+            "residualCid <- if reservedAmount < presentedReservableAmount",
+            "capacityAmount = presentedReservableAmount - reservedAmount",
+            "reservableAmount = presentedReservableAmount - reservedAmount"
+          ]
+        },
+        {
+          "file": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+          "contains": [
+            "t008_consume_and_reissue_residual_capacity"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO-DAML-003",
+      "statement": "Handoff records are metadata-only, nonconsuming, and do not widen reservation visibility.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.scope.passport-public-core-boundary"
+        ],
+        "properties": [
+          "prop.scope.reservation-handoff-covered"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run daml:test",
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:489",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:490",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:552",
+          "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml:73"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "contains": [
+            "nonconsuming choice CreateReservationHandoff",
+            "template ReservationHandoffInstruction",
+            "observer handoffRecipient"
+          ]
+        },
+        {
+          "file": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+          "contains": [
+            "handoff is nonconsuming and keeps reservation active",
+            "handoff recipient should not see reservation through reservation-level observer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO-DAML-004",
+      "statement": "Released credentials preserve reservation policy publisher even when publisher and verifier differ.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.daml.reservation-lineage"
+        ],
+        "properties": [
+          "prop.daml.release-preserves-policy-publisher"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run daml:test",
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:376",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:431",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:456",
+          "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml:118"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "contains": [
+            "template CapacityReservation",
+            "policyPublisher : Party",
+            "policyPublisher"
+          ],
+          "excludes": [
+            "policyPublisher = verifier"
+          ]
+        },
+        {
+          "file": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+          "contains": [
+            "t023_release_preserves_policy_publisher",
+            "test setup keeps policy publisher distinct from verifier",
+            "released credential should preserve original policy publisher"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO-DAML-005",
+      "statement": "Externally relevant Daml choices remain controlled by holder, attester, verifier, or publisher role sets.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.daml.authorization"
+        ],
+        "properties": [
+          "prop.daml.controllers-match-authority"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run daml:test",
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:38",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:195",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:251",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:370",
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml:450"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "contains": [
+            "controller holder",
+            "controller holder, attester",
+            "controller holder, attester, verifier",
+            "controller policyPublisher",
+            "controller attester"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO-DAML-006",
+      "statement": "Formal obligations are mapped to invariant properties, implementation references, and active evidence commands.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.daml.formal-ledger-core"
+        ],
+        "properties": [
+          "prop.daml.formal-obligations-mapped"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "hardening/formal/daml-ledger-core/FORMAL_LADDER.md:1",
+          "hardening/formal/daml-ledger-core/obligations.json:1",
+          "hardening/scripts/validate-formal.mjs:1"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
+          "contains": [
+            "## S0. Security Objective",
+            "## S6. Assumption Register",
+            "result_status: bounded-pass"
+          ]
+        },
+        {
+          "file": "package.json",
+          "contains": [
+            "\"hardening:formal\": \"node hardening/scripts/validate-formal.mjs\""
+          ]
+        }
+      ]
+    }
+  ]
+}

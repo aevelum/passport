@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 120" fill="none" role="img" aria-label="Aevelum logo for dark mode">
+  <title>Aevelum logo for dark mode</title>
+  <desc>A horizontal Aevelum logo lockup with the overlapping arches icon and lowercase Aevelum wordmark for dark surfaces.</desc>
+  <defs>
+    <linearGradient id="aevelumLogoDarkSurface" x1="14" y1="20" x2="88" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F3A"/>
+      <stop offset="100%" stop-color="#07111A"/>
+    </linearGradient>
+    <filter id="aevelumLogoDarkShadow" x="0" y="0" width="1024" height="1024" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="76" flood-color="#07111A" flood-opacity="0.28" stdDeviation="64"/>
+    </filter>
+  </defs>
+
+  <rect x="8" y="18" width="84" height="84" rx="16" fill="url(#aevelumLogoDarkSurface)"/>
+  <rect x="7" y="17" width="86" height="86" rx="17" stroke="#5F6673" stroke-opacity="0.95" stroke-width="2"/>
+
+  <g filter="url(#aevelumLogoDarkShadow)" transform="translate(10 20) scale(0.078125)">
+    <path
+      fill="#F8FAFC"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M512 116
+         L892 848
+         H776
+         L512 344
+         L248 848
+         H132
+         L512 116Z
+         M512 260
+         L316 640
+         H708
+         L512 260Z"/>
+    <path
+      fill="#BD9B6B"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M512 452
+         L708 848
+         H608
+         L512 656
+         L416 848
+         H316
+         L512 452Z
+         M512 572
+         L424 748
+         H600
+         L512 572Z"/>
+  </g>
+
+  <text x="116" y="74" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="46" font-weight="700" fill="#F8FAFC">aevelum</text>
+</svg>

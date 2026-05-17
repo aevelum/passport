@@ -1,5 +1,11 @@
 # Design Change Log
 
+## 2026-05-15 - Aevelum Logo Lockups
+
+- Added light and dark horizontal Aevelum logo lockups with the overlapping arches icon plus the lowercase Aevelum wordmark.
+- Kept the lockups on the approved navy, slate, off-white, and restrained gold brand palette.
+- Regenerated matching Aevelum and Passport PNG logo derivatives from the SVG sources.
+
 ## 2026-05-14 - Aevelum Icon Variants
 
 - Added light and dark Aevelum icon logo SVG sources for generic product and brand usage.

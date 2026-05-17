@@ -46,3 +46,28 @@
 - Replaced the strict self-hosted offline PR runner contract with standard GitHub-hosted Ubuntu CI using explicit Node 24, Java 17, DPM SDK `3.5.1-rc3`, npm lockfile install, and cached DPM components.
 - Kept repo-authored validation and generation network-bounded: CDM schema refreshes remain explicit vendoring commands, while default gates do not fetch schemas, plugin code, or mutable runtime inputs.
 - Updated repo guidance, architecture policy, and invariant-map CI properties so future changes enforce standard hosted CI rather than a custom `passport-offline-ci` runner.
+
+## 2026-05-15 - round-0006
+
+- Added a bounded formal Daml ledger core lane under `hardening/formal/daml-ledger-core/` with an S0-S6 ladder, proof-obligation registry, TLA-style reservation model, and executable bounded reference model.
+- Added `npm run hardening:formal` and wired it into default CI before `npm run hardening:gate`, Daml tests, and Canton smoke.
+- Mapped formal obligations into the invariant map through `inv.daml.formal-ledger-core` and guarded them with `test.hardening.formal-ledger-core`.
+- Added `inv.daml.reservation-lineage` and `prop.daml.release-preserves-policy-publisher` so reservation release preserves the original policy publisher when publisher and verifier differ.
+- Updated `CapacityReservation` to carry `policyPublisher`, updated `ReleaseReservation` to reuse it, and added a Daml Script regression test with distinct policy publisher and verifier parties.
+
+## 2026-05-15 - round-0007
+
+- Added a CDM schema tamper negative case to `validateNegativeCases`: validation copies the committed schema set, mutates a schema without updating `manifest.json`, and requires manifest verification to reject it before AJV registration.
+- Exposed `verifySchemaManifestAt` so the tamper falsifier can run against a temporary schema set without mutating committed vendor files.
+- Tightened `npm run hardening:gate` and `npm run gate` so generated interop reports must include passing `negative-cdm-schema-manifest-tamper` evidence.
+- Updated CDM readiness metadata, the invariant map, and the hardening frontier to mark the schema-substitution path as covered by an executable falsifier.
+- Updated the repo-local Passport hardening skill and root instructions with a non-theatre filter: formal artifacts, ADRs, and policy text must map to executable evidence or stay as follow-up assumptions.
+
+## 2026-05-15 - round-0008
+
+- Migrated the default DPM SDK pin from active RC `3.5.1-rc3` to the latest stable release returned by Digital Asset's stable installer endpoint, `3.4.11`.
+- Updated package `daml.yaml` files, GitHub Actions DPM install/cache/verification, README toolchain docs, architecture policy, and gate metadata to use the same stable SDK pin.
+- Added `prop.ci.dpm-sdk-pins-consistent` to the invariant map so DPM migrations are treated as hardening-sensitive CI/toolchain changes rather than ad hoc version edits.
+- Tightened `npm run hardening:gate` with `checkDpmSdkPins`, which rejects mismatched package/workflow/docs/policy/gate SDK pins and rejects default RC or snapshot DPM pins.
+- Changed `scripts/run-daml-tests.sh` to run Daml Script tests from `packages/passport-tests` after SDK `3.4.11` exposed that the previous `dpm test --package-root` path could build packages but fail test dependency resolution.
+- Recorded the stress-test result in `hardening/rounds/round-0008.md`: the hardening loop surfaced a real drift class and converted it into an executable static gate.

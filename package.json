@@ -11,6 +11,7 @@
     "interop:vendor:cdm": "node scripts/interop-vendor-cdm.mjs",
     "hardening:map": "node hardening/scripts/validate-map.mjs",
     "hardening:frontier": "node hardening/scripts/score-frontier.mjs",
+    "hardening:formal": "node hardening/scripts/validate-formal.mjs",
     "hardening:select": "node hardening/scripts/select-round.mjs",
     "hardening:gate": "node hardening/scripts/hardening-gate.mjs",
     "gate": "node scripts/gates.mjs",
