@@ -4,9 +4,15 @@ const STATUS = Object.freeze({
 });
 
 function reserve(presentation, reservedAmount) {
+  const now = presentation.now ?? 0;
+  const presentationValidUntilTime = presentation.presentationValidUntilTime ?? 100;
+  const reservationValidUntilTime = presentation.reservationValidUntilTime ?? presentationValidUntilTime;
   if (!presentation.reservationAllowed) return { status: STATUS.REJECTED, reason: 'reservation-disabled' };
+  if (now >= presentationValidUntilTime) return { status: STATUS.REJECTED, reason: 'presentation-expired' };
   if (reservedAmount <= 0) return { status: STATUS.REJECTED, reason: 'non-positive' };
   if (reservedAmount > presentation.presentedReservableAmount) return { status: STATUS.REJECTED, reason: 'over-reservation' };
+  if (reservationValidUntilTime <= now) return { status: STATUS.REJECTED, reason: 'reservation-expired-at-create' };
+  if (reservationValidUntilTime > presentationValidUntilTime) return { status: STATUS.REJECTED, reason: 'reservation-outlives-presentation' };
 
   const reservation = {
     id: `reservation-${reservedAmount}`,
@@ -15,6 +21,12 @@ function reserve(presentation, reservedAmount) {
     verifier: presentation.verifier,
     policyPublisher: presentation.policyPublisher,
     reservedAmount,
+    reservedAtTime: now,
+    validUntilTime: reservationValidUntilTime,
+    credentialValuationTime: presentation.credentialValuationTime ?? 0,
+    credentialValidFromTime: presentation.credentialValidFromTime ?? 0,
+    credentialValidUntilTime: presentation.credentialValidUntilTime ?? presentationValidUntilTime,
+    credentialFreshUntilTime: presentation.credentialFreshUntilTime ?? presentationValidUntilTime,
     active: true,
     visibleTo: new Set([presentation.holder, presentation.attester, presentation.verifier])
   };
@@ -26,6 +38,10 @@ function reserve(presentation, reservedAmount) {
         attester: presentation.attester,
         policyPublisher: presentation.policyPublisher,
         reservableAmount: residualAmount,
+        valuationTime: reservation.credentialValuationTime,
+        validFromTime: reservation.credentialValidFromTime,
+        validUntilTime: reservation.credentialValidUntilTime,
+        freshUntilTime: reservation.credentialFreshUntilTime,
         visibleTo: new Set([presentation.holder, presentation.attester])
       }
     : null;
@@ -41,7 +57,39 @@ function release(reservation) {
     attester: reservation.attester,
     policyPublisher: reservation.policyPublisher,
     reservableAmount: reservation.reservedAmount,
+    valuationTime: reservation.credentialValuationTime,
+    validFromTime: reservation.credentialValidFromTime,
+    validUntilTime: reservation.credentialValidUntilTime,
+    freshUntilTime: reservation.credentialFreshUntilTime,
     visibleTo: new Set([reservation.holder, reservation.attester])
+  };
+}
+
+function policyActive(policy, now) {
+  return policy.status === STATUS.ACTIVE
+    && now >= policy.validFromTime
+    && now < policy.validUntilTime;
+}
+
+function presentCredential(credential, now) {
+  if (now < credential.validFromTime) return { status: STATUS.REJECTED, reason: 'credential-not-yet-valid' };
+  if (now >= credential.validUntilTime) return { status: STATUS.REJECTED, reason: 'credential-expired' };
+  if (now >= credential.freshUntilTime) return { status: STATUS.REJECTED, reason: 'credential-stale' };
+  return {
+    status: STATUS.ACTIVE,
+    presentation: {
+      holder: credential.holder,
+      attester: credential.attester,
+      verifier: credential.verifier,
+      policyPublisher: credential.policyPublisher,
+      presentedReservableAmount: credential.reservableAmount,
+      reservationAllowed: credential.reservableAmount > 0,
+      credentialValuationTime: credential.valuationTime,
+      credentialValidFromTime: credential.validFromTime,
+      credentialValidUntilTime: credential.validUntilTime,
+      credentialFreshUntilTime: credential.freshUntilTime,
+      presentationValidUntilTime: Math.min(credential.validUntilTime, credential.freshUntilTime)
+    }
   };
 }
 
@@ -126,7 +174,14 @@ export function runBoundedReservationModel() {
     verifier: actors.verifier,
     policyPublisher: actors.policyPublisher,
     presentedReservableAmount: 50,
-    reservationAllowed: true
+    reservationAllowed: true,
+    credentialValuationTime: 0,
+    credentialValidFromTime: 0,
+    credentialValidUntilTime: 20,
+    credentialFreshUntilTime: 10,
+    presentationValidUntilTime: 10,
+    now: 1,
+    reservationValidUntilTime: 5
   };
   const reserved = reserve(presentation, 20);
   check(reserved.status === STATUS.ACTIVE, 'PO-DAML-001', 'setup reservation is valid', failures, checks);
@@ -160,6 +215,48 @@ export function runBoundedReservationModel() {
       && emptyGrant.status === STATUS.REJECTED,
     'PO-DAML-005',
     'audit grant visibility is scoped and empty allowed fields are rejected',
+    failures,
+    checks
+  );
+
+  const policy = { status: STATUS.ACTIVE, validFromTime: 0, validUntilTime: 10 };
+  const credential = {
+    holder: actors.holder,
+    attester: actors.attester,
+    verifier: actors.verifier,
+    policyPublisher: actors.policyPublisher,
+    reservableAmount: 50,
+    valuationTime: 0,
+    validFromTime: 0,
+    validUntilTime: 20,
+    freshUntilTime: 10
+  };
+  const freshPresentation = presentCredential(credential, 5);
+  const stalePresentation = presentCredential(credential, 10);
+  const expiredPresentation = freshPresentation.status === STATUS.ACTIVE
+    ? reserve({ ...freshPresentation.presentation, now: 10, reservationValidUntilTime: 11 }, 10)
+    : { status: STATUS.REJECTED };
+  const outlivingReservation = freshPresentation.status === STATUS.ACTIVE
+    ? reserve({ ...freshPresentation.presentation, now: 5, reservationValidUntilTime: 11 }, 10)
+    : { status: STATUS.REJECTED };
+  const validReservation = freshPresentation.status === STATUS.ACTIVE
+    ? reserve({ ...freshPresentation.presentation, now: 5, reservationValidUntilTime: 8 }, 10)
+    : { status: STATUS.REJECTED };
+  const releasedFreshness = validReservation.status === STATUS.ACTIVE
+    ? release(validReservation.reservation)
+    : { status: STATUS.REJECTED };
+  check(
+    policyActive(policy, 5)
+      && !policyActive(policy, 10)
+      && freshPresentation.status === STATUS.ACTIVE
+      && stalePresentation.status === STATUS.REJECTED
+      && expiredPresentation.status === STATUS.REJECTED
+      && outlivingReservation.status === STATUS.REJECTED
+      && validReservation.status === STATUS.ACTIVE
+      && releasedFreshness.freshUntilTime === credential.freshUntilTime
+      && validReservation.residualCredential?.freshUntilTime === credential.freshUntilTime,
+    'PO-DAML-007',
+    'typed time policy, freshness, presentation, reservation, residual, and release checks',
     failures,
     checks
   );

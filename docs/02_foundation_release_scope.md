@@ -8,6 +8,8 @@ Passport records readiness. It models collateral-capacity accounts, collateral p
 
 Passport may record a reservation handoff notice. The notice is for downstream readiness metadata only. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, or move collateral.
 
+Passport 0.2.0 adds ledger-comparable Daml `Time` fields for policy validity, credential valuation and freshness, presentation validity, and reservation validity. These typed fields are authoritative for validation. ISO timestamp text fields are retained as display and interop metadata only.
+
 CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Aevelum Passport demonstrates a roomless Canton-native collateral credential account for repo pre-trade capacity verification and reservation.
@@ -35,6 +37,7 @@ The public core proves one committee-ready readiness workflow:
 - Framework-neutral interop adapter surface.
 - CDM 6.0 collateral eligibility plugin at Level 2 — Artifact Conformance.
 - Local structural gates.
+- Typed Daml `Time` validity and freshness fields for downstream ledger-time comparison.
 
 ## Out of scope
 

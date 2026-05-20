@@ -6,7 +6,7 @@ import { defineAdapterPlugin, pluginIdentity } from '../../core/adapter.js';
 import { CDM_READINESS } from './readiness.js';
 import { cdmVersion, rootSchemas, schemaDir, verifySchemaManifest, verifySchemaManifestAt, walkSchemaFiles } from './vendor.js';
 
-const adapterVersion = '0.1.0';
+const adapterVersion = '0.2.0';
 const decisionMirrorWarning = 'CheckEligibilityResult mirrors the Passport sample decision; no CDM eligibility engine is executed.';
 const artifactSchemas = Object.freeze({
   'eligible-collateral-specification': rootSchemas[0],

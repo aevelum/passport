@@ -20,12 +20,14 @@ t007_reject_over_reservation = script do
   let holder = presented.base.actors.holder
   let dealer = presented.base.actors.dealer
   let attester = presented.base.actors.attester
+  setTime reservationLedgerTime
   submitMustFail (actAs holder <> actAs attester <> actAs dealer) do
     exerciseCmd presented.presentationCid ReserveFromPresentation with
       reservationId = "reservation-over-001"
       reservedAmount = 60000000.0
       reservationPurpose = RepoPreTradeReservation
       reservationValidUntil = "2026-05-10T04:03:00Z"
+      reservationValidUntilTime = demoReservationValidUntilTime
       residualCredentialId = "credential-residual-over-001"
   dealerReservations <- query @CapacityReservation dealer
   assertMsg "over reservation should not create a reservation" (length dealerReservations == 0)
@@ -46,6 +48,7 @@ t009_release_reservation = script do
   let holder = reserved.presented.base.actors.holder
   let dealer = reserved.presented.base.actors.dealer
   let attester = reserved.presented.base.actors.attester
+  setTime releaseLedgerTime
   _releasedCredentialCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
     exerciseCmd reserved.reservationCid ReleaseReservation with
       releasedCredentialId = "credential-released-009"
@@ -60,6 +63,7 @@ t019_expire_reservation = script do
   let holder = reserved.presented.base.actors.holder
   let dealer = reserved.presented.base.actors.dealer
   let attester = reserved.presented.base.actors.attester
+  setTime reservationExpiredLedgerTime
   _revocationCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
     exerciseCmd reserved.reservationCid ExpireReservation with
       revocationId = "reservation-expiration-001"
@@ -78,12 +82,13 @@ t020_create_reservation_handoff = script do
   let attester = reserved.presented.base.actors.attester
   let recipient = reserved.presented.base.actors.operator
   let auditor = reserved.presented.base.actors.auditor
+  setTime releaseLedgerTime
   _handoffCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
     exerciseCmd reserved.reservationCid CreateReservationHandoff with
       handoffId = "reservation-handoff-001"
       handoffRecipient = recipient
       handoffPurpose = "repo pre-trade readiness handoff"
-      handoffCreatedAt = "2026-05-10T05:15:00Z"
+      handoffCreatedAt = "2026-05-10T01:15:00Z"
   recipientHandoffs <- query @ReservationHandoffInstruction recipient
   dealerReservations <- query @CapacityReservation dealer
   recipientReservations <- query @CapacityReservation recipient
@@ -103,6 +108,7 @@ t021_dispute_reservation = script do
   let holder = reserved.presented.base.actors.holder
   let dealer = reserved.presented.base.actors.dealer
   let attester = reserved.presented.base.actors.attester
+  setTime releaseLedgerTime
   _disputeCid <- submit (actAs holder <> actAs attester <> actAs dealer) do
     exerciseCmd reserved.reservationCid DisputeReservation with
       disputeId = "reservation-dispute-001"
@@ -129,7 +135,7 @@ t023_release_preserves_policy_publisher = script do
       holder
       operator = Some policyPublisher
       displayName = "Policy Publisher Preservation Account"
-      schemaVersion = "foundation-0.1"
+      schemaVersion = "foundation-0.2"
       createdAt = "2026-05-10T00:00:00Z"
       status = AccountActive
 
@@ -148,10 +154,13 @@ t023_release_preserves_policy_publisher = script do
       freshnessWindowHours = 24
       reservationAllowed = True
       validFrom = "2026-05-10T00:00:00Z"
-      validUntil = "2026-05-11T00:00:00Z"
-      schemaVersion = "foundation-0.1"
+      validFromTime = policyValidFromTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime = policyValidUntilTime
+      schemaVersion = "foundation-0.2"
       status = PolicyActive
 
+  setTime requestLedgerTime
   requestCid <- submit holder do
     exerciseCmd accountCid RequestCapacityCredential with
       requestId = "request-separate-publisher-001"
@@ -164,20 +173,26 @@ t023_release_preserves_policy_publisher = script do
       purpose = RepoPreTrade
       requestedAt = "2026-05-10T00:01:00Z"
 
+  setTime credentialValuationLedgerTime
   credentialCid <- submit (actAs holder <> actAs attester) do
     exerciseCmd requestCid IssueCapacityCredential with
       credentialId = "credential-separate-publisher-001"
       capacityAmount = 40000000.0
       capacityBand = AtLeast 40000000.0
       haircutScheduleRef = "haircut-separate-publisher-v1"
-      valuationTime = "2026-05-10T00:02:00Z"
+      valuationTimestamp = "2026-05-10T00:02:00Z"
+      valuationTime = credentialValuationLedgerTime
       validFrom = "2026-05-10T00:02:00Z"
-      validUntil = "2026-05-11T00:02:00Z"
+      validFromTime = credentialValuationLedgerTime
+      validUntil = "2026-05-12T00:02:00Z"
+      validUntilTime = demoCredentialValidUntilTime
+      freshnessWindowHours = 24
       evidenceManifestHash = "sha256:evidence-separate-publisher-001"
       calculationMethodHash = "sha256:calculation-separate-publisher-001"
       reservableAmount = 40000000.0
-      schemaVersion = "foundation-0.1"
+      schemaVersion = "foundation-0.2"
 
+  setTime presentationLedgerTime
   presentationCid <- submit holder do
     exerciseCmd credentialCid PresentToVerifier with
       presentationId = "presentation-separate-publisher-001"
@@ -185,14 +200,17 @@ t023_release_preserves_policy_publisher = script do
       presentationPurpose = RepoPreTrade
       presentedAt = "2026-05-10T00:03:00Z"
 
+  setTime reservationLedgerTime
   outcome <- submit (actAs holder <> actAs attester <> actAs verifier) do
     exerciseCmd presentationCid ReserveFromPresentation with
       reservationId = "reservation-separate-publisher-001"
       reservedAmount = 20000000.0
       reservationPurpose = RepoPreTradeReservation
       reservationValidUntil = "2026-05-10T04:03:00Z"
+      reservationValidUntilTime = demoReservationValidUntilTime
       residualCredentialId = "credential-residual-separate-publisher-001"
 
+  setTime releaseLedgerTime
   _releasedCredentialCid <- submit (actAs holder <> actAs attester <> actAs verifier) do
     exerciseCmd outcome.reservationCid ReleaseReservation with
       releasedCredentialId = "credential-released-separate-publisher-001"

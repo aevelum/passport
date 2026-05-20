@@ -1,5 +1,6 @@
 module Aevelum.Passport.Foundation where
 
+import DA.Time (addRelTime, hours)
 import Aevelum.Passport.Types
 
 -- Aevelum Passport Foundation.
@@ -37,6 +38,7 @@ template PassportAccount
         requestedAt : IsoTimestamp
       controller holder
       do
+        now <- getTime
         assertMsg "requested capacity must be positive" (positive requestedMinimumCapacity)
         create CredentialRequest with
           requestId
@@ -50,6 +52,7 @@ template PassportAccount
           capacityCurrency
           purpose
           requestedAt
+          requestedAtTime = now
           status = "Requested"
 
     nonconsuming choice GrantAuditDisclosureFromAccount : ContractId AuditDisclosureGrant
@@ -62,11 +65,14 @@ template PassportAccount
         allowedFields : [Text]
         evidenceManifestHash : EvidenceManifestHash
         validFrom : IsoTimestamp
+        validFromTime : Time
         validUntil : IsoTimestamp
+        validUntilTime : Time
         legalBasisRef : Text
       controller holder, attester
       do
         assertMsg "audit grant must name at least one allowed field" (not (null allowedFields))
+        assertMsg "audit grant validity window must be coherent" (coherentTimeWindow validFromTime validUntilTime)
         create AuditDisclosureGrant with
           grantId
           credentialId
@@ -77,7 +83,9 @@ template PassportAccount
           allowedFields
           evidenceManifestHash
           validFrom
+          validFromTime
           validUntil
+          validUntilTime
           legalBasisRef
           schemaVersion
 
@@ -103,14 +111,28 @@ template CollateralPolicy
     freshnessWindowHours : Int
     reservationAllowed : Bool
     validFrom : IsoTimestamp
+    validFromTime : Time
     validUntil : IsoTimestamp
+    validUntilTime : Time
     schemaVersion : Text
     status : PolicyStatus
   where
     signatory policyPublisher
     observer approvedHolders, approvedAttesters
 
-    ensure status == PolicyActive && positive minimumCapacity && freshnessWindowHours > 0
+    ensure
+      status == PolicyActive
+        && positive minimumCapacity
+        && freshnessWindowHours > 0
+        && coherentTimeWindow validFromTime validUntilTime
+
+    nonconsuming choice ValidatePolicyActiveAtLedgerTime : ()
+      controller policyPublisher
+      do
+        now <- getTime
+        assertMsg "policy not yet valid at ledger time" (now >= validFromTime)
+        assertMsg "policy expired at ledger time" (now < validUntilTime)
+        return ()
 
     choice RetirePolicy : ContractId PolicyLifecycleEvent
       with
@@ -118,6 +140,7 @@ template CollateralPolicy
         reason : Text
       controller policyPublisher
       do
+        now <- getTime
         create PolicyLifecycleEvent with
           eventId = policyId <> ":retired:" <> retiredAt
           policyId
@@ -125,6 +148,7 @@ template CollateralPolicy
           policyPublisher
           eventType = "Retired"
           eventTime = retiredAt
+          eventTimeValue = now
           reason
           schemaVersion
 
@@ -137,13 +161,16 @@ template CollateralPolicy
         amendedAt : IsoTimestamp
       controller policyPublisher
       do
+        now <- getTime
         assertMsg "new minimum capacity must be positive" (positive newMinimumCapacity)
+        assertMsg "amended policy must remain valid after ledger amendment time" (now < validUntilTime)
         create this with
           policyVersion = newPolicyVersion
           minimumCapacity = newMinimumCapacity
           haircutScheduleRef = newHaircutScheduleRef
           concentrationLimitRef = newConcentrationLimitRef
           validFrom = amendedAt
+          validFromTime = now
           status = PolicyActive
 
 template PolicyLifecycleEvent
@@ -154,6 +181,7 @@ template PolicyLifecycleEvent
     policyPublisher : Party
     eventType : Text
     eventTime : IsoTimestamp
+    eventTimeValue : Time
     reason : Text
     schemaVersion : Text
   where
@@ -172,6 +200,7 @@ template CredentialRequest
     capacityCurrency : CurrencyCode
     purpose : PresentationPurpose
     requestedAt : IsoTimestamp
+    requestedAtTime : Time
     status : Text
   where
     signatory holder
@@ -185,18 +214,29 @@ template CredentialRequest
         capacityAmount : Amount
         capacityBand : CapacityBand
         haircutScheduleRef : HaircutScheduleRef
-        valuationTime : IsoTimestamp
+        valuationTimestamp : IsoTimestamp
+        valuationTime : Time
         validFrom : IsoTimestamp
+        validFromTime : Time
         validUntil : IsoTimestamp
+        validUntilTime : Time
+        freshnessWindowHours : Int
         evidenceManifestHash : EvidenceManifestHash
         calculationMethodHash : CalculationMethodHash
         reservableAmount : Amount
         schemaVersion : Text
       controller holder, attester
       do
+        now <- getTime
+        let freshUntilTime = addRelTime valuationTime (hours freshnessWindowHours)
         assertMsg "capacity amount must meet requested minimum" (capacityAmount >= requestedMinimumCapacity)
         assertMsg "reservable amount cannot exceed credential capacity" (reservableAmount <= capacityAmount)
         assertMsg "reservable amount cannot be negative" (nonNegative reservableAmount)
+        assertMsg "credential validity window must be coherent" (coherentTimeWindow validFromTime validUntilTime)
+        assertMsg "credential valuation must be inside validity window" (withinTimeWindow valuationTime validFromTime validUntilTime)
+        assertMsg "credential freshness window must be positive" (freshnessWindowHours > 0)
+        assertMsg "credential must be active at issuance ledger time" (withinTimeWindow now validFromTime validUntilTime)
+        assertMsg "credential freshness expired at issuance ledger time" (now < freshUntilTime)
         create CapacityCredential with
           credentialId
           holder
@@ -208,9 +248,14 @@ template CredentialRequest
           capacityCurrency
           capacityBand
           haircutScheduleRef
+          valuationTimestamp
           valuationTime
           validFrom
+          validFromTime
           validUntil
+          validUntilTime
+          freshnessWindowHours
+          freshUntilTime
           evidenceManifestHash
           calculationMethodHash
           reservableAmount
@@ -229,9 +274,14 @@ template CapacityCredential
     capacityCurrency : CurrencyCode
     capacityBand : CapacityBand
     haircutScheduleRef : HaircutScheduleRef
-    valuationTime : IsoTimestamp
+    valuationTimestamp : IsoTimestamp
+    valuationTime : Time
     validFrom : IsoTimestamp
+    validFromTime : Time
     validUntil : IsoTimestamp
+    validUntilTime : Time
+    freshnessWindowHours : Int
+    freshUntilTime : Time
     evidenceManifestHash : EvidenceManifestHash
     calculationMethodHash : CalculationMethodHash
     reservableAmount : Amount
@@ -240,7 +290,15 @@ template CapacityCredential
   where
     signatory holder, attester
 
-    ensure status == CredentialActive && positive capacityAmount && reservableAmount <= capacityAmount && nonNegative reservableAmount
+    ensure
+      status == CredentialActive
+        && positive capacityAmount
+        && reservableAmount <= capacityAmount
+        && nonNegative reservableAmount
+        && coherentTimeWindow validFromTime validUntilTime
+        && withinTimeWindow valuationTime validFromTime validUntilTime
+        && freshnessWindowHours > 0
+        && freshUntilTime == addRelTime valuationTime (hours freshnessWindowHours)
 
     nonconsuming choice PresentToVerifier : ContractId CredentialPresentation
       with
@@ -250,6 +308,12 @@ template CapacityCredential
         presentedAt : IsoTimestamp
       controller holder
       do
+        now <- getTime
+        let presentationValidUntilTime =
+              if validUntilTime <= freshUntilTime then validUntilTime else freshUntilTime
+        assertMsg "credential not yet valid at presentation ledger time" (now >= validFromTime)
+        assertMsg "credential expired at presentation ledger time" (now < validUntilTime)
+        assertMsg "credential stale at presentation ledger time" (now < freshUntilTime)
         create CredentialPresentation with
           presentationId
           sourceCredentialCid = self
@@ -263,12 +327,21 @@ template CapacityCredential
           capacityBand
           capacityCurrency
           validUntil
+          validUntilTime
+          valuationTimestamp
+          valuationTime
+          validFrom
+          validFromTime
+          freshnessWindowHours
+          freshUntilTime
+          presentationValidUntilTime
           reservationAllowed = reservableAmount > 0.0
           presentedReservableAmount = reservableAmount
           evidenceManifestHash
           calculationMethodHash
           presentationPurpose
           presentedAt
+          presentedAtTime = now
           schemaVersion
 
     choice RevokeCredential : ContractId CredentialRevocation
@@ -280,6 +353,7 @@ template CapacityCredential
         supersedingCredentialId : Optional CredentialId
       controller attester
       do
+        now <- getTime
         create CredentialRevocation with
           revocationId
           credentialId
@@ -288,6 +362,7 @@ template CapacityCredential
           priorVerifiers
           reasonCode
           revokedAt
+          revokedAtTime = now
           supersedingCredentialId
           schemaVersion
 
@@ -298,6 +373,8 @@ template CapacityCredential
         priorVerifiers : [Party]
       controller holder, attester
       do
+        now <- getTime
+        assertMsg "credential cannot be expired before typed validity expiry" (now >= validUntilTime)
         create CredentialRevocation with
           revocationId
           credentialId
@@ -306,6 +383,7 @@ template CapacityCredential
           priorVerifiers
           reasonCode = CredentialExpiredReason
           revokedAt = expiredAt
+          revokedAtTime = now
           supersedingCredentialId = None
           schemaVersion
 
@@ -320,14 +398,20 @@ template CapacityCredential
         newCalculationMethodHash : CalculationMethodHash
       controller holder, attester
       do
+        now <- getTime
         assertMsg "new capacity amount must be positive" (positive newCapacityAmount)
         assertMsg "new reservable amount cannot exceed new capacity" (newReservableAmount <= newCapacityAmount)
+        assertMsg "new reservable amount cannot be negative" (nonNegative newReservableAmount)
+        assertMsg "credential must be active at supersession ledger time" (withinTimeWindow now validFromTime validUntilTime)
         create this with
           credentialId = newCredentialId
           capacityAmount = newCapacityAmount
           capacityBand = newCapacityBand
-          valuationTime = supersededAt
+          valuationTimestamp = supersededAt
+          valuationTime = now
           validFrom = supersededAt
+          validFromTime = now
+          freshUntilTime = addRelTime now (hours freshnessWindowHours)
           evidenceManifestHash = newEvidenceManifestHash
           calculationMethodHash = newCalculationMethodHash
           reservableAmount = newReservableAmount
@@ -347,18 +431,36 @@ template CredentialPresentation
     capacityBand : CapacityBand
     capacityCurrency : CurrencyCode
     validUntil : IsoTimestamp
+    validUntilTime : Time
+    valuationTimestamp : IsoTimestamp
+    valuationTime : Time
+    validFrom : IsoTimestamp
+    validFromTime : Time
+    freshnessWindowHours : Int
+    freshUntilTime : Time
+    presentationValidUntilTime : Time
     reservationAllowed : Bool
     presentedReservableAmount : Amount
     evidenceManifestHash : EvidenceManifestHash
     calculationMethodHash : CalculationMethodHash
     presentationPurpose : PresentationPurpose
     presentedAt : IsoTimestamp
+    presentedAtTime : Time
     schemaVersion : Text
   where
     signatory holder
     observer verifier, attester
 
-    ensure nonNegative presentedReservableAmount
+    ensure
+      nonNegative presentedReservableAmount
+        && coherentTimeWindow validFromTime validUntilTime
+        && withinTimeWindow valuationTime validFromTime validUntilTime
+        && freshnessWindowHours > 0
+        && freshUntilTime == addRelTime valuationTime (hours freshnessWindowHours)
+        && presentedAtTime >= validFromTime
+        && presentedAtTime < presentationValidUntilTime
+        && presentationValidUntilTime <= validUntilTime
+        && presentationValidUntilTime <= freshUntilTime
 
     choice ReserveFromPresentation : ReservationOutcome
       with
@@ -366,12 +468,17 @@ template CredentialPresentation
         reservedAmount : Amount
         reservationPurpose : ReservationPurpose
         reservationValidUntil : IsoTimestamp
+        reservationValidUntilTime : Time
         residualCredentialId : CredentialId
       controller holder, attester, verifier
       do
+        now <- getTime
         assertMsg "reservation must be allowed" reservationAllowed
+        assertMsg "presentation expired at reservation ledger time" (now < presentationValidUntilTime)
         assertMsg "reserved amount must be positive" (positive reservedAmount)
         assertMsg "cannot reserve more than presented reservable amount" (reservedAmount <= presentedReservableAmount)
+        assertMsg "reservation validity must be after ledger reservation time" (reservationValidUntilTime > now)
+        assertMsg "reservation cannot outlive typed presentation validity" (reservationValidUntilTime <= presentationValidUntilTime)
         archive sourceCredentialCid
         reservationCid <- create CapacityReservation with
           reservationId
@@ -384,7 +491,17 @@ template CredentialPresentation
           currency = capacityCurrency
           policyId
           policyVersion
+          reservedAtTime = now
           validUntil = reservationValidUntil
+          validUntilTime = reservationValidUntilTime
+          credentialValuationTimestamp = valuationTimestamp
+          credentialValuationTime = valuationTime
+          credentialValidFrom = validFrom
+          credentialValidFromTime = validFromTime
+          credentialValidUntil = validUntil
+          credentialValidUntilTime = validUntilTime
+          credentialFreshnessWindowHours = freshnessWindowHours
+          credentialFreshUntilTime = freshUntilTime
           reservationPurpose
           status = ReservationActive
           evidenceManifestHash
@@ -403,9 +520,14 @@ template CredentialPresentation
               capacityCurrency
               capacityBand = AtLeast (presentedReservableAmount - reservedAmount)
               haircutScheduleRef = "residual-from-" <> credentialId
-              valuationTime = presentedAt
-              validFrom = presentedAt
+              valuationTimestamp
+              valuationTime
+              validFrom
+              validFromTime
               validUntil
+              validUntilTime
+              freshnessWindowHours
+              freshUntilTime
               evidenceManifestHash
               calculationMethodHash
               reservableAmount = presentedReservableAmount - reservedAmount
@@ -434,7 +556,17 @@ template CapacityReservation
     currency : CurrencyCode
     policyId : PolicyId
     policyVersion : PolicyVersion
+    reservedAtTime : Time
     validUntil : IsoTimestamp
+    validUntilTime : Time
+    credentialValuationTimestamp : IsoTimestamp
+    credentialValuationTime : Time
+    credentialValidFrom : IsoTimestamp
+    credentialValidFromTime : Time
+    credentialValidUntil : IsoTimestamp
+    credentialValidUntilTime : Time
+    credentialFreshnessWindowHours : Int
+    credentialFreshUntilTime : Time
     reservationPurpose : ReservationPurpose
     status : ReservationStatus
     evidenceManifestHash : EvidenceManifestHash
@@ -443,7 +575,16 @@ template CapacityReservation
   where
     signatory holder, attester, verifier
 
-    ensure status == ReservationActive && positive reservedAmount
+    ensure
+      status == ReservationActive
+        && positive reservedAmount
+        && validUntilTime > reservedAtTime
+        && coherentTimeWindow credentialValidFromTime credentialValidUntilTime
+        && withinTimeWindow credentialValuationTime credentialValidFromTime credentialValidUntilTime
+        && credentialFreshnessWindowHours > 0
+        && credentialFreshUntilTime == addRelTime credentialValuationTime (hours credentialFreshnessWindowHours)
+        && validUntilTime <= credentialValidUntilTime
+        && validUntilTime <= credentialFreshUntilTime
 
     choice ReleaseReservation : ContractId CapacityCredential
       with
@@ -451,6 +592,8 @@ template CapacityReservation
         releasedAt : IsoTimestamp
       controller holder, attester, verifier
       do
+        now <- getTime
+        assertMsg "reservation expired at release ledger time" (now < validUntilTime)
         create CapacityCredential with
           credentialId = releasedCredentialId
           holder
@@ -462,9 +605,14 @@ template CapacityReservation
           capacityCurrency = currency
           capacityBand = AtLeast reservedAmount
           haircutScheduleRef = "released-from-" <> reservationId
-          valuationTime = releasedAt
-          validFrom = releasedAt
-          validUntil
+          valuationTimestamp = credentialValuationTimestamp
+          valuationTime = credentialValuationTime
+          validFrom = credentialValidFrom
+          validFromTime = credentialValidFromTime
+          validUntil = credentialValidUntil
+          validUntilTime = credentialValidUntilTime
+          freshnessWindowHours = credentialFreshnessWindowHours
+          freshUntilTime = credentialFreshUntilTime
           evidenceManifestHash
           calculationMethodHash
           reservableAmount = reservedAmount
@@ -477,6 +625,8 @@ template CapacityReservation
         expiredAt : IsoTimestamp
       controller holder, attester, verifier
       do
+        now <- getTime
+        assertMsg "reservation cannot be expired before typed validity expiry" (now >= validUntilTime)
         create CredentialRevocation with
           revocationId
           credentialId = sourceCredentialId
@@ -485,6 +635,7 @@ template CapacityReservation
           priorVerifiers = [verifier]
           reasonCode = CredentialExpiredReason
           revokedAt = expiredAt
+          revokedAtTime = now
           supersedingCredentialId = None
           schemaVersion
 
@@ -497,6 +648,8 @@ template CapacityReservation
         handoffCreatedAt : IsoTimestamp
       controller holder, attester, verifier
       do
+        now <- getTime
+        assertMsg "reservation expired at handoff ledger time" (now < validUntilTime)
         create ReservationHandoffInstruction with
           handoffId
           reservationId
@@ -510,6 +663,7 @@ template CapacityReservation
           policyVersion
           handoffPurpose
           handoffCreatedAt
+          handoffCreatedAtTime = now
           evidenceManifestHash
           schemaVersion
 
@@ -521,7 +675,9 @@ template CapacityReservation
         disputedAt : IsoTimestamp
       controller holder, attester, verifier
       do
+        now <- getTime
         assertMsg "disputing party must be part of reservation" (elem disputedBy [holder, attester, verifier])
+        assertMsg "reservation expired at dispute ledger time" (now < validUntilTime)
         create ReservationDispute with
           disputeId
           reservationId
@@ -531,6 +687,7 @@ template CapacityReservation
           disputedBy
           disputeReason
           disputedAt
+          disputedAtTime = now
           schemaVersion
 
 -- This handoff records readiness metadata for a downstream system. It does not execute, settle, transfer, custody, or move collateral.
@@ -548,6 +705,7 @@ template ReservationHandoffInstruction
     policyVersion : PolicyVersion
     handoffPurpose : Text
     handoffCreatedAt : IsoTimestamp
+    handoffCreatedAtTime : Time
     evidenceManifestHash : EvidenceManifestHash
     schemaVersion : Text
   where
@@ -564,6 +722,7 @@ template ReservationDispute
     disputedBy : Party
     disputeReason : Text
     disputedAt : IsoTimestamp
+    disputedAtTime : Time
     schemaVersion : Text
   where
     signatory disputedBy
@@ -578,6 +737,7 @@ template CredentialRevocation
     priorVerifiers : [Party]
     reasonCode : RevocationReason
     revokedAt : IsoTimestamp
+    revokedAtTime : Time
     supersedingCredentialId : Optional CredentialId
     schemaVersion : Text
   where
@@ -595,11 +755,13 @@ template AuditDisclosureGrant
     allowedFields : [Text]
     evidenceManifestHash : EvidenceManifestHash
     validFrom : IsoTimestamp
+    validFromTime : Time
     validUntil : IsoTimestamp
+    validUntilTime : Time
     legalBasisRef : Text
     schemaVersion : Text
   where
     signatory holder, attester
     observer auditor
 
-    ensure not (null allowedFields)
+    ensure not (null allowedFields) && coherentTimeWindow validFromTime validUntilTime

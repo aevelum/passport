@@ -10,6 +10,8 @@ It models collateral-capacity accounts, collateral policies, credential requests
 
 Passport records readiness. Passport may record a reservation handoff notice. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, or move collateral.
 
+Passport 0.2.0 exposes authoritative Daml `Time` fields for policy validity, credential valuation and freshness, presentation validity, and reservation validity. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
+
 CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Aevelum Passport demonstrates a roomless Canton-native collateral credential account for repo pre-trade capacity verification and reservation.
@@ -83,6 +85,7 @@ docs/
   07_non_goals.md
   08_brand_ui_system.md
   09_adapter_readiness_levels.md
+  10_release_notes.md
 design/
   tokens/colors.json
   change-log.md
@@ -133,6 +136,7 @@ The repo-local hardening loop is discoverable to Codex agents through `.agents/s
 ```bash
 npm run hardening:map
 npm run hardening:frontier
+npm run hardening:formal
 npm run hardening:gate
 ```
 

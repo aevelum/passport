@@ -29,7 +29,9 @@ t013_grant_scoped_audit_disclosure = script do
       allowedFields = ["credentialId", "evidenceManifestHash", "policyId", "policyVersion"]
       evidenceManifestHash = "sha256:evidence-demo-001"
       validFrom = "2026-05-10T00:00:00Z"
-      validUntil = "2026-05-11T00:00:00Z"
+      validFromTime = policyValidFromTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime = policyValidUntilTime
       legalBasisRef = "demo-audit-request"
   auditorGrants <- query @AuditDisclosureGrant base.actors.auditor
   assertMsg "auditor should see one scoped audit grant" (length auditorGrants == 1)
@@ -48,7 +50,9 @@ t014_auditor_cannot_see_unscoped_fields = script do
       allowedFields = ["credentialId", "evidenceManifestHash"]
       evidenceManifestHash = "sha256:evidence-demo-001"
       validFrom = "2026-05-10T00:00:00Z"
-      validUntil = "2026-05-11T00:00:00Z"
+      validFromTime = policyValidFromTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime = policyValidUntilTime
       legalBasisRef = "demo-audit-request"
   auditorCredentials <- query @CapacityCredential base.actors.auditor
   outsiderGrants <- query @AuditDisclosureGrant base.actors.outsider

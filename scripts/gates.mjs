@@ -172,6 +172,7 @@ const testFoundation = 'packages/passport-tests/daml/Aevelum/Passport/Test/Found
 const testPrivacy = 'packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml';
 const testReservation = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml';
 const testRevocation = 'packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml';
+const testTemporal = 'packages/passport-tests/daml/Aevelum/Passport/Test/TemporalTests.daml';
 const interopDoc = 'docs/06_interop_adapters.md';
 const interopSample = 'interop/samples/repo-pretrade-passport-input.json';
 const cdmSchemaRoot = 'interop/plugins/cdm/assets/schemas/6.0';
@@ -203,6 +204,7 @@ const requiredFiles = [
   testPrivacy,
   testReservation,
   testRevocation,
+  testTemporal,
   'docs/00_product_thesis.md',
   'docs/01_daml_as_spec.md',
   'docs/02_foundation_release_scope.md',
@@ -213,6 +215,7 @@ const requiredFiles = [
   'docs/07_non_goals.md',
   'docs/08_brand_ui_system.md',
   'docs/09_adapter_readiness_levels.md',
+  'docs/10_release_notes.md',
   'design/tokens/colors.json',
   'design/change-log.md',
   'AGENTS.md',
@@ -256,6 +259,7 @@ const requiredFiles = [
   'hardening/rounds/round-0006.md',
   'hardening/rounds/round-0007.md',
   'hardening/rounds/round-0008.md',
+  'hardening/rounds/round-0009.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -290,7 +294,13 @@ checkContains(coreFoundation, [
   'ReservationHandoffInstruction',
   'handoffRecipient',
   'RevokeCredential',
-  'GrantAuditDisclosureFromAccount'
+  'GrantAuditDisclosureFromAccount',
+  'validFromTime',
+  'validUntilTime',
+  'freshUntilTime',
+  'presentedAtTime',
+  'reservedAtTime',
+  'ValidatePolicyActiveAtLedgerTime'
 ]);
 
 checkContains(testFoundation, [
@@ -326,6 +336,16 @@ checkContains(testRevocation, [
   't011_reject_revoked_credential_reservation',
   't012_reject_expired_credential',
   't022_supersede_credential'
+]);
+
+checkContains(testTemporal, [
+  't024_policy_active_within_typed_validity_window',
+  't025_policy_rejected_after_typed_valid_until',
+  't026_credential_freshness_rejected_after_window',
+  't027_presentation_reservation_rejected_after_typed_validity_expiry',
+  't028_reservation_release_rejected_after_typed_validity_expiry',
+  't029_reservation_expiry_uses_typed_time',
+  't030_legacy_text_timestamps_metadata_only'
 ]);
 
 checkContains(interopDoc, [
@@ -591,7 +611,7 @@ try {
 const report = {
   artifact: 'gate_report',
   package: 'aevelum-passport-foundation',
-  version: '0.1.0',
+  version: '0.2.0',
   generatedAt: getGeneratedAt(),
   dpmSdk: '3.4.11',
   note: 'This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.',

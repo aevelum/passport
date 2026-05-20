@@ -107,3 +107,10 @@ nonNegative amount = amount >= 0.0
 
 positive : Amount -> Bool
 positive amount = amount > 0.0
+
+coherentTimeWindow : Time -> Time -> Bool
+coherentTimeWindow validFromTime validUntilTime = validUntilTime > validFromTime
+
+withinTimeWindow : Time -> Time -> Time -> Bool
+withinTimeWindow now validFromTime validUntilTime =
+  now >= validFromTime && now < validUntilTime

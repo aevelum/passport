@@ -8,7 +8,7 @@ fs.mkdirSync(artifacts, { recursive: true });
 const transcript = {
   artifact: 'demo_transcript',
   package: 'aevelum-passport-foundation',
-  version: '0.1.0',
+  version: '0.2.0',
   workflow: 'repo-pretrade-collateral-capacity',
   parties: {
     holder: 'AevelumDemoHolder',
@@ -38,6 +38,27 @@ const transcript = {
   },
   evidenceManifestHash: 'sha256:evidence-demo-001',
   calculationMethodHash: 'sha256:calculation-demo-001',
+  typedTimeValidation: {
+    policy: {
+      validFromTime: '2026-05-10T00:00:00Z',
+      validUntilTime: '2026-05-12T00:00:00Z'
+    },
+    credential: {
+      valuationTime: '2026-05-10T00:02:00Z',
+      validFromTime: '2026-05-10T00:02:00Z',
+      validUntilTime: '2026-05-12T00:02:00Z',
+      freshUntilTime: '2026-05-11T00:02:00Z'
+    },
+    presentation: {
+      presentedAtTime: '2026-05-10T00:03:00Z',
+      presentationValidUntilTime: '2026-05-11T00:02:00Z'
+    },
+    reservation: {
+      reservedAtTime: '2026-05-10T00:04:00Z',
+      validUntilTime: '2026-05-10T04:03:00Z'
+    },
+    textTimestampFields: 'display-and-interop metadata only'
+  },
   steps: [
     'Dealer publishes CollateralPolicy',
     'Holder creates PassportAccount',

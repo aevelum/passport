@@ -295,6 +295,73 @@
           ]
         }
       ]
+    },
+    {
+      "id": "PO-DAML-007",
+      "statement": "Typed Time fields are authoritative for policy validity, credential freshness, presentation validity, reservation validity, residual credentials, and released credentials.",
+      "status": "bounded-pass",
+      "maps_to": {
+        "invariants": [
+          "inv.daml.temporal-validity"
+        ],
+        "properties": [
+          "prop.daml.typed-time-authoritative",
+          "prop.daml.no-freshness-refresh-on-residual-release"
+        ]
+      },
+      "evidence": {
+        "test_ids": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "commands": [
+          "npm run daml:test",
+          "npm run hardening:formal"
+        ],
+        "source_refs": [
+          "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "packages/passport-tests/daml/Aevelum/Passport/Test/TemporalTests.daml",
+          "hardening/formal/daml-ledger-core/reference-model.mjs"
+        ]
+      },
+      "source_assertions": [
+        {
+          "file": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+          "contains": [
+            "validFromTime : Time",
+            "validUntilTime : Time",
+            "freshUntilTime : Time",
+            "presentedAtTime : Time",
+            "presentationValidUntilTime : Time",
+            "reservedAtTime : Time",
+            "ValidatePolicyActiveAtLedgerTime",
+            "now <- getTime",
+            "reservation cannot outlive typed presentation validity",
+            "valuationTime = credentialValuationTime",
+            "freshUntilTime = credentialFreshUntilTime"
+          ]
+        },
+        {
+          "file": "packages/passport-tests/daml/Aevelum/Passport/Test/TemporalTests.daml",
+          "contains": [
+            "t024_policy_active_within_typed_validity_window",
+            "t025_policy_rejected_after_typed_valid_until",
+            "t026_credential_freshness_rejected_after_window",
+            "t027_presentation_reservation_rejected_after_typed_validity_expiry",
+            "t028_reservation_release_rejected_after_typed_validity_expiry",
+            "t029_reservation_expiry_uses_typed_time",
+            "t030_legacy_text_timestamps_metadata_only"
+          ]
+        },
+        {
+          "file": "hardening/formal/daml-ledger-core/reference-model.mjs",
+          "contains": [
+            "PO-DAML-007",
+            "policyActive",
+            "presentCredential"
+          ]
+        }
+      ]
     }
   ]
 }

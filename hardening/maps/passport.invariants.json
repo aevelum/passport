@@ -19,12 +19,12 @@
     ],
     "source_inventory": [
       {
-        "path": "AGENTS.md",
-        "language": "markdown",
+        "path": ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+        "language": "yaml",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.agent.repo-guidance",
         "status": "semantics",
-        "notes": "Repository-level instructions that direct agents to repo-local skills and hardening gates."
+        "notes": "Codex app metadata for repo-local skill discovery and implicit invocation."
       },
       {
         "path": ".agents/skills/passport-hardening-loop/SKILL.md",
@@ -35,12 +35,12 @@
         "notes": "Codex-discoverable repo-local hardening skill."
       },
       {
-        "path": ".agents/skills/passport-hardening-loop/agents/openai.yaml",
+        "path": ".agents/skills/passport-ui-design-system/agents/openai.yaml",
         "language": "yaml",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.agent.repo-guidance",
         "status": "semantics",
-        "notes": "Codex app metadata for repo-local skill discovery and implicit invocation."
+        "notes": "Codex app metadata for UI design skill discovery and implicit invocation."
       },
       {
         "path": ".agents/skills/passport-ui-design-system/SKILL.md",
@@ -51,12 +51,20 @@
         "notes": "Codex-discoverable repo-local UI and brand design skill."
       },
       {
-        "path": ".agents/skills/passport-ui-design-system/agents/openai.yaml",
+        "path": ".github/workflows/ci.yml",
         "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Default GitHub-hosted PR workflow and explicit toolchain setup."
+      },
+      {
+        "path": "AGENTS.md",
+        "language": "markdown",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.agent.repo-guidance",
         "status": "semantics",
-        "notes": "Codex app metadata for UI design skill discovery and implicit invocation."
+        "notes": "Repository-level instructions that direct agents to repo-local skills and hardening gates."
       },
       {
         "path": "design/tokens/colors.json",
@@ -67,196 +75,12 @@
         "notes": "Machine-readable institutional finance color tokens."
       },
       {
-        "path": "docs/08_brand_ui_system.md",
-        "language": "markdown",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.agent.repo-guidance",
-        "status": "semantics",
-        "notes": "Human-readable brand and UI usage rules for future frontend development."
-      },
-      {
-        "path": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
-        "language": "daml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.ledger-schema",
-        "status": "breakdown",
-        "notes": "Normative templates, choices, parties, and state-transition guards."
-      },
-      {
-        "path": "packages/passport-core/daml/Aevelum/Passport/Types.daml",
-        "language": "daml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.domain-types",
-        "status": "semantics",
-        "notes": "Domain enums, identifiers, amount helpers, and non-goal boundary comments."
-      },
-      {
-        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml",
-        "language": "daml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.tests",
-        "status": "breakdown",
-        "notes": "Happy-path and lifecycle Daml Script coverage."
-      },
-      {
-        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml",
-        "language": "daml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.tests",
-        "status": "breakdown",
-        "notes": "Visibility and scoped audit disclosure negative coverage."
-      },
-      {
-        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
-        "language": "daml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.tests",
-        "status": "breakdown",
-        "notes": "Reservation amount, lifecycle, reservation handoff metadata, and dispute coverage."
-      },
-      {
-        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml",
-        "language": "daml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.tests",
-        "status": "breakdown",
-        "notes": "Revocation, expiry, and supersession coverage."
-      },
-      {
-        "path": "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
-        "language": "markdown",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.formal-ledger-core",
-        "status": "breakdown",
-        "notes": "S0-S6 bounded formal ladder for the Daml ledger core."
-      },
-      {
-        "path": "hardening/formal/daml-ledger-core/obligations.json",
-        "language": "json",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.formal-ledger-core",
-        "status": "breakdown",
-        "notes": "Machine-readable proof obligations mapped to invariant properties, source references, and evidence commands."
-      },
-      {
-        "path": "hardening/formal/daml-ledger-core/reference-model.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.formal-ledger-core",
-        "status": "breakdown",
-        "notes": "Bounded executable reference model for reservation, handoff, audit, and release lineage obligations."
-      },
-      {
-        "path": "hardening/formal/daml-ledger-core/reservation-core.tla",
-        "language": "tla",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.formal-ledger-core",
-        "status": "semantics",
-        "notes": "TLA-style abstract state-machine specification for the reservation core."
-      },
-      {
-        "path": "hardening/scripts/validate-formal.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.daml.formal-ledger-core",
-        "status": "breakdown",
-        "notes": "Formal obligation validator and bounded reference-model gate."
-      },
-      {
-        "path": "interop/core/adapter.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.adapter-core",
-        "status": "breakdown",
-        "notes": "Adapter plugin contract and shape validation."
-      },
-      {
-        "path": "interop/core/readiness.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.adapter-core",
-        "status": "breakdown",
-        "notes": "Machine-readable Adapter Readiness Level model, summaries, and evidence-bound claim checks."
-      },
-      {
-        "path": "interop/context.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.adapter-core",
-        "status": "semantics",
-        "notes": "Default adapter context, resolvers, and security policy."
-      },
-      {
-        "path": "interop/registry.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.registry",
-        "status": "breakdown",
-        "notes": "Static plugin registry."
-      },
-      {
-        "path": "interop/runner.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.runner",
-        "status": "breakdown",
-        "notes": "Offline generation and validation runner."
-      },
-      {
-        "path": "interop/plugins/cdm/index.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.cdm-plugin",
-        "status": "breakdown",
-        "notes": "CDM artifact generation, validation, and negative case."
-      },
-      {
-        "path": "interop/plugins/cdm/readiness.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.cdm-plugin",
-        "status": "breakdown",
-        "notes": "Single source of truth for current CDM Level 2 readiness metadata, claims, non-claims, promotion criteria, and evidence references."
-      },
-      {
-        "path": "interop/plugins/cdm/vendor.js",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.cdm-vendor",
-        "status": "breakdown",
-        "notes": "Explicit CDM schema refresh and manifest verification."
-      },
-      {
-        "path": "README.md",
-        "language": "markdown",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.adapter-core",
-        "status": "semantics",
-        "notes": "Public canonical scope, non-goals, and local gate documentation."
-      },
-      {
         "path": "docs/00_product_thesis.md",
         "language": "markdown",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.interop.adapter-core",
         "status": "semantics",
         "notes": "Product thesis and Passport scope boundary."
-      },
-      {
-        "path": "docs/06_interop_adapters.md",
-        "language": "markdown",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.adapter-core",
-        "status": "semantics",
-        "notes": "Interop adapter contract, CDM boundary, and current readiness classification."
-      },
-      {
-        "path": "docs/09_adapter_readiness_levels.md",
-        "language": "markdown",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.adapter-core",
-        "status": "semantics",
-        "notes": "Adapter Readiness Level ladder and promotion evidence boundaries."
       },
       {
         "path": "docs/02_foundation_release_scope.md",
@@ -291,6 +115,14 @@
         "notes": "Visibility model for credentials, reservations, handoff notices, and audit grants."
       },
       {
+        "path": "docs/06_interop_adapters.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Interop adapter contract, CDM boundary, and current readiness classification."
+      },
+      {
         "path": "docs/07_non_goals.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -299,148 +131,76 @@
         "notes": "Repository non-goals and sentence-bounded overclaim exclusions."
       },
       {
-        "path": "scripts/ci.sh",
-        "language": "bash",
+        "path": "docs/08_brand_ui_system.md",
+        "language": "markdown",
         "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Default local CI command order, package check, and freshness diff gate."
+        "primary_component_id": "cmp.agent.repo-guidance",
+        "status": "semantics",
+        "notes": "Human-readable brand and UI usage rules for future frontend development."
       },
       {
-        "path": "scripts/gates.mjs",
-        "language": "javascript",
+        "path": "docs/09_adapter_readiness_levels.md",
+        "language": "markdown",
         "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Repository structure and generated artifact gate."
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Adapter Readiness Level ladder and promotion evidence boundaries."
       },
       {
-        "path": "scripts/package.mjs",
-        "language": "javascript",
+        "path": "docs/10_release_notes.md",
+        "language": "markdown",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.release.package",
-        "status": "breakdown",
-        "notes": "Review archive source selection."
+        "status": "semantics",
+        "notes": "Release notes and Markets migration guidance for schema-changing releases."
       },
       {
-        "path": ".github/workflows/ci.yml",
-        "language": "yaml",
+        "path": "docs/trackers/typed-time-policy-reservation-freshness.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "breakdown",
+        "notes": "Implementation tracker for typed Time policy and reservation freshness upgrade."
+      },
+      {
+        "path": "hardening/change-log.md",
+        "language": "markdown",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Default GitHub-hosted PR workflow and explicit toolchain setup."
+        "status": "semantics",
+        "notes": "Hardening change log."
       },
       {
-        "path": "package.json",
+        "path": "hardening/formal/daml-ledger-core/FORMAL_LADDER.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "S0-S6 bounded formal ladder for the Daml ledger core."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/obligations.json",
         "language": "json",
         "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Machine-readable proof obligations mapped to invariant properties, source references, and evidence commands."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/reference-model.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Bounded executable reference model for reservation, handoff, audit, and release lineage obligations."
+      },
+      {
+        "path": "hardening/formal/daml-ledger-core/reservation-core.tla",
+        "language": "tla",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
         "status": "semantics",
-        "notes": "NPM script graph for local and default CI commands."
-      },
-      {
-        "path": "package-lock.json",
-        "language": "json",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "semantics",
-        "notes": "Pinned npm dependency graph and AJV transitive exception evidence."
-      },
-      {
-        "path": "multi-package.yaml",
-        "language": "yaml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "semantics",
-        "notes": "DPM multi-package build root used by CI."
-      },
-      {
-        "path": "packages/passport-core/daml.yaml",
-        "language": "yaml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "semantics",
-        "notes": "Pinned core DPM package configuration."
-      },
-      {
-        "path": "packages/passport-tests/daml.yaml",
-        "language": "yaml",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "semantics",
-        "notes": "Pinned Daml test package configuration."
-      },
-      {
-        "path": "scripts/generated-time.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Shared deterministic generated timestamp helper."
-      },
-      {
-        "path": "scripts/run-daml-tests.sh",
-        "language": "bash",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "DPM build, Daml Script, and coverage runner."
-      },
-      {
-        "path": "scripts/daml-coverage-gate.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Daml coverage parser and threshold gate."
-      },
-      {
-        "path": "scripts/canton-smoke.sh",
-        "language": "bash",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Local Canton sandbox smoke gate."
-      },
-      {
-        "path": "scripts/export-demo-transcript.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Generated demo transcript writer."
-      },
-      {
-        "path": "scripts/interop-generate.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.runner",
-        "status": "breakdown",
-        "notes": "Interop artifact generation command wrapper."
-      },
-      {
-        "path": "scripts/interop-validate.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.runner",
-        "status": "breakdown",
-        "notes": "Interop validation command wrapper."
-      },
-      {
-        "path": "scripts/interop-vendor-cdm.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.interop.cdm-vendor",
-        "status": "breakdown",
-        "notes": "Explicit networked CDM schema refresh wrapper."
-      },
-      {
-        "path": "hardening/maps/passport.invariants.json",
-        "language": "json",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Invariant/property map source of truth."
+        "notes": "TLA-style abstract state-machine specification for the reservation core."
       },
       {
         "path": "hardening/frontiers/passport.frontier.json",
@@ -449,6 +209,14 @@
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
         "notes": "Generated hardening frontier."
+      },
+      {
+        "path": "hardening/maps/passport.invariants.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Invariant/property map source of truth."
       },
       {
         "path": "hardening/policies/architecture-rules.json",
@@ -523,12 +291,20 @@
         "notes": "DPM latest stable pin migration and SDK pin-consistency gate round record."
       },
       {
-        "path": "hardening/change-log.md",
+        "path": "hardening/rounds/round-0009.md",
         "language": "markdown",
         "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "breakdown",
+        "notes": "Typed Time temporal validity hardening round record."
+      },
+      {
+        "path": "hardening/scripts/hardening-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
-        "status": "semantics",
-        "notes": "Hardening change log."
+        "status": "breakdown",
+        "notes": "Architecture, offline CI, dependency exception, and payload purity gate."
       },
       {
         "path": "hardening/scripts/lib.mjs",
@@ -537,14 +313,6 @@
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
         "notes": "Hardening map/frontier validation library and source-inventory coverage gate."
-      },
-      {
-        "path": "hardening/scripts/validate-map.mjs",
-        "language": "javascript",
-        "pin": "git:HEAD",
-        "primary_component_id": "cmp.ci.gates",
-        "status": "breakdown",
-        "notes": "Hardening map validation command."
       },
       {
         "path": "hardening/scripts/score-frontier.mjs",
@@ -563,17 +331,281 @@
         "notes": "Hardening round selection command."
       },
       {
-        "path": "hardening/scripts/hardening-gate.mjs",
+        "path": "hardening/scripts/validate-formal.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.formal-ledger-core",
+        "status": "breakdown",
+        "notes": "Formal obligation validator and bounded reference-model gate."
+      },
+      {
+        "path": "hardening/scripts/validate-map.mjs",
         "language": "javascript",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
-        "notes": "Architecture, offline CI, dependency exception, and payload purity gate."
+        "notes": "Hardening map validation command."
+      },
+      {
+        "path": "interop/context.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Default adapter context, resolvers, and security policy."
+      },
+      {
+        "path": "interop/core/adapter.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "breakdown",
+        "notes": "Adapter plugin contract and shape validation."
+      },
+      {
+        "path": "interop/core/readiness.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "breakdown",
+        "notes": "Machine-readable Adapter Readiness Level model, summaries, and evidence-bound claim checks."
+      },
+      {
+        "path": "interop/plugins/cdm/index.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-plugin",
+        "status": "breakdown",
+        "notes": "CDM artifact generation, validation, and negative case."
+      },
+      {
+        "path": "interop/plugins/cdm/readiness.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-plugin",
+        "status": "breakdown",
+        "notes": "Single source of truth for current CDM Level 2 readiness metadata, claims, non-claims, promotion criteria, and evidence references."
+      },
+      {
+        "path": "interop/plugins/cdm/vendor.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-vendor",
+        "status": "breakdown",
+        "notes": "Explicit CDM schema refresh and manifest verification."
+      },
+      {
+        "path": "interop/registry.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.registry",
+        "status": "breakdown",
+        "notes": "Static plugin registry."
+      },
+      {
+        "path": "interop/runner.js",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Offline generation and validation runner."
+      },
+      {
+        "path": "multi-package.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "DPM multi-package build root used by CI."
+      },
+      {
+        "path": "package-lock.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned npm dependency graph and AJV transitive exception evidence."
+      },
+      {
+        "path": "package.json",
+        "language": "json",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "NPM script graph for local and default CI commands."
+      },
+      {
+        "path": "packages/passport-core/daml.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned core DPM package configuration."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "breakdown",
+        "notes": "Normative templates, choices, parties, and state-transition guards."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/Types.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.domain-types",
+        "status": "semantics",
+        "notes": "Domain enums, identifiers, amount helpers, and non-goal boundary comments."
+      },
+      {
+        "path": "packages/passport-tests/daml.yaml",
+        "language": "yaml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Pinned Daml test package configuration."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Happy-path and lifecycle Daml Script coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Visibility and scoped audit disclosure negative coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Reservation amount, lifecycle, reservation handoff metadata, and dispute coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Revocation, expiry, and supersession coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/TemporalTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Typed Time validity and freshness Daml Script coverage."
+      },
+      {
+        "path": "README.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Public canonical scope, non-goals, and local gate documentation."
+      },
+      {
+        "path": "scripts/canton-smoke.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Local Canton sandbox smoke gate."
+      },
+      {
+        "path": "scripts/ci.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Default local CI command order, package check, and freshness diff gate."
+      },
+      {
+        "path": "scripts/daml-coverage-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Daml coverage parser and threshold gate."
+      },
+      {
+        "path": "scripts/export-demo-transcript.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Generated demo transcript writer."
+      },
+      {
+        "path": "scripts/gates.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Repository structure and generated artifact gate."
+      },
+      {
+        "path": "scripts/generated-time.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Shared deterministic generated timestamp helper."
+      },
+      {
+        "path": "scripts/interop-generate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Interop artifact generation command wrapper."
+      },
+      {
+        "path": "scripts/interop-validate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.runner",
+        "status": "breakdown",
+        "notes": "Interop validation command wrapper."
+      },
+      {
+        "path": "scripts/interop-vendor-cdm.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.cdm-vendor",
+        "status": "breakdown",
+        "notes": "Explicit networked CDM schema refresh wrapper."
+      },
+      {
+        "path": "scripts/package.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.release.package",
+        "status": "breakdown",
+        "notes": "Review archive source selection."
+      },
+      {
+        "path": "scripts/run-daml-tests.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "DPM build, Daml Script, and coverage runner."
       }
     ]
   },
   "frontier": {
-    "round_id": "round-0008",
+    "round_id": "round-0009",
     "selected_surfaces": [
       "inv.daml.domain-boundary",
       "inv.daml.capacity-conservation",
@@ -587,10 +619,17 @@
       "inv.scope.passport-public-core-boundary",
       "inv.ci.default-green-bar",
       "prop.ci.dpm-sdk-pins-consistent",
-      "cmp.ci.gates"
+      "cmp.ci.gates",
+      "inv.daml.temporal-validity",
+      "prop.daml.typed-time-authoritative",
+      "prop.daml.no-freshness-refresh-on-residual-release",
+      "bd.daml.typed-time-authority-drift",
+      "bd.daml.freshness-refresh-drift"
     ],
-    "selection_reason": "Round 0008 stress-tests the hardening loop by moving DPM pins from the 3.5.1 RC line to the latest stable DPM release and adding an executable DPM SDK pin-consistency gate.",
+    "selection_reason": "Round 0009 upgrades Passport from ISO timestamp text-only temporal metadata to authoritative Daml Time validity and freshness fields for downstream ledger-time validation.",
     "kill_gates": [
+      "hardening:formal fails if typed temporal validity obligations lose invariant-map properties, source assertions, active evidence commands, or bounded model coverage.",
+      "Daml temporal tests fail if policy validity, credential freshness, presentation validity, reservation validity, or legacy text timestamp metadata semantics stop using typed Time fields.",
       "hardening:gate fails if package daml.yaml files, GitHub workflow install/cache/verification, README docs, run-daml-tests messaging or package-local test invocation, architecture policy, or gate report drift to different DPM SDK versions or brittle DPM test invocation.",
       "interop:validate fails if a vendored CDM schema changes without a matching manifest update; the report must include the negative-cdm-schema-manifest-tamper case.",
       "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
@@ -656,6 +695,21 @@
                 "id": "fn.daml.grant-audit-disclosure",
                 "name": "GrantAuditDisclosureFromAccount",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.validate-policy-active-at-ledger-time",
+                "name": "ValidatePolicyActiveAtLedgerTime",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.expire-reservation",
+                "name": "ExpireReservation",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.dispute-reservation",
+                "name": "DisputeReservation",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
               }
             ],
             "invariants": [
@@ -676,7 +730,10 @@
                       "fn.daml.release-reservation",
                       "fn.daml.create-reservation-handoff",
                       "fn.daml.revoke-credential",
-                      "fn.daml.grant-audit-disclosure"
+                      "fn.daml.grant-audit-disclosure",
+                      "fn.daml.validate-policy-active-at-ledger-time",
+                      "fn.daml.expire-reservation",
+                      "fn.daml.dispute-reservation"
                     ]
                   },
                   {
@@ -725,6 +782,36 @@
                     "type": "guarantee",
                     "severity": "high",
                     "statement": "ReleaseReservation must create a released credential with the original policy publisher recorded through presentation and reservation, even when the verifier is a different party.",
+                    "enforcing_functions": [
+                      "fn.daml.reserve-from-presentation",
+                      "fn.daml.release-reservation"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "inv.daml.temporal-validity",
+                "statement": "Policy, credential, presentation, and reservation freshness or validity checks use authoritative Daml Time fields and ledger time rather than ISO timestamp text metadata.",
+                "properties": [
+                  {
+                    "id": "prop.daml.typed-time-authoritative",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Typed Time fields must be the authoritative fields for policy validity, credential freshness, presentation validity, and reservation validity; text timestamp fields are metadata only.",
+                    "enforcing_functions": [
+                      "fn.daml.validate-policy-active-at-ledger-time",
+                      "fn.daml.issue-capacity-credential",
+                      "fn.daml.present-to-verifier",
+                      "fn.daml.reserve-from-presentation",
+                      "fn.daml.release-reservation",
+                      "fn.daml.expire-reservation"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.no-freshness-refresh-on-residual-release",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Residual and released credentials must preserve the source credential typed valuation, validity, and freshness fields rather than refreshing freshness from reservation or release time.",
                     "enforcing_functions": [
                       "fn.daml.reserve-from-presentation",
                       "fn.daml.release-reservation"
@@ -1443,7 +1530,10 @@
           "prop.daml.release-preserves-policy-publisher",
           "inv.tests.external-coverage",
           "prop.tests.coverage-gate-required",
-          "prop.scope.reservation-handoff-covered"
+          "prop.scope.reservation-handoff-covered",
+          "inv.daml.temporal-validity",
+          "prop.daml.typed-time-authoritative",
+          "prop.daml.no-freshness-refresh-on-residual-release"
         ]
       },
       {
@@ -1462,7 +1552,10 @@
           "inv.scope.passport-public-core-boundary",
           "prop.scope.reservation-handoff-covered",
           "inv.daml.formal-ledger-core",
-          "prop.daml.formal-obligations-mapped"
+          "prop.daml.formal-obligations-mapped",
+          "inv.daml.temporal-validity",
+          "prop.daml.typed-time-authoritative",
+          "prop.daml.no-freshness-refresh-on-residual-release"
         ]
       },
       {
@@ -1832,6 +1925,40 @@
           "test.ci.full"
         ],
         "exploit_path_ids": []
+      },
+      {
+        "id": "bd.daml.typed-time-authority-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.typed-time-authoritative",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "A future schema or choice change reverts to ISO timestamp text as the validation source for policy, credential freshness, presentation, or reservation expiry.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.stale-text-time-accepted"
+        ],
+        "kill_gate": "Daml temporal tests and hardening:formal fail if typed Time fields stop controlling policy, credential freshness, presentation, or reservation validity."
+      },
+      {
+        "id": "bd.daml.freshness-refresh-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.no-freshness-refresh-on-residual-release",
+        "attacker_control": "indirect",
+        "severity": "high",
+        "status": "guarded",
+        "description": "Residual or released capacity is recreated with reservation or release ledger time as a new valuation/freshness anchor, extending stale attestations without a new attester valuation.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.formal-ledger-core"
+        ],
+        "exploit_path_ids": [
+          "xp.daml.release-refreshes-stale-credential"
+        ],
+        "kill_gate": "Daml tests and hardening:formal fail if residual or released credentials stop preserving source valuation, validity, and freshness fields."
       }
     ],
     "exploit_paths": [
@@ -1961,6 +2088,25 @@
           "A generator rewrites tracked artifacts and CI does not diff the regenerated output."
         ],
         "status": "guarded-by-ci-diff-gate"
+      },
+      {
+        "id": "xp.daml.stale-text-time-accepted",
+        "breakdown_id": "bd.daml.typed-time-authority-drift",
+        "impact": "Markets or another downstream Daml consumer could accept a stale policy, credential, presentation, or reservation because text timestamps appear fresh while typed ledger-comparable fields are expired.",
+        "preconditions": [
+          "A contract keeps an ISO timestamp text value that differs from the typed Time field.",
+          "A validation choice or downstream consumer treats the text timestamp as authoritative."
+        ],
+        "status": "guarded-by-temporal-tests"
+      },
+      {
+        "id": "xp.daml.release-refreshes-stale-credential",
+        "breakdown_id": "bd.daml.freshness-refresh-drift",
+        "impact": "Reservation release or residual issuance could refresh an attestation without a new attester valuation, letting stale capacity appear current.",
+        "preconditions": [
+          "ReserveFromPresentation or ReleaseReservation reconstructs typed freshness from ledger time instead of source credential time."
+        ],
+        "status": "guarded-by-temporal-tests"
       }
     ],
     "trust_boundaries": [

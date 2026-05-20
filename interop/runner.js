@@ -36,7 +36,7 @@ export async function generateInteropArtifacts({ validate = false } = {}) {
   const report = {
     artifact: 'interop_report',
     package: 'aevelum-passport-foundation',
-    version: '0.1.0',
+    version: '0.2.0',
     status: validate ? (failed ? 'failed' : 'passed') : 'generated',
     generatedAt: context.now,
     sourceRef: context.sourceRef,
