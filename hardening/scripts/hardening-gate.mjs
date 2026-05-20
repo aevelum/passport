@@ -483,7 +483,7 @@ ok(packageScript.includes("file !== 'artifacts/daml_test_coverage.txt'"), 'packa
 const report = {
   artifact: 'hardening_report',
   package: 'aevelum-passport-foundation',
-  version: '0.1.0',
+  version: '0.2.0',
   generatedAt: getGeneratedAt(),
   status: fail.length ? 'failed' : 'passed',
   mapPath: 'hardening/maps/passport.invariants.json',

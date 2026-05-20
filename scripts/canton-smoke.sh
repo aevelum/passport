@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-CORE_DAR="$ROOT/packages/passport-core/.daml/dist/aevelum-passport-core-0.1.0.dar"
+CORE_DAR="$ROOT/packages/passport-core/.daml/dist/aevelum-passport-core-0.2.0.dar"
 TMP_DIR="$(mktemp -d)"
 PORT_FILE="$TMP_DIR/canton-ports.json"
 LOG_FILE="$TMP_DIR/canton-smoke.log"

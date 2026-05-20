@@ -1,6 +1,6 @@
 {
   "name": "aevelum-passport-foundation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Daml-as-spec foundation build for Aevelum Passport, a Canton-native collateral credential account.",

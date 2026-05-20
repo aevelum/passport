@@ -1,0 +1,103 @@
+module Aevelum.Passport.Test.TemporalTests where
+
+import DA.Date
+import DA.Time (time)
+import Daml.Script
+import Aevelum.Passport.Types
+import Aevelum.Passport.Foundation
+import Aevelum.Passport.Test.FoundationScenario
+
+t024_policy_active_within_typed_validity_window : Script ()
+t024_policy_active_within_typed_validity_window = script do
+  base <- createBaseContext
+  setTime releaseLedgerTime
+  submit base.actors.dealer do
+    exerciseCmd base.policyCid ValidatePolicyActiveAtLedgerTime
+  return ()
+
+t025_policy_rejected_after_typed_valid_until : Script ()
+t025_policy_rejected_after_typed_valid_until = script do
+  base <- createBaseContext
+  setTime (time (date 2026 May 12) 0 1 0)
+  submitMustFail base.actors.dealer do
+    exerciseCmd base.policyCid ValidatePolicyActiveAtLedgerTime
+  return ()
+
+t026_credential_freshness_rejected_after_window : Script ()
+t026_credential_freshness_rejected_after_window = script do
+  base <- createBaseContext
+  setTime (time (date 2026 May 11) 0 3 0)
+  submitMustFail base.actors.holder do
+    exerciseCmd base.credentialCid PresentToVerifier with
+      presentationId = "presentation-after-freshness-expiry-001"
+      verifier = base.actors.dealer
+      presentationPurpose = RepoPreTrade
+      presentedAt = "2026-05-11T00:03:00Z"
+  return ()
+
+t027_presentation_reservation_rejected_after_typed_validity_expiry : Script ()
+t027_presentation_reservation_rejected_after_typed_validity_expiry = script do
+  presented <- createPresentedContext
+  setTime (time (date 2026 May 11) 0 3 0)
+  submitMustFail (actAs presented.base.actors.holder <> actAs presented.base.actors.attester <> actAs presented.base.actors.dealer) do
+    exerciseCmd presented.presentationCid ReserveFromPresentation with
+      reservationId = "reservation-after-presentation-expiry-001"
+      reservedAmount = 1000000.0
+      reservationPurpose = RepoPreTradeReservation
+      reservationValidUntil = "2026-05-11T01:00:00Z"
+      reservationValidUntilTime = time (date 2026 May 11) 1 0 0
+      residualCredentialId = "credential-residual-after-presentation-expiry-001"
+  return ()
+
+t028_reservation_release_rejected_after_typed_validity_expiry : Script ()
+t028_reservation_release_rejected_after_typed_validity_expiry = script do
+  reserved <- createReservedContext
+  setTime reservationExpiredLedgerTime
+  submitMustFail (actAs reserved.presented.base.actors.holder <> actAs reserved.presented.base.actors.attester <> actAs reserved.presented.base.actors.dealer) do
+    exerciseCmd reserved.reservationCid ReleaseReservation with
+      releasedCredentialId = "credential-release-after-expiry-001"
+      releasedAt = "2026-05-10T05:00:00Z"
+  return ()
+
+t029_reservation_expiry_uses_typed_time : Script ()
+t029_reservation_expiry_uses_typed_time = script do
+  reserved <- createReservedContext
+  submitMustFail (actAs reserved.presented.base.actors.holder <> actAs reserved.presented.base.actors.attester <> actAs reserved.presented.base.actors.dealer) do
+    exerciseCmd reserved.reservationCid ExpireReservation with
+      revocationId = "reservation-expiration-too-early-001"
+      expiredAt = "2026-05-10T00:04:00Z"
+  setTime reservationExpiredLedgerTime
+  _revocationCid <- submit (actAs reserved.presented.base.actors.holder <> actAs reserved.presented.base.actors.attester <> actAs reserved.presented.base.actors.dealer) do
+    exerciseCmd reserved.reservationCid ExpireReservation with
+      revocationId = "reservation-expiration-typed-001"
+      expiredAt = "2026-05-10T05:00:00Z"
+  return ()
+
+t030_legacy_text_timestamps_metadata_only : Script ()
+t030_legacy_text_timestamps_metadata_only = script do
+  actors <- mkActors
+  setTime policyValidFromTime
+  policyCid <- submit actors.dealer do
+    createCmd CollateralPolicy with
+      policyId = "repo-policy-text-metadata-001"
+      policyVersion = "v1"
+      policyPublisher = actors.dealer
+      approvedHolders = [actors.holder]
+      approvedAttesters = [actors.attester]
+      eligibleAssetClasses = [USTreasury]
+      eligibleCurrencies = ["USD"]
+      minimumCapacity = 1000000.0
+      haircutScheduleRef = "haircut-text-metadata-v1"
+      concentrationLimitRef = "concentration-text-metadata-v1"
+      freshnessWindowHours = 24
+      reservationAllowed = True
+      validFrom = "2026-05-10T00:00:00Z"
+      validFromTime = policyValidFromTime
+      validUntil = "2099-01-01T00:00:00Z"
+      validUntilTime = time (date 2026 May 10) 0 30 0
+      schemaVersion = "foundation-0.2"
+      status = PolicyActive
+  setTime (time (date 2026 May 10) 0 31 0)
+  submitMustFail actors.dealer do
+    exerciseCmd policyCid ValidatePolicyActiveAtLedgerTime
+  return ()

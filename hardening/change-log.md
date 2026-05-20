@@ -71,3 +71,12 @@
 - Tightened `npm run hardening:gate` with `checkDpmSdkPins`, which rejects mismatched package/workflow/docs/policy/gate SDK pins and rejects default RC or snapshot DPM pins.
 - Changed `scripts/run-daml-tests.sh` to run Daml Script tests from `packages/passport-tests` after SDK `3.4.11` exposed that the previous `dpm test --package-root` path could build packages but fail test dependency resolution.
 - Recorded the stress-test result in `hardening/rounds/round-0008.md`: the hardening loop surfaced a real drift class and converted it into an executable static gate.
+
+## 2026-05-19 - round-0009
+
+- Upgraded Passport temporal validation to authoritative Daml `Time` fields for policy validity, credential valuation/freshness, presentation validity, and reservation validity.
+- Preserved ISO timestamp text fields as display and interop metadata only, with Daml tests proving text timestamps do not control policy validity.
+- Added ledger-time checks with `getTime` for policy validation, presentation, reservation, release, expiry, handoff, and dispute paths.
+- Preserved source credential typed valuation, validity, and freshness fields when issuing residual or released credentials so reservation flow cannot refresh stale attestations.
+- Added `inv.daml.temporal-validity`, `prop.daml.typed-time-authoritative`, and `prop.daml.no-freshness-refresh-on-residual-release` to the invariant map, plus bounded formal obligation `PO-DAML-007`.
+- Bumped the Daml packages to `0.2.0`, updated the test data dependency, and added release notes for downstream Markets migration.

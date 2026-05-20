@@ -31,18 +31,21 @@ t011_reject_revoked_credential_reservation = script do
       revokedAt = "2026-05-10T00:10:00Z"
       priorVerifiers = [presented.base.actors.dealer]
       supersedingCredentialId = None
+  setTime reservationLedgerTime
   submitMustFail (actAs (presented.base.actors.holder) <> actAs (presented.base.actors.attester) <> actAs (presented.base.actors.dealer)) do
     exerciseCmd presented.presentationCid ReserveFromPresentation with
       reservationId = "reservation-after-revocation-001"
       reservedAmount = 30000000.0
       reservationPurpose = RepoPreTradeReservation
       reservationValidUntil = "2026-05-10T04:03:00Z"
+      reservationValidUntilTime = demoReservationValidUntilTime
       residualCredentialId = "credential-residual-after-revocation-001"
   return ()
 
 t012_reject_expired_credential : Script ()
 t012_reject_expired_credential = script do
   base <- createBaseContext
+  setTime demoCredentialValidUntilTime
   _expired <- submit (actAs (base.actors.holder) <> actAs (base.actors.attester)) do
     exerciseCmd base.credentialCid ExpireCredential with
       revocationId = "expiration-001"
@@ -59,13 +62,14 @@ t012_reject_expired_credential = script do
 t022_supersede_credential : Script ()
 t022_supersede_credential = script do
   base <- createBaseContext
+  setTime releaseLedgerTime
   _newCredentialCid <- submit (actAs (base.actors.holder) <> actAs (base.actors.attester)) do
     exerciseCmd base.credentialCid SupersedeCredential with
       newCredentialId = "credential-superseded-001"
       newCapacityAmount = 55000000.0
       newCapacityBand = Between with low = 50000000.0; high = 55000000.0
       newReservableAmount = 55000000.0
-      supersededAt = "2026-05-10T06:00:00Z"
+      supersededAt = "2026-05-10T01:00:00Z"
       newEvidenceManifestHash = "sha256:evidence-superseded-001"
       newCalculationMethodHash = "sha256:calculation-superseded-001"
   holderCredentials <- query @CapacityCredential base.actors.holder

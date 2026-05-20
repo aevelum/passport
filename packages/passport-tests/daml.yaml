@@ -1,6 +1,6 @@
 sdk-version: 3.4.11
 name: aevelum-passport-tests
-version: 0.1.0
+version: 0.2.0
 source: daml
 init-script: Aevelum.Passport.Test.FoundationScenario:t015_full_repo_pretrade_happy_path
 dependencies:
@@ -8,4 +8,4 @@ dependencies:
   - daml-stdlib
   - daml-script
 data-dependencies:
-  - ../passport-core/.daml/dist/aevelum-passport-core-0.1.0.dar
+  - ../passport-core/.daml/dist/aevelum-passport-core-0.2.0.dar
