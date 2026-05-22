@@ -2044,6 +2044,7 @@
     "negative overclaim fixture is rejected: Passport has live external integration.",
     "negative overclaim fixture is rejected: The current CDM adapter is certified.",
     "negative overclaim fixture is rejected: The adapter supports custody and settlement.",
+    "negative overclaim fixture is rejected: The adapter not only supports custody but also settlement.",
     "Daml foundation contains ReservationHandoffInstruction",
     "Daml foundation contains CreateReservationHandoff",
     "Daml foundation contains handoffRecipient",

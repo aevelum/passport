@@ -49,6 +49,17 @@ for (const fixture of unsafeClaimFixtures()) {
   }
 }
 
+for (const fixture of safeClaimFixtures()) {
+  const labels = matchingClaimLabels(fixture);
+  if (!labels.length) {
+    fail.push(`safe fixture did not match prohibited claim: ${fixture}`);
+  } else if (!isSafeBoundaryClaim(fixture)) {
+    fail.push(`safe fixture rejected as unsafe claim: ${fixture}`);
+  } else {
+    pass.push(`safe fixture bounded: ${labels.join(', ')}`);
+  }
+}
+
 for (const rel of files) {
   const text = fs.readFileSync(path.join(root, rel), 'utf8');
   for (const unit of claimUnits(text)) {
@@ -124,7 +135,9 @@ function claimUnits(text) {
 }
 
 function isSafeBoundaryClaim(text) {
-  return /\b(not|no|without|does not|must not|non-executing|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|rewritten|external systems remain external)\b/i.test(text);
+  return hasExplicitBoundaryNegation(text)
+    || hasBoundaryScopePhrase(text)
+    || hasGateOrTestBoundary(text);
 }
 
 function matchingClaimLabels(text) {
@@ -136,6 +149,33 @@ function matchingClaimLabels(text) {
 function unsafeClaimFixtures() {
   return [
     'Passport clears trades when upstream checks fail.',
-    'Passport provides custody of assets if venue validation fails.'
+    'Passport provides custody of assets if venue validation fails.',
+    'Passport not only clears trades but also settles them.',
+    'Passport rejects failed venue checks and admits participants to a venue.'
   ];
+}
+
+function safeClaimFixtures() {
+  return [
+    'Passport does not clear or settle trades.',
+    'The readiness claim gate rejects docs that imply Passport grants licenses.'
+  ];
+}
+
+function hasExplicitBoundaryNegation(text) {
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b/i.test(text)
+    || /\bcannot\b|\bcan not\b/i.test(text)
+    || /\bmust\s+never\b/i.test(text)
+    || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
+    || /\bwithout\b[^.\n|;]{0,100}\b(?:grant|issue|register|approve|admit|operate|execute|form|clear|settle|custody|transfer|wallet|token|license|legal permission|venue)\b/i.test(text)
+    || /\bno\b[^.\n|;]{0,100}\b(?:license|legal permission|venue admission|venue operation|trade execution|trade formation|clearing|settlement|custody|asset transfer|token issuance|wallet operation|production integration|live external integration)\b/i.test(text);
+}
+
+function hasBoundaryScopePhrase(text) {
+  return /\b(non-executing|evidence only|attestation only|out of scope|excludes|excluded|rewritten|external systems remain external)\b/i.test(text);
+}
+
+function hasGateOrTestBoundary(text) {
+  return /\b(?:claim gate|readiness claim gate|hardening gate|structural gate|static gates?|tests?)\b[^.\n|;]{0,120}\b(?:must\s+)?rejects?\b/i.test(text)
+    || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
 }

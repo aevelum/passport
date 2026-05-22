@@ -206,7 +206,27 @@ function claimUnits(text) {
 }
 
 function isSafeNegativeOrBoundary(text) {
-  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|rewritten)\b/i.test(text);
+  return hasExplicitBoundaryNegation(text)
+    || hasBoundaryScopePhrase(text)
+    || hasGateOrTestBoundary(text);
+}
+
+function hasExplicitBoundaryNegation(text) {
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b/i.test(text)
+    || /\bcannot\b|\bcan not\b/i.test(text)
+    || /\bmust\s+never\b/i.test(text)
+    || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
+    || /\bwithout\b[^.\n|;]{0,100}\b(?:grant|issue|register|approve|admit|operate|execute|form|clear|settle|custody|transfer|wallet|token|license|legal permission|venue)\b/i.test(text)
+    || /\bno\b[^.\n|;]{0,100}\b(?:license|legal permission|venue admission|venue operation|trade execution|trade formation|clearing|settlement|custody|asset transfer|token issuance|wallet operation|production integration|live external integration)\b/i.test(text);
+}
+
+function hasBoundaryScopePhrase(text) {
+  return /\b(non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|rewritten)\b/i.test(text);
+}
+
+function hasGateOrTestBoundary(text) {
+  return /\b(?:claim gate|readiness claim gate|hardening gate|structural gate|static gates?|tests?)\b[^.\n|;]{0,120}\b(?:must\s+)?rejects?\b/i.test(text)
+    || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
 }
 
 const coreFoundation = 'packages/passport-core/daml/Aevelum/Passport/Foundation.daml';
