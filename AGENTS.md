@@ -17,12 +17,27 @@
 
 ## Architecture Boundaries
 
-- Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials; it records readiness and may record reservation handoff notices.
+- Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family. Passport records attested readiness and scoped evidence only, and may record reservation handoff notices.
 - Keep Daml templates as the Canton ledger schema unless an explicit ADR and invariant-map update justify a change.
 - Keep interop framework-neutral: CDM is one static plugin, not repo-global special-case code.
 - Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands.
 - Do not add dynamic plugin loading, eval-style execution, arbitrary plugin path resolution, or Passport provenance inside generated CDM payloads.
-- Do not add custody, wallet, settlement, collateral transfer, venue, margin engine, optimizer, credit decision, legal-title, ZK, production identity, or live external integration code.
+- Do not add custody, wallet, settlement, clearing, collateral transfer, asset transfer, token issuance, venue operation, order matching, margin engine, optimizer, credit decision, legal-title, ZK, production identity, legal-compliance determination, license granting, venue admission, or live external integration code.
+
+## Readiness Credential Expansion
+
+Passport may now model generic regulated-market readiness credentials in addition to collateral-capacity credentials. Credential families may include participant eligibility, license or registration attestations, venue access readiness, product eligibility, operational capability, disclosure consent, and settlement or clearing readiness evidence.
+
+These are evidence and readiness credentials only. Passport must not grant legal licenses, determine legal compliance, admit participants to a venue, operate a venue, create trades, match orders, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
+
+Any new credential family must include:
+
+- typed Daml `Time` validity / freshness checks;
+- scoped presentation;
+- revocation / expiry;
+- privacy tests;
+- audit disclosure tests;
+- overclaim / boundary gate updates.
 
 ## Frontend And Brand
 

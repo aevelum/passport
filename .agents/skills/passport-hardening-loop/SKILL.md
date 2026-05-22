@@ -9,7 +9,7 @@ description: Use inside the Passport repo while developing to keep invariants, a
 
 Use this skill when changing Passport code, Daml templates, interop adapters, release scripts, CI, or docs that affect security or architectural invariants.
 
-Passport scope is collateral-readiness credentialing: readiness, eligibility, presentation, reservation, reservation handoff metadata, revocation, expiry, audit, evidence, bounded interop artifacts, and adapter readiness reports. Passport does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement ZK proofs, provide production identity, or provide live external integration.
+Passport scope is regulated-market readiness credentialing. Collateral capacity is the first credential family. Additional readiness credential families may include participant eligibility, license or registration attestations, venue access readiness, product eligibility, operational capability, disclosure consent, and settlement or clearing readiness evidence. These credentials record externally attested readiness only; Passport does not grant licenses, admit participants to a venue, operate a venue, execute trades, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, determine legal title, decide credit, or determine legal compliance.
 
 Adapter readiness changes are hardening-sensitive. If a change touches adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level, keep readiness metadata, the invariant map, frontier, hardening round or change log, generated interop report, and hardening gate in sync.
 
@@ -105,3 +105,4 @@ Default to `package` only when the frontier state is already a clean, evidence-b
 - Keep Daml templates as the Canton ledger schema unless an explicit architectural decision updates the map.
 - Keep hardening changes executable: every high or critical property must map to tests or gates.
 - Keep formal claims bounded and honest: do not call a bounded model check, Daml Script suite, mocked checker, or source assertion a full proof.
+- License or registration credential changes must preserve attestation-only semantics. Any prose or artifact implying Passport grants, issues, approves, licenses, registers, authorizes, or legally certifies a party must fail a hardening gate or be rewritten.

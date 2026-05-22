@@ -1,0 +1,330 @@
+module Aevelum.Passport.Test.ReadinessScenario where
+
+import DA.Date
+import DA.Time (time)
+import Daml.Script
+import Aevelum.Passport.Readiness.Types
+import Aevelum.Passport.Readiness.Foundation
+
+data ReadinessActors = ReadinessActors
+  with
+    holder : Party
+    policyPublisher : Party
+    attester : Party
+    verifier : Party
+    operator : Party
+    auditor : Party
+    outsider : Party
+
+data ReadinessBaseContext = ReadinessBaseContext
+  with
+    actors : ReadinessActors
+    accountCid : ContractId ReadinessAccount
+    policyCid : ContractId ReadinessPolicy
+    requestCid : ContractId ReadinessCredentialRequest
+    credentialCid : ContractId ReadinessCredential
+
+data ReadinessPresentedContext = ReadinessPresentedContext
+  with
+    base : ReadinessBaseContext
+    presentationCid : ContractId ReadinessPresentation
+
+data ReadinessBoundContext = ReadinessBoundContext
+  with
+    presented : ReadinessPresentedContext
+    bindingCid : ContractId ReadinessBinding
+
+readinessPolicyValidFromTime : Time
+readinessPolicyValidFromTime = time (date 2026 May 10) 0 0 0
+
+readinessPolicyValidUntilTime : Time
+readinessPolicyValidUntilTime = time (date 2026 May 12) 0 0 0
+
+readinessRequestLedgerTime : Time
+readinessRequestLedgerTime = time (date 2026 May 10) 0 1 0
+
+readinessIssueLedgerTime : Time
+readinessIssueLedgerTime = time (date 2026 May 10) 0 2 0
+
+readinessCredentialValidUntilTime : Time
+readinessCredentialValidUntilTime = time (date 2026 May 12) 0 2 0
+
+readinessPresentationLedgerTime : Time
+readinessPresentationLedgerTime = time (date 2026 May 10) 0 3 0
+
+readinessBindingLedgerTime : Time
+readinessBindingLedgerTime = time (date 2026 May 10) 0 4 0
+
+readinessAuditLedgerTime : Time
+readinessAuditLedgerTime = time (date 2026 May 10) 0 5 0
+
+readinessStaleLedgerTime : Time
+readinessStaleLedgerTime = time (date 2026 May 10) 2 3 0
+
+mkReadinessActors : Script ReadinessActors
+mkReadinessActors = script do
+  holder <- allocateParty "ReadinessDemoHolder"
+  policyPublisher <- allocateParty "ReadinessPolicyPublisher"
+  attester <- allocateParty "ReadinessAttester"
+  verifier <- allocateParty "MarketsReadinessVerifier"
+  operator <- allocateParty "ReadinessOperator"
+  auditor <- allocateParty "ReadinessAuditor"
+  outsider <- allocateParty "ReadinessOutsider"
+  return ReadinessActors with holder; policyPublisher; attester; verifier; operator; auditor; outsider
+
+demoLicenseScope : LicenseAttestationScope
+demoLicenseScope = LicenseAttestationScope with
+  jurisdiction = "US-NY"
+  externalAuthorityRef = "external-authority:ny-registry"
+  registrationRef = "registration:holder-001"
+  licensedActivityRefs = ["broker-dealer-readiness"]
+  attestationOnly = True
+
+createReadinessAccount : ReadinessActors -> Script (ContractId ReadinessAccount)
+createReadinessAccount actors = script do
+  submit actors.holder do
+    createCmd ReadinessAccount with
+      accountId = "readiness-account-001"
+      holder = actors.holder
+      operator = Some actors.operator
+      displayName = "Demo Readiness Account"
+      schemaVersion = "readiness-0.3"
+      createdAt = "2026-05-10T00:00:00Z"
+      status = ReadinessAccountActive
+
+createReadinessPolicyWith :
+  ReadinessActors ->
+  [ReadinessCredentialKind] ->
+  [JurisdictionRef] ->
+  [Text] ->
+  Int ->
+  Time ->
+  Script (ContractId ReadinessPolicy)
+createReadinessPolicyWith actors credentialKinds jurisdictions activities freshnessHours validUntilTime = script do
+  setTime readinessPolicyValidFromTime
+  submit actors.policyPublisher do
+    createCmd ReadinessPolicy with
+      policyId = "readiness-policy-001"
+      policyVersion = "v1"
+      policyPublisher = actors.policyPublisher
+      approvedHolders = [actors.holder]
+      approvedAttesters = [actors.attester]
+      approvedVerifiers = [actors.verifier]
+      approvedCredentialKinds = credentialKinds
+      approvedJurisdictions = jurisdictions
+      approvedActivityRefs = activities
+      freshnessWindowHours = freshnessHours
+      validFrom = "2026-05-10T00:00:00Z"
+      validFromTime = readinessPolicyValidFromTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime
+      schemaVersion = "readiness-0.3"
+      status = ReadinessPolicyActive
+
+createDefaultReadinessPolicy : ReadinessActors -> Script (ContractId ReadinessPolicy)
+createDefaultReadinessPolicy actors =
+  createReadinessPolicyWith
+    actors
+    [ ParticipantEligibilityCredential
+    , LicenseOrRegistrationAttestation
+    , VenueAccessReadinessCredential
+    , ProductEligibilityCredential
+    , OperationalCapabilityCredential
+    , DisclosureConsentCredential
+    , SettlementOrClearingReadinessCredential
+    , CollateralCapacityReadinessCredential
+    ]
+    ["US-NY"]
+    ["broker-dealer-readiness", "participant-eligibility", "venue-access", "treasury-product"]
+    24
+    readinessPolicyValidUntilTime
+
+requestReadinessCredential :
+  ContractId ReadinessAccount ->
+  ReadinessActors ->
+  ReadinessCredentialKind ->
+  ReadinessSubject ->
+  JurisdictionRef ->
+  [Text] ->
+  Optional LicenseAttestationScope ->
+  Script (ContractId ReadinessCredentialRequest)
+requestReadinessCredential accountCid actors credentialKind subject jurisdiction activityRefs licenseScopeValue = script do
+  setTime readinessRequestLedgerTime
+  submit actors.holder do
+    exerciseCmd accountCid RequestReadinessCredential with
+      requestId = "readiness-request-001"
+      policyId = "readiness-policy-001"
+      policyVersion = "v1"
+      policyPublisher = actors.policyPublisher
+      attester = actors.attester
+      credentialKind
+      subject
+      jurisdiction
+      activityRefs
+      licenseScope = licenseScopeValue
+      requestedAt = "2026-05-10T00:01:00Z"
+
+issueReadinessCredential :
+  ContractId ReadinessCredentialRequest ->
+  ContractId ReadinessPolicy ->
+  ReadinessActors ->
+  ReadinessCredentialId ->
+  Script (ContractId ReadinessCredential)
+issueReadinessCredential requestCid policyCid actors credentialId = script do
+  setTime readinessIssueLedgerTime
+  submit (actAs actors.holder <> actAs actors.attester) do
+    exerciseCmd requestCid IssueReadinessCredential with
+      credentialId
+      policyCid
+      evidenceHash = "sha256:readiness-evidence-001"
+      calculationMethodHash = "sha256:readiness-calculation-001"
+      validFrom = "2026-05-10T00:02:00Z"
+      validFromTime = readinessIssueLedgerTime
+      validUntil = "2026-05-12T00:02:00Z"
+      validUntilTime = readinessCredentialValidUntilTime
+      issuedAt = "2026-05-10T00:02:00Z"
+
+createBaseReadinessContext : Script ReadinessBaseContext
+createBaseReadinessContext = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  policyCid <- createDefaultReadinessPolicy actors
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ParticipantEligibilityCredential
+    (PartySubject actors.holder)
+    "US-NY"
+    ["participant-eligibility"]
+    None
+  credentialCid <- issueReadinessCredential requestCid policyCid actors "readiness-credential-001"
+  return ReadinessBaseContext with actors; accountCid; policyCid; requestCid; credentialCid
+
+createPresentedReadinessContext : Script ReadinessPresentedContext
+createPresentedReadinessContext = script do
+  base <- createBaseReadinessContext
+  setTime readinessPresentationLedgerTime
+  presentationCid <- submit base.actors.holder do
+    exerciseCmd base.credentialCid PresentReadinessToVerifier with
+      presentationId = "readiness-presentation-001"
+      verifier = base.actors.verifier
+      presentationPurpose = WorkflowEligibilityBinding
+      allowedFields = ["credentialId", "credentialKind", "policyId", "jurisdiction", "activityRefs"]
+      presentedAt = "2026-05-10T00:03:00Z"
+  return ReadinessPresentedContext with base; presentationCid
+
+createBoundReadinessContext : Script ReadinessBoundContext
+createBoundReadinessContext = script do
+  presented <- createPresentedReadinessContext
+  setTime readinessBindingLedgerTime
+  bindingCid <- submit (actAs presented.base.actors.holder <> actAs presented.base.actors.attester <> actAs presented.base.actors.verifier) do
+    exerciseCmd presented.presentationCid BindReadinessToContext with
+      bindingId = "readiness-binding-001"
+      workflowRef = Some "markets-workflow:participant-check"
+      venueProfileRef = Some "venue-profile:demo"
+      venueRulebookRef = None
+      bindingPurpose = WorkflowEligibilityBinding
+      boundAt = "2026-05-10T00:04:00Z"
+  return ReadinessBoundContext with presented; bindingCid
+
+t100_create_readiness_account : Script ()
+t100_create_readiness_account = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  holderAccounts <- query @ReadinessAccount actors.holder
+  operatorAccounts <- query @ReadinessAccount actors.operator
+  outsiderAccounts <- query @ReadinessAccount actors.outsider
+  assertMsg "holder should see readiness account" (length holderAccounts == 1)
+  assertMsg "operator should see readiness account" (length operatorAccounts == 1)
+  assertMsg "outsider should not see readiness account" (length outsiderAccounts == 0)
+  submit actors.holder do
+    exerciseCmd accountCid CloseReadinessAccount with
+      closedAt = "2026-05-10T00:10:00Z"
+  holderClosedAccounts <- query @ReadinessAccount actors.holder
+  assertMsg "closing the readiness account consumes it" (length holderClosedAccounts == 0)
+  return ()
+
+t101_publish_readiness_policy : Script ()
+t101_publish_readiness_policy = script do
+  actors <- mkReadinessActors
+  policyCid <- createDefaultReadinessPolicy actors
+  setTime readinessRequestLedgerTime
+  submit actors.policyPublisher do
+    exerciseCmd policyCid ValidateReadinessPolicyActiveAtLedgerTime
+  _eventCid <- submit actors.policyPublisher do
+    exerciseCmd policyCid RetireReadinessPolicy with
+      retiredAt = "2026-05-10T00:20:00Z"
+      reason = "phase-a lifecycle coverage"
+  publisherEvents <- query @ReadinessPolicyLifecycleEvent actors.policyPublisher
+  publisherPolicies <- query @ReadinessPolicy actors.policyPublisher
+  assertMsg "retiring readiness policy creates lifecycle event" (length publisherEvents == 1)
+  assertMsg "retiring readiness policy consumes active policy" (length publisherPolicies == 0)
+  return ()
+
+t102_request_participant_eligibility_credential : Script ()
+t102_request_participant_eligibility_credential = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  _policyCid <- createDefaultReadinessPolicy actors
+  _requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ParticipantEligibilityCredential
+    (PartySubject actors.holder)
+    "US-NY"
+    ["participant-eligibility"]
+    None
+  holderRequests <- query @ReadinessCredentialRequest actors.holder
+  attesterRequests <- query @ReadinessCredentialRequest actors.attester
+  assertMsg "holder should see readiness credential request" (length holderRequests == 1)
+  assertMsg "attester should see readiness credential request" (length attesterRequests == 1)
+  return ()
+
+t103_issue_readiness_credential : Script ()
+t103_issue_readiness_credential = script do
+  base <- createBaseReadinessContext
+  holderCredentials <- query @ReadinessCredential base.actors.holder
+  attesterCredentials <- query @ReadinessCredential base.actors.attester
+  verifierCredentials <- query @ReadinessCredential base.actors.verifier
+  assertMsg "holder should see readiness credential" (length holderCredentials == 1)
+  assertMsg "attester should see readiness credential" (length attesterCredentials == 1)
+  assertMsg "verifier should not see raw readiness credential before presentation" (length verifierCredentials == 0)
+  return ()
+
+t104_present_readiness_to_verifier : Script ()
+t104_present_readiness_to_verifier = script do
+  presented <- createPresentedReadinessContext
+  verifierPresentations <- query @ReadinessPresentation presented.base.actors.verifier
+  verifierCredentials <- query @ReadinessCredential presented.base.actors.verifier
+  assertMsg "verifier should see scoped readiness presentation" (length verifierPresentations == 1)
+  assertMsg "verifier should not see raw readiness credential after presentation" (length verifierCredentials == 0)
+  return ()
+
+t105_bind_readiness_to_workflow_context : Script ()
+t105_bind_readiness_to_workflow_context = script do
+  bound <- createBoundReadinessContext
+  verifierBindings <- query @ReadinessBinding bound.presented.base.actors.verifier
+  outsiderBindings <- query @ReadinessBinding bound.presented.base.actors.outsider
+  assertMsg "verifier should see readiness binding" (length verifierBindings == 1)
+  assertMsg "outsider should not see readiness binding" (length outsiderBindings == 0)
+  return ()
+
+t106_issue_license_registration_attestation_only : Script ()
+t106_issue_license_registration_attestation_only = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  policyCid <- createDefaultReadinessPolicy actors
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    LicenseOrRegistrationAttestation
+    (PartySubject actors.holder)
+    "US-NY"
+    ["broker-dealer-readiness"]
+    (Some demoLicenseScope)
+  _credentialCid <- issueReadinessCredential requestCid policyCid actors "license-attestation-credential-001"
+  holderCredentials <- query @ReadinessCredential actors.holder
+  case holderCredentials of
+    [(_, credential)] -> assertMsg "license credential preserves attestation-only scope" (credential.licenseScope == Some demoLicenseScope)
+    _ -> assertMsg "holder should see exactly one license attestation credential" False
+  return ()

@@ -263,11 +263,11 @@ function checkPassportScopeBoundary() {
   }
 
   const requiredScopeStatements = [
-    'Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.',
-    'Passport records readiness.',
+    'Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.',
+    'Passport records attested readiness and scoped evidence only.',
     'Passport may record a reservation handoff notice.',
     'Passport does not execute the downstream trade.',
-    'Passport does not custody, transfer, settle, or move collateral.'
+    'Passport does not custody, transfer, settle, clear, or move collateral or assets.'
   ];
   for (const rel of ['README.md', 'docs/02_foundation_release_scope.md']) {
     const text = readText(rel);
@@ -296,24 +296,19 @@ function checkPassportScopeBoundary() {
     ok(nonGoalDoc.includes(required), `docs/07_non_goals.md includes non-goal ${required}`);
   }
 
-  for (const rel of [
-    'README.md',
-    'docs/02_foundation_release_scope.md',
-    'docs/05_privacy_model.md',
-    'docs/07_non_goals.md',
-    'artifacts/demo_transcript.json'
-  ]) {
+  const visibilityChecks = {
+    'README.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/02_foundation_release_scope.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/05_privacy_model.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/07_non_goals.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'artifacts/demo_transcript.json': ['capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'artifacts/readiness_demo_transcript.json': ['readinesscredential', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant'],
+    'artifacts/venue_readiness_demo_transcript.json': ['venuereadinessevidence', 'holder', 'attester', 'verifier']
+  };
+  for (const [rel, needles] of Object.entries(visibilityChecks)) {
+    if (!fs.existsSync(abs(rel))) continue;
     const text = readText(rel).toLowerCase();
-    for (const needle of [
-      'capacityreservation is visible',
-      'holder',
-      'attester',
-      'verifier',
-      'reservationhandoffinstruction',
-      'handoff recipient',
-      'auditdisclosuregrant',
-      'auditor'
-    ]) {
+    for (const needle of needles) {
       ok(text.includes(needle), `${rel} includes dedicated visibility language`);
     }
   }
@@ -336,8 +331,11 @@ function checkPassportScopeBoundary() {
     { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
     { label: 'custodying assets', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:custodies|custodying|custody|custodian)\b[^.\n|;]{0,80}\b(?:asset|assets|collateral)\b/i },
     { label: 'settling transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:settles?|settling|settlement)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
+    { label: 'clearing transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:clears?|clearing)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
     { label: 'operating a wallet', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bwallet\b/i },
     { label: 'operating a venue', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bvenue\b/i },
+    { label: 'granting licenses', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:grants?|granting|issues?|issuing)\b[^.\n|;]{0,80}\blicen[sc]es?\b/i },
+    { label: 'venue admission', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:admits?|admitting)\b[^.\n|;]{0,80}\bvenue\b/i },
     { label: 'live external integration', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:has|provides?|providing|is)\b[^.\n|;]{0,80}\blive external integration\b/i }
   ];
 
@@ -359,13 +357,15 @@ function passportScopeDocs() {
     ...walkFiles('design', { extensions: ['.md'] }),
     ...walkFiles('hardening', { extensions: ['.md'] }),
     ...walkFiles('.agents/skills', { extensions: ['.md'] }),
-    'artifacts/demo_transcript.json'
+    'artifacts/demo_transcript.json',
+    'artifacts/readiness_demo_transcript.json',
+    'artifacts/venue_readiness_demo_transcript.json'
   ]);
   return [...files].filter(file => fs.existsSync(abs(file))).sort();
 }
 
 function isSafeScopeBoundaryClaim(text) {
-  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|out of scope|excludes|excluded)\b/i.test(text);
+  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|fail|fails|rewritten)\b/i.test(text);
 }
 
 function visit(value, onKey) {
@@ -483,7 +483,7 @@ ok(packageScript.includes("file !== 'artifacts/daml_test_coverage.txt'"), 'packa
 const report = {
   artifact: 'hardening_report',
   package: 'aevelum-passport-foundation',
-  version: '0.2.0',
+  version: '0.3.0',
   generatedAt: getGeneratedAt(),
   status: fail.length ? 'failed' : 'passed',
   mapPath: 'hardening/maps/passport.invariants.json',
@@ -972,7 +972,7 @@ function isBoundedReadinessClaim(text) {
 }
 
 function hasSameSentenceNegation(text) {
-  return /\b(not|no|without|does not|must not|non-claim|non-claims|excluded|out of scope|not shipped)\b/i.test(text);
+  return /\b(not|no|without|does not|must not|non-claim|non-claims|excluded|out of scope|outside passport|not shipped|reject|rejects|fail|fails)\b/i.test(text);
 }
 
 function hasSameSentencePromotionBoundary(text) {

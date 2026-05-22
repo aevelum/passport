@@ -1,0 +1,34 @@
+module Aevelum.Passport.VenueReadiness.Foundation where
+
+import Aevelum.Passport.Types
+import Aevelum.Passport.Readiness.Types
+import Aevelum.Passport.Readiness.Foundation
+import Aevelum.Passport.VenueReadiness.Types
+
+template VenueReadinessEvidence
+  with
+    venueReadinessEvidenceId : Text
+    readinessBindingCid : ContractId ReadinessBinding
+    bindingId : ReadinessBindingId
+    holder : Party
+    attester : Party
+    verifier : Party
+    venueId : VenueId
+    venueProfileRef : VenueProfileRef
+    use : VenueReadinessUse
+    credentialKind : ReadinessCredentialKind
+    subject : ReadinessSubject
+    evidenceHash : EvidenceHash
+    createdAt : IsoTimestamp
+    createdAtTime : Time
+    schemaVersion : Text
+  where
+    signatory holder, attester, verifier
+
+    ensure
+      venueReadinessEvidenceId /= ""
+        && bindingId /= ""
+        && venueId /= ""
+        && venueProfileRef /= ""
+        && evidenceHash /= ""
+        && createdAt /= ""

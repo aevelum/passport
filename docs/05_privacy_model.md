@@ -2,7 +2,7 @@
 
 Passport privacy is modeled through Daml signatories, observers, and choices.
 
-CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+Passport records attested readiness and scoped evidence only. ReadinessCredential is visible to holder and attester. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 ## Visibility by object
 
@@ -16,6 +16,14 @@ CapacityReservation is visible to holder, attester, and verifier. ReservationHan
 | `ReservationHandoffInstruction` | Holder, attester, verifier | Handoff recipient | Metadata-only readiness notice for a downstream system. |
 | `CredentialRevocation` | Attester | Holder and prior verifiers | Revocation notice. |
 | `AuditDisclosureGrant` | Holder, attester | Auditor | Scoped audit metadata. |
+| `ReadinessAccount` | Holder | Optional operator | Generic readiness account root. |
+| `ReadinessPolicy` | Policy publisher | Approved holders, attesters, and verifiers | Readiness policy disclosure. |
+| `ReadinessCredential` | Holder, attester | None by default | Private readiness statement. |
+| `ReadinessPresentation` | Holder | Verifier, attester | Scoped verifier-facing readiness result. |
+| `ReadinessBinding` | Holder, attester, verifier | None beyond signatories | Non-executing evidence binding to workflow or venue-profile context. |
+| `ReadinessRevocation` | Attester | Holder and prior verifiers | Readiness revocation notice. |
+| `ReadinessAuditDisclosureGrant` | Holder, attester | Auditor | Scoped readiness audit metadata. |
+| `VenueReadinessEvidence` | Holder, attester, verifier | None beyond signatories | Markets-facing evidence wrapper over a readiness binding. |
 
 ## Privacy invariants
 
@@ -26,3 +34,5 @@ CapacityReservation is visible to holder, attester, and verifier. ReservationHan
 5. Raw evidence remains outside the verifier-facing payload.
 6. Reservation handoff records readiness metadata only; it does not execute, settle, transfer, custody, or move collateral.
 7. Handoff visibility is isolated to `ReservationHandoffInstruction`; audit visibility is isolated to `AuditDisclosureGrant`.
+8. License or registration credentials expose attestation metadata only and must not expose a legal grant, permission, venue admission, or compliance decision.
+9. Readiness bindings are evidence-only context records; they do not form trades, match orders, clear, settle, custody, or transfer assets.

@@ -1,0 +1,37 @@
+module Aevelum.Passport.Test.VenueReadinessScenario where
+
+import Daml.Script
+import Aevelum.Passport.Readiness.Foundation
+import Aevelum.Passport.VenueReadiness.Foundation
+import Aevelum.Passport.VenueReadiness.Types
+import Aevelum.Passport.Test.ReadinessScenario
+
+t118_create_venue_readiness_evidence_from_binding : Script ()
+t118_create_venue_readiness_evidence_from_binding = script do
+  bound <- createBoundReadinessContext
+  verifierBindings <- query @ReadinessBinding bound.presented.base.actors.verifier
+  case verifierBindings of
+    [(_, binding)] -> do
+      _evidenceCid <- submit (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+        createCmd VenueReadinessEvidence with
+          venueReadinessEvidenceId = "venue-readiness-evidence-001"
+          readinessBindingCid = bound.bindingCid
+          bindingId = binding.bindingId
+          holder = bound.presented.base.actors.holder
+          attester = bound.presented.base.actors.attester
+          verifier = bound.presented.base.actors.verifier
+          venueId = "venue:demo-markets"
+          venueProfileRef = "venue-profile:demo"
+          use = VenueParticipantAdmissionUse
+          credentialKind = binding.credentialKind
+          subject = binding.subject
+          evidenceHash = binding.evidenceHash
+          createdAt = "2026-05-10T00:04:00Z"
+          createdAtTime = readinessBindingLedgerTime
+          schemaVersion = "readiness-0.3"
+      verifierEvidence <- query @VenueReadinessEvidence bound.presented.base.actors.verifier
+      outsiderEvidence <- query @VenueReadinessEvidence bound.presented.base.actors.outsider
+      assertMsg "verifier should see venue readiness evidence" (length verifierEvidence == 1)
+      assertMsg "outsider should not see venue readiness evidence" (length outsiderEvidence == 0)
+    _ -> assertMsg "verifier should see one readiness binding before venue evidence creation" False
+  return ()

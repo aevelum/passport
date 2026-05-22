@@ -1,8 +1,8 @@
 module Aevelum.Passport.Types where
 
 -- Aevelum Passport Foundation types.
--- The package intentionally models collateral capacity credentials only.
--- It does not execute, settle, transfer, custody, move collateral, decide credit, determine legal title, or implement proof systems.
+-- The package models regulated-market readiness credentials, with collateral capacity as the first credential family.
+-- It does not grant licenses, admit participants to a venue, execute, settle, clear, transfer, custody, move assets, operate wallets, decide credit, determine legal title, or implement proof systems.
 
 type AccountId = Text
 type PolicyId = Text

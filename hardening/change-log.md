@@ -1,5 +1,13 @@
 # Hardening Change Log
 
+## 2026-05-22 - round-0010
+
+- Upgraded Passport scope from collateral-readiness-only to regulated-market readiness credentialing, with collateral capacity preserved as the first credential family.
+- Added generic readiness and venue-readiness Daml modules, including readiness accounts, policies, credential requests, credentials, presentations, bindings, revocations, audit disclosure grants, and venue-readiness evidence.
+- Added license or registration attestation-only enforcement through `LicenseAttestationScope.attestationOnly = True`, negative Daml tests, and a static readiness claim gate.
+- Added Daml Script tests `t100` through `t119` covering lifecycle, policy approval, typed-time freshness, scoped presentation/binding, privacy, revocation, audit disclosure, venue evidence, and non-executing binding boundaries.
+- Updated canonical docs, repo guidance, ADRs, demo transcripts, gate expectations, invariant-map coverage, and the hardening frontier for the Phase A readiness expansion.
+
 ## 2026-05-12 - round-0001
 
 - Added a repo-local Passport hardening loop with an invariant/property map, scored frontier, bounded round record, and architecture policy gate.

@@ -1,0 +1,16 @@
+module Aevelum.Passport.VenueReadiness.Types where
+
+type VenueId = Text
+type VenueParticipantId = Text
+type VenueProductId = Text
+type VenueSessionId = Text
+type VenueProtocolRef = Text
+
+data VenueReadinessUse
+  = VenueParticipantAdmissionUse
+  | VenueProductAdmissionUse
+  | VenueSessionAccessUse
+  | VenueTradingInterestSubmissionUse
+  | VenueSurveillanceUse
+  | VenueReportingUse
+  deriving (Eq, Show)

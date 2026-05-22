@@ -1,0 +1,570 @@
+module Aevelum.Passport.Readiness.Foundation where
+
+import DA.Time (addRelTime, hours)
+import Aevelum.Passport.Types
+import Aevelum.Passport.Readiness.Types
+
+template ReadinessAccount
+  with
+    accountId : ReadinessAccountId
+    holder : Party
+    operator : Optional Party
+    displayName : Text
+    schemaVersion : Text
+    createdAt : IsoTimestamp
+    status : ReadinessAccountStatus
+  where
+    signatory holder
+    observer case operator of
+      Some op -> op
+      None -> holder
+
+    ensure status == ReadinessAccountActive && accountId /= "" && displayName /= ""
+
+    nonconsuming choice RequestReadinessCredential : ContractId ReadinessCredentialRequest
+      with
+        requestId : ReadinessRequestId
+        policyId : ReadinessPolicyId
+        policyVersion : ReadinessPolicyVersion
+        policyPublisher : Party
+        attester : Party
+        credentialKind : ReadinessCredentialKind
+        subject : ReadinessSubject
+        jurisdiction : JurisdictionRef
+        activityRefs : [Text]
+        licenseScope : Optional LicenseAttestationScope
+        requestedAt : IsoTimestamp
+      controller holder
+      do
+        now <- getTime
+        assertMsg "readiness request id must be present" (requestId /= "")
+        assertMsg "readiness policy id must be present" (policyId /= "")
+        assertMsg "readiness policy version must be present" (policyVersion /= "")
+        assertMsg "readiness jurisdiction must be present" (jurisdiction /= "")
+        assertMsg "readiness request must name at least one activity" (not (null activityRefs))
+        assertMsg "license registration readiness requires valid attestation-only scope"
+          (validReadinessKindScope credentialKind licenseScope)
+        create ReadinessCredentialRequest with
+          requestId
+          accountId
+          holder
+          policyId
+          policyVersion
+          policyPublisher
+          attester
+          credentialKind
+          subject
+          jurisdiction
+          activityRefs
+          licenseScope
+          requestedAt
+          requestedAtTime = now
+          status = "Requested"
+          schemaVersion
+
+    choice CloseReadinessAccount : ()
+      with
+        closedAt : IsoTimestamp
+      controller holder
+      do
+        return ()
+
+template ReadinessPolicy
+  with
+    policyId : ReadinessPolicyId
+    policyVersion : ReadinessPolicyVersion
+    policyPublisher : Party
+    approvedHolders : [Party]
+    approvedAttesters : [Party]
+    approvedVerifiers : [Party]
+    approvedCredentialKinds : [ReadinessCredentialKind]
+    approvedJurisdictions : [JurisdictionRef]
+    approvedActivityRefs : [Text]
+    freshnessWindowHours : Int
+    validFrom : IsoTimestamp
+    validFromTime : Time
+    validUntil : IsoTimestamp
+    validUntilTime : Time
+    schemaVersion : Text
+    status : ReadinessPolicyStatus
+  where
+    signatory policyPublisher
+    observer approvedHolders, approvedAttesters, approvedVerifiers
+
+    ensure
+      policyId /= ""
+        && policyVersion /= ""
+        && status == ReadinessPolicyActive
+        && not (null approvedHolders)
+        && not (null approvedAttesters)
+        && not (null approvedVerifiers)
+        && not (null approvedCredentialKinds)
+        && not (null approvedJurisdictions)
+        && not (null approvedActivityRefs)
+        && freshnessWindowHours > 0
+        && coherentTimeWindow validFromTime validUntilTime
+
+    nonconsuming choice ValidateReadinessPolicyActiveAtLedgerTime : ()
+      controller policyPublisher
+      do
+        now <- getTime
+        assertMsg "readiness policy not yet valid at ledger time" (now >= validFromTime)
+        assertMsg "readiness policy expired at ledger time" (now < validUntilTime)
+        return ()
+
+    choice RetireReadinessPolicy : ContractId ReadinessPolicyLifecycleEvent
+      with
+        retiredAt : IsoTimestamp
+        reason : Text
+      controller policyPublisher
+      do
+        now <- getTime
+        create ReadinessPolicyLifecycleEvent with
+          eventId = policyId <> ":retired:" <> retiredAt
+          policyId
+          policyVersion
+          policyPublisher
+          eventType = "Retired"
+          eventTime = retiredAt
+          eventTimeValue = now
+          reason
+          schemaVersion
+
+template ReadinessPolicyLifecycleEvent
+  with
+    eventId : Text
+    policyId : ReadinessPolicyId
+    policyVersion : ReadinessPolicyVersion
+    policyPublisher : Party
+    eventType : Text
+    eventTime : IsoTimestamp
+    eventTimeValue : Time
+    reason : Text
+    schemaVersion : Text
+  where
+    signatory policyPublisher
+    ensure eventId /= "" && policyId /= "" && policyVersion /= ""
+
+template ReadinessCredentialRequest
+  with
+    requestId : ReadinessRequestId
+    accountId : ReadinessAccountId
+    holder : Party
+    policyId : ReadinessPolicyId
+    policyVersion : ReadinessPolicyVersion
+    policyPublisher : Party
+    attester : Party
+    credentialKind : ReadinessCredentialKind
+    subject : ReadinessSubject
+    jurisdiction : JurisdictionRef
+    activityRefs : [Text]
+    licenseScope : Optional LicenseAttestationScope
+    requestedAt : IsoTimestamp
+    requestedAtTime : Time
+    status : Text
+    schemaVersion : Text
+  where
+    signatory holder
+    observer policyPublisher, attester
+
+    ensure
+      requestId /= ""
+        && accountId /= ""
+        && jurisdiction /= ""
+        && not (null activityRefs)
+        && validReadinessKindScope credentialKind licenseScope
+
+    choice IssueReadinessCredential : ContractId ReadinessCredential
+      with
+        credentialId : ReadinessCredentialId
+        policyCid : ContractId ReadinessPolicy
+        evidenceHash : EvidenceHash
+        calculationMethodHash : CalculationMethodHash
+        validFrom : IsoTimestamp
+        validFromTime : Time
+        validUntil : IsoTimestamp
+        validUntilTime : Time
+        issuedAt : IsoTimestamp
+      controller holder, attester
+      do
+        now <- getTime
+        policy <- fetch policyCid
+        let freshUntilTime = addRelTime now (hours policy.freshnessWindowHours)
+
+        assertMsg "readiness credential id must be present" (credentialId /= "")
+        assertMsg "readiness evidence hash must be present" (evidenceHash /= "")
+        assertMsg "readiness calculation method hash must be present" (calculationMethodHash /= "")
+        assertMsg "readiness policy id must match request" (policy.policyId == policyId)
+        assertMsg "readiness policy version must match request" (policy.policyVersion == policyVersion)
+        assertMsg "readiness policy publisher must match request" (policy.policyPublisher == policyPublisher)
+        assertMsg "readiness policy must be active" (policy.status == ReadinessPolicyActive)
+        assertMsg "readiness policy must approve holder" (elem holder policy.approvedHolders)
+        assertMsg "readiness policy must approve attester" (elem attester policy.approvedAttesters)
+        assertMsg "readiness policy must approve credential kind" (elem credentialKind policy.approvedCredentialKinds)
+        assertMsg "readiness policy must approve jurisdiction" (elem jurisdiction policy.approvedJurisdictions)
+        assertMsg "readiness policy typed validity must be active" (withinTimeWindow now policy.validFromTime policy.validUntilTime)
+        assertMsg "readiness credential validity window must be coherent" (coherentTimeWindow validFromTime validUntilTime)
+        assertMsg "readiness credential must be active at issuance ledger time" (withinTimeWindow now validFromTime validUntilTime)
+        assertMsg "readiness request activities must be policy approved" (all (\activity -> elem activity policy.approvedActivityRefs) activityRefs)
+        assertMsg "license registration readiness requires valid attestation-only scope"
+          (validReadinessKindScope credentialKind licenseScope)
+
+        create ReadinessCredential with
+          credentialId
+          holder
+          attester
+          policyPublisher
+          policyId
+          policyVersion
+          approvedVerifiers = policy.approvedVerifiers
+          credentialKind
+          subject
+          jurisdiction
+          activityRefs
+          licenseScope
+          evidenceHash
+          calculationMethodHash
+          issuedAt
+          issuedAtTime = now
+          validFrom
+          validFromTime
+          validUntil
+          validUntilTime
+          freshnessWindowHours = policy.freshnessWindowHours
+          freshUntilTime
+          status = ReadinessCredentialActive
+          schemaVersion
+
+template ReadinessCredential
+  with
+    credentialId : ReadinessCredentialId
+    holder : Party
+    attester : Party
+    policyPublisher : Party
+    policyId : ReadinessPolicyId
+    policyVersion : ReadinessPolicyVersion
+    approvedVerifiers : [Party]
+    credentialKind : ReadinessCredentialKind
+    subject : ReadinessSubject
+    jurisdiction : JurisdictionRef
+    activityRefs : [Text]
+    licenseScope : Optional LicenseAttestationScope
+    evidenceHash : EvidenceHash
+    calculationMethodHash : CalculationMethodHash
+    issuedAt : IsoTimestamp
+    issuedAtTime : Time
+    validFrom : IsoTimestamp
+    validFromTime : Time
+    validUntil : IsoTimestamp
+    validUntilTime : Time
+    freshnessWindowHours : Int
+    freshUntilTime : Time
+    status : ReadinessCredentialStatus
+    schemaVersion : Text
+  where
+    signatory holder, attester
+
+    ensure
+      credentialId /= ""
+        && status == ReadinessCredentialActive
+        && not (null approvedVerifiers)
+        && jurisdiction /= ""
+        && not (null activityRefs)
+        && evidenceHash /= ""
+        && calculationMethodHash /= ""
+        && validReadinessKindScope credentialKind licenseScope
+        && coherentTimeWindow validFromTime validUntilTime
+        && withinTimeWindow issuedAtTime validFromTime validUntilTime
+        && freshnessWindowHours > 0
+        && freshUntilTime == addRelTime issuedAtTime (hours freshnessWindowHours)
+
+    nonconsuming choice PresentReadinessToVerifier : ContractId ReadinessPresentation
+      with
+        presentationId : ReadinessPresentationId
+        verifier : Party
+        presentationPurpose : ReadinessBindingPurpose
+        allowedFields : [Text]
+        presentedAt : IsoTimestamp
+      controller holder
+      do
+        now <- getTime
+        let presentationValidUntilTime =
+              if validUntilTime <= freshUntilTime then validUntilTime else freshUntilTime
+
+        assertMsg "readiness presentation id must be present" (presentationId /= "")
+        assertMsg "readiness presentation must name allowed fields" (not (null allowedFields))
+        assertMsg "readiness verifier must be approved by policy" (elem verifier approvedVerifiers)
+        assertMsg "readiness credential not yet valid at presentation ledger time" (now >= validFromTime)
+        assertMsg "readiness credential expired at presentation ledger time" (now < validUntilTime)
+        assertMsg "readiness credential stale at presentation ledger time" (now < freshUntilTime)
+
+        create ReadinessPresentation with
+          presentationId
+          sourceCredentialCid = self
+          credentialId
+          holder
+          attester
+          verifier
+          policyPublisher
+          policyId
+          policyVersion
+          credentialKind
+          subject
+          jurisdiction
+          activityRefs
+          licenseScope
+          allowedFields
+          evidenceHash
+          calculationMethodHash
+          validFrom
+          validFromTime
+          validUntil
+          validUntilTime
+          freshnessWindowHours
+          freshUntilTime
+          presentationValidUntilTime
+          presentationPurpose
+          presentedAt
+          presentedAtTime = now
+          schemaVersion
+
+    nonconsuming choice GrantReadinessAuditDisclosure : ContractId ReadinessAuditDisclosureGrant
+      with
+        grantId : ReadinessGrantId
+        auditor : Party
+        allowedFields : [Text]
+        validFrom : IsoTimestamp
+        validFromTime : Time
+        validUntil : IsoTimestamp
+        validUntilTime : Time
+        legalBasisRef : Text
+      controller holder, attester
+      do
+        now <- getTime
+        assertMsg "readiness audit grant id must be present" (grantId /= "")
+        assertMsg "readiness audit grant must name allowed fields" (not (null allowedFields))
+        assertMsg "readiness audit grant validity window must be coherent" (coherentTimeWindow validFromTime validUntilTime)
+        assertMsg "readiness credential must be active at audit grant ledger time" (withinTimeWindow now validFromTime validUntilTime)
+        create ReadinessAuditDisclosureGrant with
+          grantId
+          credentialId
+          holder
+          attester
+          auditor
+          allowedFields
+          evidenceHash
+          validFrom
+          validFromTime
+          validUntil
+          validUntilTime
+          legalBasisRef
+          schemaVersion
+
+    choice RevokeReadinessCredential : ContractId ReadinessRevocation
+      with
+        revocationId : ReadinessRevocationId
+        reasonCode : ReadinessRevocationReason
+        revokedAt : IsoTimestamp
+        priorVerifiers : [Party]
+        supersedingCredentialId : Optional ReadinessCredentialId
+      controller attester
+      do
+        now <- getTime
+        create ReadinessRevocation with
+          revocationId
+          credentialId
+          holder
+          attester
+          priorVerifiers
+          reasonCode
+          revokedAt
+          revokedAtTime = now
+          supersedingCredentialId
+          schemaVersion
+
+template ReadinessPresentation
+  with
+    presentationId : ReadinessPresentationId
+    sourceCredentialCid : ContractId ReadinessCredential
+    credentialId : ReadinessCredentialId
+    holder : Party
+    attester : Party
+    verifier : Party
+    policyPublisher : Party
+    policyId : ReadinessPolicyId
+    policyVersion : ReadinessPolicyVersion
+    credentialKind : ReadinessCredentialKind
+    subject : ReadinessSubject
+    jurisdiction : JurisdictionRef
+    activityRefs : [Text]
+    licenseScope : Optional LicenseAttestationScope
+    allowedFields : [Text]
+    evidenceHash : EvidenceHash
+    calculationMethodHash : CalculationMethodHash
+    validFrom : IsoTimestamp
+    validFromTime : Time
+    validUntil : IsoTimestamp
+    validUntilTime : Time
+    freshnessWindowHours : Int
+    freshUntilTime : Time
+    presentationValidUntilTime : Time
+    presentationPurpose : ReadinessBindingPurpose
+    presentedAt : IsoTimestamp
+    presentedAtTime : Time
+    schemaVersion : Text
+  where
+    signatory holder
+    observer verifier, attester
+
+    ensure
+      presentationId /= ""
+        && credentialId /= ""
+        && jurisdiction /= ""
+        && not (null activityRefs)
+        && not (null allowedFields)
+        && validReadinessKindScope credentialKind licenseScope
+        && coherentTimeWindow validFromTime validUntilTime
+        && presentedAtTime >= validFromTime
+        && presentedAtTime < presentationValidUntilTime
+        && presentationValidUntilTime <= validUntilTime
+        && presentationValidUntilTime <= freshUntilTime
+
+    nonconsuming choice BindReadinessToContext : ContractId ReadinessBinding
+      with
+        bindingId : ReadinessBindingId
+        workflowRef : Optional WorkflowRef
+        venueProfileRef : Optional VenueProfileRef
+        venueRulebookRef : Optional VenueRulebookRef
+        bindingPurpose : ReadinessBindingPurpose
+        boundAt : IsoTimestamp
+      controller holder, attester, verifier
+      do
+        now <- getTime
+        assertMsg "readiness binding id must be present" (bindingId /= "")
+        assertMsg "readiness presentation expired at binding ledger time" (now < presentationValidUntilTime)
+        assertMsg "readiness binding must name workflow, venue profile, or rulebook context" (hasReadinessContext workflowRef venueProfileRef venueRulebookRef)
+        create ReadinessBinding with
+          bindingId
+          presentationId
+          credentialId
+          holder
+          attester
+          verifier
+          policyPublisher
+          policyId
+          policyVersion
+          credentialKind
+          subject
+          jurisdiction
+          activityRefs
+          licenseScope
+          workflowRef
+          venueProfileRef
+          venueRulebookRef
+          bindingPurpose
+          evidenceHash
+          calculationMethodHash
+          boundAt
+          boundAtTime = now
+          credentialValidUntilTime = validUntilTime
+          credentialFreshUntilTime = freshUntilTime
+          schemaVersion
+
+template ReadinessBinding
+  with
+    bindingId : ReadinessBindingId
+    presentationId : ReadinessPresentationId
+    credentialId : ReadinessCredentialId
+    holder : Party
+    attester : Party
+    verifier : Party
+    policyPublisher : Party
+    policyId : ReadinessPolicyId
+    policyVersion : ReadinessPolicyVersion
+    credentialKind : ReadinessCredentialKind
+    subject : ReadinessSubject
+    jurisdiction : JurisdictionRef
+    activityRefs : [Text]
+    licenseScope : Optional LicenseAttestationScope
+    workflowRef : Optional WorkflowRef
+    venueProfileRef : Optional VenueProfileRef
+    venueRulebookRef : Optional VenueRulebookRef
+    bindingPurpose : ReadinessBindingPurpose
+    evidenceHash : EvidenceHash
+    calculationMethodHash : CalculationMethodHash
+    boundAt : IsoTimestamp
+    boundAtTime : Time
+    credentialValidUntilTime : Time
+    credentialFreshUntilTime : Time
+    schemaVersion : Text
+  where
+    signatory holder, attester, verifier
+
+    ensure
+      bindingId /= ""
+        && presentationId /= ""
+        && credentialId /= ""
+        && jurisdiction /= ""
+        && not (null activityRefs)
+        && evidenceHash /= ""
+        && calculationMethodHash /= ""
+        && validReadinessKindScope credentialKind licenseScope
+        && hasReadinessContext workflowRef venueProfileRef venueRulebookRef
+        && boundAtTime < credentialValidUntilTime
+        && boundAtTime < credentialFreshUntilTime
+
+template ReadinessRevocation
+  with
+    revocationId : ReadinessRevocationId
+    credentialId : ReadinessCredentialId
+    holder : Party
+    attester : Party
+    priorVerifiers : [Party]
+    reasonCode : ReadinessRevocationReason
+    revokedAt : IsoTimestamp
+    revokedAtTime : Time
+    supersedingCredentialId : Optional ReadinessCredentialId
+    schemaVersion : Text
+  where
+    signatory attester
+    observer holder, priorVerifiers
+
+    ensure revocationId /= "" && credentialId /= ""
+
+template ReadinessAuditDisclosureGrant
+  with
+    grantId : ReadinessGrantId
+    credentialId : ReadinessCredentialId
+    holder : Party
+    attester : Party
+    auditor : Party
+    allowedFields : [Text]
+    evidenceHash : EvidenceHash
+    validFrom : IsoTimestamp
+    validFromTime : Time
+    validUntil : IsoTimestamp
+    validUntilTime : Time
+    legalBasisRef : Text
+    schemaVersion : Text
+  where
+    signatory holder, attester
+    observer auditor
+
+    ensure
+      grantId /= ""
+        && credentialId /= ""
+        && not (null allowedFields)
+        && evidenceHash /= ""
+        && coherentTimeWindow validFromTime validUntilTime
+
+hasReadinessContext : Optional WorkflowRef -> Optional VenueProfileRef -> Optional VenueRulebookRef -> Bool
+hasReadinessContext workflowRef venueProfileRef venueRulebookRef =
+  case workflowRef of
+    Some ref -> ref /= ""
+    None ->
+      case venueProfileRef of
+        Some ref -> ref /= ""
+        None ->
+          case venueRulebookRef of
+            Some ref -> ref /= ""
+            None -> False

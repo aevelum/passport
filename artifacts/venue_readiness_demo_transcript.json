@@ -1,0 +1,27 @@
+{
+  "artifact": "venue_readiness_demo_transcript",
+  "package": "aevelum-passport-foundation",
+  "version": "0.3.0",
+  "workflow": "venue-readiness-evidence-wrapper",
+  "ids": {
+    "bindingId": "readiness-binding-001",
+    "venueReadinessEvidenceId": "venue-readiness-evidence-001",
+    "venueId": "venue:demo-markets",
+    "venueProfileRef": "venue-profile:demo"
+  },
+  "use": "VenueParticipantAdmissionUse",
+  "source": "VenueReadinessEvidence references a valid ReadinessBinding",
+  "visibility": "VenueReadinessEvidence is visible to holder, attester, and verifier",
+  "boundaryAssertions": [
+    "readiness evidence only",
+    "not venue operation",
+    "not participant admission decision",
+    "not order matching",
+    "not trade formation",
+    "not execution",
+    "not clearing",
+    "not settlement",
+    "not custody",
+    "not asset transfer"
+  ]
+}

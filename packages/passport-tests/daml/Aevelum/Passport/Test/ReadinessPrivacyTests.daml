@@ -1,0 +1,86 @@
+module Aevelum.Passport.Test.ReadinessPrivacyTests where
+
+import Daml.Script
+import Aevelum.Passport.Readiness.Types
+import Aevelum.Passport.Readiness.Foundation
+import Aevelum.Passport.Test.ReadinessScenario
+
+t114_revoke_readiness_credential : Script ()
+t114_revoke_readiness_credential = script do
+  base <- createBaseReadinessContext
+  _revocationCid <- submit base.actors.attester do
+    exerciseCmd base.credentialCid RevokeReadinessCredential with
+      revocationId = "readiness-revocation-001"
+      reasonCode = ReadinessAttesterCorrection
+      revokedAt = "2026-05-10T00:08:00Z"
+      priorVerifiers = [base.actors.verifier]
+      supersedingCredentialId = None
+  holderRevocations <- query @ReadinessRevocation base.actors.holder
+  verifierRevocations <- query @ReadinessRevocation base.actors.verifier
+  holderCredentials <- query @ReadinessCredential base.actors.holder
+  assertMsg "holder should see readiness revocation" (length holderRevocations == 1)
+  assertMsg "prior verifier should see readiness revocation" (length verifierRevocations == 1)
+  assertMsg "revoking readiness credential consumes raw active credential" (length holderCredentials == 0)
+  return ()
+
+t115_grant_readiness_audit_disclosure : Script ()
+t115_grant_readiness_audit_disclosure = script do
+  base <- createBaseReadinessContext
+  setTime readinessAuditLedgerTime
+  _grantCid <- submit (actAs base.actors.holder <> actAs base.actors.attester) do
+    exerciseCmd base.credentialCid GrantReadinessAuditDisclosure with
+      grantId = "readiness-audit-grant-001"
+      auditor = base.actors.auditor
+      allowedFields = ["credentialId", "policyId", "evidenceHash"]
+      validFrom = "2026-05-10T00:05:00Z"
+      validFromTime = readinessAuditLedgerTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime = readinessPolicyValidUntilTime
+      legalBasisRef = "audit-request:readiness-001"
+  auditorGrants <- query @ReadinessAuditDisclosureGrant base.actors.auditor
+  assertMsg "auditor should see scoped readiness audit grant" (length auditorGrants == 1)
+  return ()
+
+t116_auditor_cannot_see_full_readiness_credential : Script ()
+t116_auditor_cannot_see_full_readiness_credential = script do
+  base <- createBaseReadinessContext
+  setTime readinessAuditLedgerTime
+  _grantCid <- submit (actAs base.actors.holder <> actAs base.actors.attester) do
+    exerciseCmd base.credentialCid GrantReadinessAuditDisclosure with
+      grantId = "readiness-audit-grant-privacy-001"
+      auditor = base.actors.auditor
+      allowedFields = ["credentialId", "evidenceHash"]
+      validFrom = "2026-05-10T00:05:00Z"
+      validFromTime = readinessAuditLedgerTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime = readinessPolicyValidUntilTime
+      legalBasisRef = "audit-request:readiness-privacy-001"
+  auditorCredentials <- query @ReadinessCredential base.actors.auditor
+  auditorGrants <- query @ReadinessAuditDisclosureGrant base.actors.auditor
+  assertMsg "auditor should not see full readiness credential" (length auditorCredentials == 0)
+  assertMsg "auditor should see only scoped readiness audit grant" (length auditorGrants == 1)
+  return ()
+
+t117_unauthorized_party_cannot_see_readiness_credential : Script ()
+t117_unauthorized_party_cannot_see_readiness_credential = script do
+  bound <- createBoundReadinessContext
+  setTime readinessAuditLedgerTime
+  _grantCid <- submit (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester) do
+    exerciseCmd bound.presented.base.credentialCid GrantReadinessAuditDisclosure with
+      grantId = "readiness-audit-grant-outsider-001"
+      auditor = bound.presented.base.actors.auditor
+      allowedFields = ["credentialId", "evidenceHash"]
+      validFrom = "2026-05-10T00:05:00Z"
+      validFromTime = readinessAuditLedgerTime
+      validUntil = "2026-05-12T00:00:00Z"
+      validUntilTime = readinessPolicyValidUntilTime
+      legalBasisRef = "audit-request:outsider-privacy-001"
+  outsiderCredentials <- query @ReadinessCredential bound.presented.base.actors.outsider
+  outsiderPresentations <- query @ReadinessPresentation bound.presented.base.actors.outsider
+  outsiderBindings <- query @ReadinessBinding bound.presented.base.actors.outsider
+  outsiderGrants <- query @ReadinessAuditDisclosureGrant bound.presented.base.actors.outsider
+  assertMsg "outsider cannot see readiness credential" (length outsiderCredentials == 0)
+  assertMsg "outsider cannot see readiness presentation" (length outsiderPresentations == 0)
+  assertMsg "outsider cannot see readiness binding" (length outsiderBindings == 0)
+  assertMsg "outsider cannot see readiness audit grant" (length outsiderGrants == 0)
+  return ()
