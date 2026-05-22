@@ -443,7 +443,7 @@ function isSafeScopeBoundaryClaim(text) {
 }
 
 function hasExplicitBoundaryNegation(text) {
-  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b/i.test(text)
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
     || /\bcannot\b|\bcan not\b/i.test(text)
     || /\bmust\s+never\b/i.test(text)
     || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
@@ -1065,7 +1065,7 @@ function isBoundedReadinessClaim(text) {
 }
 
 function hasSameSentenceNegation(text) {
-  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b/i.test(text)
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
     || /\bcannot\b|\bcan not\b/i.test(text)
     || /\bnot\b(?!\s+only\b)|\bno\b|\bwithout\b/i.test(text)
     || /\b(non-claim|non-claims|excluded|out of scope|outside passport|not shipped)\b/i.test(text);
@@ -1090,6 +1090,7 @@ function overclaimNegativeFixtures() {
     'Passport has live external integration.',
     'The current CDM adapter is certified.',
     'The adapter supports custody and settlement.',
-    'The adapter not only supports custody but also settlement.'
+    'The adapter not only supports custody but also settlement.',
+    'The adapter should not only support custody but also settlement.'
   ];
 }

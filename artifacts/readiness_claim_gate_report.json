@@ -6,6 +6,7 @@
     "unsafe fixture rejected: clearing",
     "unsafe fixture rejected: custody",
     "unsafe fixture rejected: settlement, clearing",
+    "unsafe fixture rejected: settlement, clearing",
     "unsafe fixture rejected: venue admission",
     "safe fixture bounded: settlement, clearing",
     "safe fixture bounded: license grant",

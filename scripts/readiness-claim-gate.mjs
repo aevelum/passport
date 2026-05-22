@@ -151,6 +151,7 @@ function unsafeClaimFixtures() {
     'Passport clears trades when upstream checks fail.',
     'Passport provides custody of assets if venue validation fails.',
     'Passport not only clears trades but also settles them.',
+    'Passport should not only clear trades but also settle them.',
     'Passport rejects failed venue checks and admits participants to a venue.'
   ];
 }
@@ -163,7 +164,7 @@ function safeClaimFixtures() {
 }
 
 function hasExplicitBoundaryNegation(text) {
-  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b/i.test(text)
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
     || /\bcannot\b|\bcan not\b/i.test(text)
     || /\bmust\s+never\b/i.test(text)
     || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
