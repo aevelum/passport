@@ -19,6 +19,8 @@ These records are references and attestations only. Passport does not admit part
 
 The Daml validation path fetches the referenced `ReadinessBinding` and checks holder, attester, verifier, binding id, credential kind, subject, evidence hash, venue profile, and the `VenueReadinessUse` to `ReadinessBindingPurpose` mapping. Markets Phase C should mirror that rule when it consumes Passport readiness evidence.
 
+The verifier can exercise `ValidateVenueReadinessEvidence` independently before relying on the wrapper. Validation also checks ledger time against the binding's typed `credentialValidUntilTime` and `credentialFreshUntilTime`, so stale or expired readiness evidence does not validate.
+
 ## Visibility
 
 `VenueReadinessEvidence` is signed by holder, attester, and verifier. Unauthorized parties see nothing unless another contract explicitly observes them.

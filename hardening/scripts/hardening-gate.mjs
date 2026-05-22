@@ -368,7 +368,10 @@ function checkVenueReadinessCanonicality() {
 
   for (const needle of [
     'ValidateVenueReadinessEvidence',
+    'controller verifier',
     'binding.bindingId == bindingId',
+    'binding.credentialValidUntilTime',
+    'binding.credentialFreshUntilTime',
     'binding.holder == holder',
     'binding.attester == attester',
     'binding.verifier == verifier',
@@ -387,6 +390,9 @@ function checkVenueReadinessCanonicality() {
     't122_reject_venue_readiness_evidence_with_wrong_use',
     't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
     't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
+    't126_reject_venue_readiness_evidence_after_binding_freshness_expiry',
+    'venueReadinessStaleValidationTime',
+    'submit bound.presented.base.actors.verifier',
     'submitMustFail',
     'VenueProductAdmissionUse',
     'venue-profile:wrong',

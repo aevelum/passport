@@ -1,11 +1,16 @@
 module Aevelum.Passport.Test.VenueReadinessScenario where
 
+import DA.Date
+import DA.Time (time)
 import Daml.Script
 import Aevelum.Passport.Readiness.Types
 import Aevelum.Passport.Readiness.Foundation
 import Aevelum.Passport.VenueReadiness.Foundation
 import Aevelum.Passport.VenueReadiness.Types
 import Aevelum.Passport.Test.ReadinessScenario
+
+venueReadinessStaleValidationTime : Time
+venueReadinessStaleValidationTime = time (date 2026 May 11) 0 3 0
 
 createVenueParticipantAdmissionBoundReadinessContext : Script ReadinessBoundContext
 createVenueParticipantAdmissionBoundReadinessContext = script do
@@ -72,7 +77,7 @@ t118_create_venue_readiness_evidence_from_binding = script do
         VenueParticipantAdmissionUse
         "venue-profile:demo"
         binding.evidenceHash
-      submit (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+      submit bound.presented.base.actors.verifier do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
       verifierEvidence <- query @VenueReadinessEvidence bound.presented.base.actors.verifier
       outsiderEvidence <- query @VenueReadinessEvidence bound.presented.base.actors.outsider
@@ -95,7 +100,7 @@ t120_validate_venue_readiness_evidence = script do
         VenueParticipantAdmissionUse
         "venue-profile:demo"
         binding.evidenceHash
-      submit (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+      submit bound.presented.base.actors.verifier do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
     _ -> assertMsg "verifier should see one readiness binding before venue evidence validation" False
   return ()
@@ -114,7 +119,7 @@ t121_reject_venue_readiness_evidence_with_wrong_binding_id = script do
         VenueParticipantAdmissionUse
         "venue-profile:demo"
         binding.evidenceHash
-      submitMustFail (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+      submitMustFail bound.presented.base.actors.verifier do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
     _ -> assertMsg "verifier should see one readiness binding before wrong binding id validation" False
   return ()
@@ -133,7 +138,7 @@ t122_reject_venue_readiness_evidence_with_wrong_use = script do
         VenueProductAdmissionUse
         "venue-profile:demo"
         binding.evidenceHash
-      submitMustFail (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+      submitMustFail bound.presented.base.actors.verifier do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
     _ -> assertMsg "verifier should see one readiness binding before wrong use validation" False
   return ()
@@ -152,7 +157,7 @@ t123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref = script do
         VenueParticipantAdmissionUse
         "venue-profile:wrong"
         binding.evidenceHash
-      submitMustFail (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+      submitMustFail bound.presented.base.actors.verifier do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
     _ -> assertMsg "verifier should see one readiness binding before wrong venue profile validation" False
   return ()
@@ -171,7 +176,27 @@ t124_reject_venue_readiness_evidence_with_wrong_evidence_hash = script do
         VenueParticipantAdmissionUse
         "venue-profile:demo"
         "sha256:wrong-readiness-evidence"
-      submitMustFail (actAs bound.presented.base.actors.holder <> actAs bound.presented.base.actors.attester <> actAs bound.presented.base.actors.verifier) do
+      submitMustFail bound.presented.base.actors.verifier do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
     _ -> assertMsg "verifier should see one readiness binding before wrong evidence hash validation" False
+  return ()
+
+t126_reject_venue_readiness_evidence_after_binding_freshness_expiry : Script ()
+t126_reject_venue_readiness_evidence_after_binding_freshness_expiry = script do
+  bound <- createVenueParticipantAdmissionBoundReadinessContext
+  verifierBindings <- query @ReadinessBinding bound.presented.base.actors.verifier
+  case verifierBindings of
+    [(_, binding)] -> do
+      evidenceCid <- createVenueReadinessEvidenceForBinding
+        bound
+        binding
+        "venue-readiness-evidence-stale-binding"
+        binding.bindingId
+        VenueParticipantAdmissionUse
+        "venue-profile:demo"
+        binding.evidenceHash
+      setTime venueReadinessStaleValidationTime
+      submitMustFail bound.presented.base.actors.verifier do
+        exerciseCmd evidenceCid ValidateVenueReadinessEvidence
+    _ -> assertMsg "verifier should see one readiness binding before stale binding validation" False
   return ()

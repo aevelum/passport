@@ -417,6 +417,9 @@ checkContains(venueReadinessFoundation, [
   'readinessBindingCid',
   'VenueReadinessUse',
   'ValidateVenueReadinessEvidence',
+  'controller verifier',
+  'binding.credentialValidUntilTime',
+  'binding.credentialFreshUntilTime',
   'binding.venueProfileRef == Some venueProfileRef'
 ]);
 
@@ -514,6 +517,9 @@ checkContains(testVenueReadiness, [
   't122_reject_venue_readiness_evidence_with_wrong_use',
   't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
   't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
+  't126_reject_venue_readiness_evidence_after_binding_freshness_expiry',
+  'venueReadinessStaleValidationTime',
+  'submit bound.presented.base.actors.verifier',
   'submitMustFail',
   'ValidateVenueReadinessEvidence'
 ]);
@@ -715,7 +721,9 @@ try {
   for (const validation of [
     'Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.',
     'Markets Phase C must not trust string readiness refs or copied wrapper fields alone.',
-    'VenueReadinessUse must match ReadinessBindingPurpose.'
+    'VenueReadinessUse must match ReadinessBindingPurpose.',
+    'The verifier can exercise ValidateVenueReadinessEvidence independently.',
+    'Validation rejects stale or expired ReadinessBinding credential validity and freshness windows.'
   ]) {
     if (!transcript.validation?.includes(validation)) fail.push(`venue_readiness_demo_transcript missing validation rule ${validation}`);
     else pass.push(`venue_readiness_demo_transcript includes validation rule ${validation}`);

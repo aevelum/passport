@@ -14,6 +14,8 @@ Passport 0.3.0 adds generic readiness credential templates with typed Daml `Time
 
 VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
+The verifier can exercise VenueReadinessEvidence validation independently, and validation rejects stale or expired readiness bindings using the binding's typed freshness and validity fields.
+
 ReadinessCredential is visible to holder and attester. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Aevelum Passport demonstrates a roomless Canton-native readiness credential foundation for future regulated-market workflows, with collateral capacity still demonstrated through repo pre-trade capacity verification and reservation.

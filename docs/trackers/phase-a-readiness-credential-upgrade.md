@@ -18,6 +18,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 | 5 | Validation and package handoff. | Done | `daml:build`, `daml:test`, `canton:smoke`, `ci`, and `package` passed. `npm run ci` passed after regenerated artifacts were stabilized in the working tree. |
 | C.1 | Venue-readiness evidence canonicality before merge. | Done | Added `ValidateVenueReadinessEvidence`, `readinessUseMatchesBindingPurpose`, and negative tests for wrong binding id, use, venue profile, and evidence hash. |
 | C.1 review | Readiness audit grant typed validity review. | Done | Fixed `GrantReadinessAuditDisclosure` to validate against the credential validity window and added a negative expired-credential audit grant test. |
+| C.1 review | Venue-readiness verifier validation and freshness review. | Done | Made `ValidateVenueReadinessEvidence` verifier-exercisable and added stale binding validation coverage. |
 
 ## Required Boundary Checks
 
@@ -27,6 +28,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 - Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.
 - Markets Phase C must not trust string readiness refs or copied wrapper fields alone.
 - VenueReadinessUse must match ReadinessBindingPurpose.
+- Venue-readiness validation must be exercisable by the verifier and reject stale or expired readiness bindings.
 - Verifiers must receive scoped presentations and bindings, not raw credentials.
 - Auditors must receive scoped audit grants only.
 - Unauthorized outsiders must see no readiness credential, presentation, binding, or audit grant.

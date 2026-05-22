@@ -34,12 +34,17 @@ template VenueReadinessEvidence
         && createdAt /= ""
 
     nonconsuming choice ValidateVenueReadinessEvidence : ()
-      controller holder, attester, verifier
+      controller verifier
       do
+        now <- getTime
         binding <- fetch readinessBindingCid
 
         assertMsg "venue readiness evidence binding id must match binding"
           (binding.bindingId == bindingId)
+        assertMsg "venue readiness binding credential must not be expired at validation ledger time"
+          (now < binding.credentialValidUntilTime)
+        assertMsg "venue readiness binding credential must not be stale at validation ledger time"
+          (now < binding.credentialFreshUntilTime)
         assertMsg "venue readiness evidence holder must match binding"
           (binding.holder == holder)
         assertMsg "venue readiness evidence attester must match binding"
