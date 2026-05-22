@@ -415,7 +415,19 @@ checkContains(readinessFoundation, [
 checkContains(venueReadinessFoundation, [
   'template VenueReadinessEvidence',
   'readinessBindingCid',
-  'VenueReadinessUse'
+  'VenueReadinessUse',
+  'ValidateVenueReadinessEvidence',
+  'binding.venueProfileRef == Some venueProfileRef'
+]);
+
+checkContains(venueReadinessTypes, [
+  'readinessUseMatchesBindingPurpose',
+  'VenueParticipantAdmissionUse -> purpose == VenueParticipantAdmissionBinding',
+  'VenueProductAdmissionUse -> purpose == VenueProductAdmissionBinding',
+  'VenueSessionAccessUse -> purpose == VenueSessionAccessBinding',
+  'VenueTradingInterestSubmissionUse -> purpose == TradingInterestSubmissionBinding',
+  'VenueSurveillanceUse -> purpose == SurveillanceAuditBinding',
+  'VenueReportingUse -> purpose == ReportingAuditBinding'
 ]);
 
 checkContains(testFoundation, [
@@ -495,8 +507,33 @@ checkContains(testReadinessPrivacy, [
 ]);
 
 checkContains(testVenueReadiness, [
-  't118_create_venue_readiness_evidence_from_binding'
+  't118_create_venue_readiness_evidence_from_binding',
+  't120_validate_venue_readiness_evidence',
+  't121_reject_venue_readiness_evidence_with_wrong_binding_id',
+  't122_reject_venue_readiness_evidence_with_wrong_use',
+  't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
+  't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
+  'submitMustFail',
+  'ValidateVenueReadinessEvidence'
 ]);
+
+for (const rel of [
+  'README.md',
+  'docs/12_venue_readiness_credentials.md',
+  'docs/14_passport_markets_boundary.md',
+  'docs/15_release_notes_passport_0_3.md',
+  'docs/decisions/0002-readiness-credential-expansion.md',
+  'docs/trackers/phase-a-readiness-credential-upgrade.md'
+]) {
+  checkContains(rel, [
+    'Consumers must validate or cross-check the underlying',
+    'before relying on',
+    'VenueReadinessEvidence',
+    'Markets Phase C must not trust string readiness refs or copied wrapper fields alone',
+    'VenueReadinessUse',
+    'ReadinessBindingPurpose'
+  ]);
+}
 
 checkContains(interopDoc, [
   'framework-neutral adapter surface',
@@ -674,6 +711,14 @@ try {
   const transcript = JSON.parse(read('artifacts/venue_readiness_demo_transcript.json'));
   if (!transcript.ids?.venueReadinessEvidenceId) fail.push('venue_readiness_demo_transcript missing venue readiness evidence id');
   else pass.push('venue_readiness_demo_transcript contains venue readiness evidence id');
+  for (const validation of [
+    'Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.',
+    'Markets Phase C must not trust string readiness refs or copied wrapper fields alone.',
+    'VenueReadinessUse must match ReadinessBindingPurpose.'
+  ]) {
+    if (!transcript.validation?.includes(validation)) fail.push(`venue_readiness_demo_transcript missing validation rule ${validation}`);
+    else pass.push(`venue_readiness_demo_transcript includes validation rule ${validation}`);
+  }
   for (const assertion of ['readiness evidence only', 'not venue operation', 'not participant admission decision', 'not order matching']) {
     if (!transcript.boundaryAssertions?.includes(assertion)) fail.push(`venue_readiness_demo_transcript missing boundary assertion ${assertion}`);
     else pass.push(`venue_readiness_demo_transcript includes boundary assertion ${assertion}`);

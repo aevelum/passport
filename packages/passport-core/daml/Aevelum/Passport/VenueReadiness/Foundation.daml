@@ -32,3 +32,28 @@ template VenueReadinessEvidence
         && venueProfileRef /= ""
         && evidenceHash /= ""
         && createdAt /= ""
+
+    nonconsuming choice ValidateVenueReadinessEvidence : ()
+      controller holder, attester, verifier
+      do
+        binding <- fetch readinessBindingCid
+
+        assertMsg "venue readiness evidence binding id must match binding"
+          (binding.bindingId == bindingId)
+        assertMsg "venue readiness evidence holder must match binding"
+          (binding.holder == holder)
+        assertMsg "venue readiness evidence attester must match binding"
+          (binding.attester == attester)
+        assertMsg "venue readiness evidence verifier must match binding"
+          (binding.verifier == verifier)
+        assertMsg "venue readiness evidence credential kind must match binding"
+          (binding.credentialKind == credentialKind)
+        assertMsg "venue readiness evidence subject must match binding"
+          (binding.subject == subject)
+        assertMsg "venue readiness evidence hash must match binding"
+          (binding.evidenceHash == evidenceHash)
+        assertMsg "venue readiness use must match binding purpose"
+          (readinessUseMatchesBindingPurpose use binding.bindingPurpose)
+        assertMsg "venue readiness evidence profile must match binding profile context"
+          (binding.venueProfileRef == Some venueProfileRef)
+        return ()

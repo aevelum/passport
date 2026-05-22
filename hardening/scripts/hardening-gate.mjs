@@ -349,6 +349,72 @@ function checkPassportScopeBoundary() {
   }
 }
 
+function checkVenueReadinessCanonicality() {
+  const venueTypes = readText('packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml');
+  const venueFoundation = readText('packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml');
+  const venueTests = readText('packages/passport-tests/daml/Aevelum/Passport/Test/VenueReadinessScenario.daml');
+
+  for (const needle of [
+    'readinessUseMatchesBindingPurpose',
+    'VenueParticipantAdmissionUse -> purpose == VenueParticipantAdmissionBinding',
+    'VenueProductAdmissionUse -> purpose == VenueProductAdmissionBinding',
+    'VenueSessionAccessUse -> purpose == VenueSessionAccessBinding',
+    'VenueTradingInterestSubmissionUse -> purpose == TradingInterestSubmissionBinding',
+    'VenueSurveillanceUse -> purpose == SurveillanceAuditBinding',
+    'VenueReportingUse -> purpose == ReportingAuditBinding'
+  ]) {
+    ok(venueTypes.includes(needle), `VenueReadiness.Types contains ${needle}`);
+  }
+
+  for (const needle of [
+    'ValidateVenueReadinessEvidence',
+    'binding.bindingId == bindingId',
+    'binding.holder == holder',
+    'binding.attester == attester',
+    'binding.verifier == verifier',
+    'binding.credentialKind == credentialKind',
+    'binding.subject == subject',
+    'binding.evidenceHash == evidenceHash',
+    'readinessUseMatchesBindingPurpose use binding.bindingPurpose',
+    'binding.venueProfileRef == Some venueProfileRef'
+  ]) {
+    ok(venueFoundation.includes(needle), `VenueReadiness.Foundation validates ${needle}`);
+  }
+
+  for (const needle of [
+    't120_validate_venue_readiness_evidence',
+    't121_reject_venue_readiness_evidence_with_wrong_binding_id',
+    't122_reject_venue_readiness_evidence_with_wrong_use',
+    't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
+    't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
+    'submitMustFail',
+    'VenueProductAdmissionUse',
+    'venue-profile:wrong',
+    'sha256:wrong-readiness-evidence'
+  ]) {
+    ok(venueTests.includes(needle), `VenueReadinessScenario contains ${needle}`);
+  }
+
+  for (const rel of [
+    'README.md',
+    'docs/12_venue_readiness_credentials.md',
+    'docs/14_passport_markets_boundary.md',
+    'docs/15_release_notes_passport_0_3.md',
+    'docs/decisions/0002-readiness-credential-expansion.md',
+    'docs/trackers/phase-a-readiness-credential-upgrade.md'
+  ]) {
+    const text = readText(rel);
+    for (const needle of [
+      'Consumers must validate or cross-check the underlying',
+      'Markets Phase C must not trust string readiness refs or copied wrapper fields alone',
+      'VenueReadinessUse',
+      'ReadinessBindingPurpose'
+    ]) {
+      ok(text.includes(needle), `${rel} documents venue readiness canonicality rule ${needle}`);
+    }
+  }
+}
+
 function passportScopeDocs() {
   const files = new Set([
     'README.md',
@@ -474,6 +540,7 @@ checkInteropReportReadiness();
 checkCdmPayloadPurity();
 checkCdmReadinessDocs();
 checkPassportScopeBoundary();
+checkVenueReadinessCanonicality();
 checkCiOrder();
 checkDpmSdkPins();
 

@@ -16,11 +16,16 @@ Passport records externally attested readiness and scoped evidence only. It must
 | 3 | Docs, guidance, claim gates, and demo artifacts. | Done | Updated canonical docs and guidance, added readiness transcripts and claim gate; `npm run gate` passed. |
 | 4 | Hardening map/frontier/round records and generated reports. | Done | Updated invariant map, added `round-0010`, regenerated frontier, and passed `hardening:map`, `hardening:frontier`, `hardening:formal`, and `hardening:gate`. |
 | 5 | Validation and package handoff. | Done | `daml:build`, `daml:test`, `canton:smoke`, `ci`, and `package` passed. `npm run ci` passed after regenerated artifacts were stabilized in the working tree. |
+| C.1 | Venue-readiness evidence canonicality before merge. | Done | Added `ValidateVenueReadinessEvidence`, `readinessUseMatchesBindingPurpose`, and negative tests for wrong binding id, use, venue profile, and evidence hash. |
 
 ## Required Boundary Checks
 
 - License or registration credentials must require `attestationOnly = True`.
 - Readiness bindings must be non-executing evidence only.
+- VenueReadinessEvidence is a wrapper around a ReadinessBinding.
+- Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.
+- Markets Phase C must not trust string readiness refs or copied wrapper fields alone.
+- VenueReadinessUse must match ReadinessBindingPurpose.
 - Verifiers must receive scoped presentations and bindings, not raw credentials.
 - Auditors must receive scoped audit grants only.
 - Unauthorized outsiders must see no readiness credential, presentation, binding, or audit grant.

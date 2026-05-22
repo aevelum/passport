@@ -1,5 +1,11 @@
 # Hardening Change Log
 
+## 2026-05-22 - phase-c.1
+
+- Added `readinessUseMatchesBindingPurpose` and `ValidateVenueReadinessEvidence` so venue-readiness evidence can be validated against the referenced `ReadinessBinding`.
+- Added positive and negative Daml Script coverage for wrong binding id, wrong venue use, wrong venue profile, and wrong evidence hash.
+- Updated docs, demo transcript generation, gates, and the invariant map so Markets Phase C must fetch or cross-check the binding before relying on copied venue-readiness wrapper fields.
+
 ## 2026-05-22 - round-0010
 
 - Upgraded Passport scope from collateral-readiness-only to regulated-market readiness credentialing, with collateral capacity preserved as the first credential family.

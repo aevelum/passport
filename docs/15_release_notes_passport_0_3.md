@@ -8,10 +8,16 @@ Passport 0.3.0 introduces generic regulated-market readiness credentials while p
 - `Aevelum.Passport.Readiness.Foundation`
 - `Aevelum.Passport.VenueReadiness.Types`
 - `Aevelum.Passport.VenueReadiness.Foundation`
-- Daml Script tests `t100` through `t119`
+- `readinessUseMatchesBindingPurpose`
+- `ValidateVenueReadinessEvidence`
+- Daml Script tests `t100` through `t124`
 - readiness demo transcripts
 - static readiness claim gate
 - ADR `0002-readiness-credential-expansion`
+
+## Venue Readiness Evidence
+
+VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
 ## Preserved
 

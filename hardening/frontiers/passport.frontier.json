@@ -8,9 +8,9 @@
     "round_id": "round-0010"
   },
   "summary": {
-    "candidates": 22,
+    "candidates": 23,
     "widen": 0,
-    "deepen": 22,
+    "deepen": 23,
     "kill": 0,
     "package": 0,
     "top_candidate": "bd.ci.network-fetch-default"
@@ -164,6 +164,28 @@
         "status": 10
       },
       "kill_gate": "npm run readiness:claim-gate and npm run gate reject unsafe claim units unless they are explicit negative or boundary statements.",
+      "evidence_needed": [
+        "Keep the guard executable and fail-closed in CI."
+      ],
+      "fastest_falsifier": "Run the linked test command and confirm it fails on a minimal invariant violation.",
+      "last_round": "round-0010"
+    },
+    {
+      "id": "bd.daml.venue-readiness-wrapper-drift",
+      "source_id": "bd.daml.venue-readiness-wrapper-drift",
+      "component_id": "cmp.daml.ledger-schema",
+      "property_id": "prop.daml.venue-readiness-evidence-canonical",
+      "action": "deepen",
+      "status": "guarded",
+      "priority_score": 80,
+      "score_breakdown": {
+        "severity": 35,
+        "attacker_control": 20,
+        "missing_tests": 0,
+        "architecture_drift": 15,
+        "status": 10
+      },
+      "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, and wrong evidence hash, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],

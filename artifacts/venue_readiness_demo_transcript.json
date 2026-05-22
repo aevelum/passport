@@ -10,7 +10,13 @@
     "venueProfileRef": "venue-profile:demo"
   },
   "use": "VenueParticipantAdmissionUse",
-  "source": "VenueReadinessEvidence references a valid ReadinessBinding",
+  "source": "VenueReadinessEvidence is a wrapper around a ReadinessBinding",
+  "validation": [
+    "Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.",
+    "Markets Phase C must not trust string readiness refs or copied wrapper fields alone.",
+    "VenueReadinessUse must match ReadinessBindingPurpose.",
+    "ValidateVenueReadinessEvidence fetches the ReadinessBinding and checks binding id, parties, credential kind, subject, evidence hash, venue profile, and purpose mapping."
+  ],
   "visibility": "VenueReadinessEvidence is visible to holder, attester, and verifier",
   "boundaryAssertions": [
     "readiness evidence only",

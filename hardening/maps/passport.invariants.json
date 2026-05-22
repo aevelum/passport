@@ -545,7 +545,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.ledger-schema",
         "status": "breakdown",
-        "notes": "VenueReadinessEvidence wrapper over readiness bindings."
+        "notes": "VenueReadinessEvidence wrapper over readiness bindings with explicit validation against copied binding fields."
       },
       {
         "path": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml",
@@ -553,7 +553,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.domain-types",
         "status": "semantics",
-        "notes": "Venue-readiness semantic labels used by Markets-facing evidence wrappers."
+        "notes": "Venue-readiness semantic labels and use-to-binding-purpose mapping used by Markets-facing evidence wrappers."
       },
       {
         "path": "packages/passport-tests/daml.yaml",
@@ -641,7 +641,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "VenueReadinessEvidence coverage from a valid ReadinessBinding."
+        "notes": "VenueReadinessEvidence positive and negative canonicality coverage against ReadinessBinding."
       },
       {
         "path": "README.md",
@@ -782,9 +782,11 @@
       "prop.daml.license-attestation-only",
       "prop.daml.readiness-scoped-visibility",
       "prop.daml.readiness-temporal-validity",
+      "prop.daml.venue-readiness-evidence-canonical",
+      "bd.daml.venue-readiness-wrapper-drift",
       "prop.scope.readiness-overclaim-gate"
     ],
-    "selection_reason": "Round 0009 upgrades Passport from ISO timestamp text-only temporal metadata to authoritative Daml Time validity and freshness fields for downstream ledger-time validation.",
+    "selection_reason": "Phase C.1 closes the venue-readiness wrapper canonicality gap by validating copied VenueReadinessEvidence fields against the referenced ReadinessBinding.",
     "kill_gates": [
       "hardening:formal fails if typed temporal validity obligations lose invariant-map properties, source assertions, active evidence commands, or bounded model coverage.",
       "Daml temporal tests fail if policy validity, credential freshness, presentation validity, reservation validity, or legacy text timestamp metadata semantics stop using typed Time fields.",
@@ -798,7 +800,9 @@
       "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
       "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.",
-      "Daml readiness tests t100-t119 must pass with 100% template and choice coverage.",
+      "Daml readiness tests t100-t124 must pass with 100% template and choice coverage.",
+      "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, or evidence hash.",
+      "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, or consumer cross-check docs are removed.",
       "npm run readiness:claim-gate must reject license, venue, trade, clearing, settlement, custody, asset-transfer, token, and wallet overclaims."
     ]
   },
@@ -912,6 +916,11 @@
                 "id": "fn.daml.revoke-readiness-credential",
                 "name": "RevokeReadinessCredential",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.validate-venue-readiness-evidence",
+                "name": "ValidateVenueReadinessEvidence",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml"
               }
             ],
             "invariants": [
@@ -1117,6 +1126,16 @@
                       "fn.daml.bind-readiness-to-context",
                       "fn.daml.grant-readiness-audit-disclosure"
                     ]
+                  },
+                  {
+                    "id": "prop.daml.venue-readiness-evidence-canonical",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "VenueReadinessEvidence must be treated as a wrapper around ReadinessBinding and must validate copied binding fields, venue profile, evidence hash, and VenueReadinessUse to ReadinessBindingPurpose before consumers rely on it.",
+                    "enforcing_functions": [
+                      "fn.daml.validate-venue-readiness-evidence",
+                      "fn.daml.readiness-use-matches-binding-purpose"
+                    ]
                   }
                 ]
               }
@@ -1141,6 +1160,11 @@
                 "id": "fn.daml.non-negative",
                 "name": "nonNegative",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Types.daml"
+              },
+              {
+                "id": "fn.daml.readiness-use-matches-binding-purpose",
+                "name": "readinessUseMatchesBindingPurpose",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml"
               }
             ],
             "invariants": [
@@ -1817,7 +1841,8 @@
           "prop.daml.readiness-policy-issue-bounds",
           "prop.daml.license-attestation-only",
           "prop.daml.readiness-scoped-visibility",
-          "prop.daml.readiness-temporal-validity"
+          "prop.daml.readiness-temporal-validity",
+          "prop.daml.venue-readiness-evidence-canonical"
         ]
       },
       {
@@ -1892,7 +1917,8 @@
           "prop.scope.no-out-of-scope-daml-language",
           "prop.scope.reservation-handoff-covered",
           "prop.scope.readiness-overclaim-gate",
-          "prop.daml.license-attestation-only"
+          "prop.daml.license-attestation-only",
+          "prop.daml.venue-readiness-evidence-canonical"
         ]
       },
       {
@@ -1934,7 +1960,8 @@
           "prop.scope.reservation-handoff-covered",
           "inv.daml.readiness-credential-core",
           "prop.scope.readiness-overclaim-gate",
-          "prop.daml.license-attestation-only"
+          "prop.daml.license-attestation-only",
+          "prop.daml.venue-readiness-evidence-canonical"
         ]
       },
       {
@@ -2289,6 +2316,21 @@
         ],
         "exploit_path_ids": [],
         "kill_gate": "Readiness privacy Daml Script tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts."
+      },
+      {
+        "id": "bd.daml.venue-readiness-wrapper-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.venue-readiness-evidence-canonical",
+        "severity": "high",
+        "attacker_control": "direct",
+        "status": "guarded",
+        "description": "A directly created VenueReadinessEvidence copies fields that drift from the referenced ReadinessBinding, allowing a consumer to rely on a mismatched binding id, use, venue profile, or evidence hash.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [],
+        "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, and wrong evidence hash, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping."
       },
       {
         "id": "bd.scope.readiness-venue-operation-overclaim",

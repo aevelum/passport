@@ -14,8 +14,12 @@ Keep the Phase A expansion inside `passport-core` and bump the package to `0.3.0
 
 License or registration credentials are attestation-only. The model requires `LicenseAttestationScope.attestationOnly = True`.
 
+VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
+
 ## Consequences
 
 Markets can vendor one Passport DAR and read generic readiness evidence without Passport becoming a venue or licensing authority.
 
 Passport must maintain gates and tests proving it does not grant licenses, register participants, determine legal compliance, admit participants to a venue, operate venues, execute trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, or determine legal title.
+
+Passport still does not admit participants, operate venues, grant licenses, determine compliance, execute trades, form trades, settle, clear, custody, transfer assets, issue tokens, or operate wallets.

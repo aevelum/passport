@@ -12,6 +12,8 @@ Passport records attested readiness and scoped evidence only. Passport may recor
 
 Passport 0.3.0 adds generic readiness credential templates with typed Daml `Time` fields for policy validity, credential validity/freshness, presentation validity, binding freshness, revocation event time, audit grant validity, and venue-readiness evidence creation time. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
 
+VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
+
 ReadinessCredential is visible to holder and attester. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Aevelum Passport demonstrates a roomless Canton-native readiness credential foundation for future regulated-market workflows, with collateral capacity still demonstrated through repo pre-trade capacity verification and reservation.
@@ -27,6 +29,7 @@ Holder presents ReadinessPresentation to a verifier.
 Holder, attester, and verifier bind ReadinessBinding to workflow or venue-profile context.
 Auditor receives only scoped ReadinessAuditDisclosureGrant.
 VenueReadinessEvidence references a valid readiness binding.
+Markets fetches or cross-checks the underlying ReadinessBinding before relying on VenueReadinessEvidence.
 
 Dealer publishes collateral policy.
 Holder creates Passport Account.
