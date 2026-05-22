@@ -14,9 +14,9 @@ Passport 0.3.0 adds generic readiness credential templates with typed Daml `Time
 
 VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
-The verifier can exercise VenueReadinessEvidence validation independently, and validation rejects stale or expired readiness bindings using the binding's typed freshness and validity fields.
+The verifier can exercise VenueReadinessEvidence validation independently. Validation fetches the binding's live `ReadinessCredentialActiveStatus`, so revoked credentials, stale credentials, or expired readiness bindings do not validate.
 
-ReadinessCredential is visible to holder and attester. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+ReadinessCredential is visible to holder and attester. ReadinessCredentialActiveStatus is visible to holder, attester, and approved verifiers as a minimal revocation liveness witness, not as a raw credential. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Aevelum Passport demonstrates a roomless Canton-native readiness credential foundation for future regulated-market workflows, with collateral capacity still demonstrated through repo pre-trade capacity verification and reservation.
 
@@ -32,6 +32,7 @@ Holder, attester, and verifier bind ReadinessBinding to workflow or venue-profil
 Auditor receives only scoped ReadinessAuditDisclosureGrant.
 VenueReadinessEvidence references a valid readiness binding.
 Markets fetches or cross-checks the underlying ReadinessBinding before relying on VenueReadinessEvidence.
+Markets rejects venue readiness evidence if the binding's source ReadinessCredential has been revoked.
 
 Dealer publishes collateral policy.
 Holder creates Passport Account.

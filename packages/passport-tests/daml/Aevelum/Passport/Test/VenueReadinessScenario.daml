@@ -200,3 +200,30 @@ t126_reject_venue_readiness_evidence_after_binding_freshness_expiry = script do
         exerciseCmd evidenceCid ValidateVenueReadinessEvidence
     _ -> assertMsg "verifier should see one readiness binding before stale binding validation" False
   return ()
+
+t130_reject_venue_readiness_evidence_after_credential_revocation : Script ()
+t130_reject_venue_readiness_evidence_after_credential_revocation = script do
+  bound <- createVenueParticipantAdmissionBoundReadinessContext
+  verifierBindings <- query @ReadinessBinding bound.presented.base.actors.verifier
+  case verifierBindings of
+    [(_, binding)] -> do
+      evidenceCid <- createVenueReadinessEvidenceForBinding
+        bound
+        binding
+        "venue-readiness-evidence-revoked-credential"
+        binding.bindingId
+        VenueParticipantAdmissionUse
+        "venue-profile:demo"
+        binding.evidenceHash
+      setTime readinessAuditLedgerTime
+      _revocationCid <- submit bound.presented.base.actors.attester do
+        exerciseCmd bound.presented.base.credentialCid RevokeReadinessCredential with
+          revocationId = "readiness-revocation-before-venue-validation-001"
+          reasonCode = ReadinessAttesterCorrection
+          revokedAt = "2026-05-10T00:05:00Z"
+          priorVerifiers = [bound.presented.base.actors.verifier]
+          supersedingCredentialId = None
+      submitMustFail bound.presented.base.actors.verifier do
+        exerciseCmd evidenceCid ValidateVenueReadinessEvidence
+    _ -> assertMsg "verifier should see one readiness binding before revoked credential validation" False
+  return ()

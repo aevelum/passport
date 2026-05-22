@@ -297,12 +297,12 @@ function checkPassportScopeBoundary() {
   }
 
   const visibilityChecks = {
-    'README.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
-    'docs/02_foundation_release_scope.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
-    'docs/05_privacy_model.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
-    'docs/07_non_goals.md': ['readinesscredential is visible', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'README.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/02_foundation_release_scope.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/05_privacy_model.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/07_non_goals.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
     'artifacts/demo_transcript.json': ['capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
-    'artifacts/readiness_demo_transcript.json': ['readinesscredential', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant'],
+    'artifacts/readiness_demo_transcript.json': ['readinesscredential', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant'],
     'artifacts/venue_readiness_demo_transcript.json': ['venuereadinessevidence', 'holder', 'attester', 'verifier']
   };
   for (const [rel, needles] of Object.entries(visibilityChecks)) {
@@ -370,6 +370,9 @@ function checkVenueReadinessCanonicality() {
     'ValidateVenueReadinessEvidence',
     'controller verifier',
     'binding.bindingId == bindingId',
+    'activeStatus <- fetch binding.sourceCredentialActiveStatusCid',
+    'activeStatus.credentialId == binding.credentialId',
+    'activeStatus.evidenceHash == binding.evidenceHash',
     'binding.credentialValidUntilTime',
     'binding.credentialFreshUntilTime',
     'binding.holder == holder',
@@ -391,6 +394,7 @@ function checkVenueReadinessCanonicality() {
     't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
     't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
     't126_reject_venue_readiness_evidence_after_binding_freshness_expiry',
+    't130_reject_venue_readiness_evidence_after_credential_revocation',
     'venueReadinessStaleValidationTime',
     'submit bound.presented.base.actors.verifier',
     'submitMustFail',

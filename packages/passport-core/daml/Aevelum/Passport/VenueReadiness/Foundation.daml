@@ -38,9 +38,22 @@ template VenueReadinessEvidence
       do
         now <- getTime
         binding <- fetch readinessBindingCid
+        activeStatus <- fetch binding.sourceCredentialActiveStatusCid
 
         assertMsg "venue readiness evidence binding id must match binding"
           (binding.bindingId == bindingId)
+        assertMsg "venue readiness binding active status credential id must match binding"
+          (activeStatus.credentialId == binding.credentialId)
+        assertMsg "venue readiness binding active status holder must match binding"
+          (activeStatus.holder == binding.holder)
+        assertMsg "venue readiness binding active status attester must match binding"
+          (activeStatus.attester == binding.attester)
+        assertMsg "venue readiness binding active status evidence hash must match binding"
+          (activeStatus.evidenceHash == binding.evidenceHash)
+        assertMsg "venue readiness binding active status must be active at validation ledger time"
+          (withinTimeWindow now activeStatus.validFromTime activeStatus.validUntilTime)
+        assertMsg "venue readiness binding active status must be fresh at validation ledger time"
+          (now < activeStatus.freshUntilTime)
         assertMsg "venue readiness binding credential must not be expired at validation ledger time"
           (now < binding.credentialValidUntilTime)
         assertMsg "venue readiness binding credential must not be stale at validation ledger time"

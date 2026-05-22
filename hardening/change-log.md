@@ -7,6 +7,7 @@
 - Made venue-readiness validation verifier-exercisable and added stale binding rejection against typed credential validity and freshness fields.
 - Bound license attestation scope jurisdiction to the credential/request jurisdiction, preserved presentation purpose during binding, and broadened readiness claim gate noun-form coverage.
 - Tightened readiness overclaim safe-boundary classifiers and added unsafe claim fixtures so failure-condition or `not only` language cannot whitelist prohibited Passport capability claims.
+- Required readiness bindings to fetch the live source readiness credential and venue-readiness validation to fetch `ReadinessCredentialActiveStatus`, with negative coverage for binding or validating after credential revocation.
 - Updated docs, demo transcript generation, gates, and the invariant map so Markets Phase C must fetch or cross-check the binding before relying on copied venue-readiness wrapper fields.
 - Addressed Codex review feedback by making `GrantReadinessAuditDisclosure` validate against the source credential's typed validity window rather than the grant argument window, with an expired-credential negative test.
 

@@ -16,6 +16,8 @@ License or registration credentials are attestation-only. The model requires `Li
 
 VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
+Validation must fetch the binding's live `ReadinessCredentialActiveStatus` so revoked, stale, or expired readiness evidence cannot be accepted through copied wrapper fields.
+
 ## Consequences
 
 Markets can vendor one Passport DAR and read generic readiness evidence without Passport becoming a venue or licensing authority.

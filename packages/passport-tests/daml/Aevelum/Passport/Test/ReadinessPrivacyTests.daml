@@ -84,3 +84,14 @@ t117_unauthorized_party_cannot_see_readiness_credential = script do
   assertMsg "outsider cannot see readiness binding" (length outsiderBindings == 0)
   assertMsg "outsider cannot see readiness audit grant" (length outsiderGrants == 0)
   return ()
+
+t131_active_status_visibility_is_liveness_only : Script ()
+t131_active_status_visibility_is_liveness_only = script do
+  base <- createBaseReadinessContext
+  verifierStatuses <- query @ReadinessCredentialActiveStatus base.actors.verifier
+  outsiderStatuses <- query @ReadinessCredentialActiveStatus base.actors.outsider
+  verifierCredentials <- query @ReadinessCredential base.actors.verifier
+  assertMsg "approved verifier should see readiness active status" (length verifierStatuses == 1)
+  assertMsg "outsider should not see readiness active status" (length outsiderStatuses == 0)
+  assertMsg "approved verifier should not see raw readiness credential through active status" (length verifierCredentials == 0)
+  return ()

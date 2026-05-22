@@ -185,7 +185,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, and wrong evidence hash, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping.",
+      "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, wrong evidence hash, stale binding, and revoked source credential, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping and active-status fetch.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
@@ -317,7 +317,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "Readiness privacy Daml Script tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts.",
+      "kill_gate": "Readiness privacy Daml Script tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts and approved-verifier active-status witnesses.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],

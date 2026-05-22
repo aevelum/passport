@@ -72,6 +72,7 @@ const readinessTranscript = {
   ],
   privacyAssertions: [
     'Holder and Attester see the raw ReadinessCredential',
+    'Approved verifiers see only ReadinessCredentialActiveStatus for revocation liveness before presentation',
     'Verifier receives scoped ReadinessPresentation and ReadinessBinding',
     'Auditor receives ReadinessAuditDisclosureGrant only',
     'Outsider sees no readiness credential, presentation, binding, or audit grant'
@@ -110,8 +111,8 @@ const venueTranscript = {
     'Markets Phase C must not trust string readiness refs or copied wrapper fields alone.',
     'VenueReadinessUse must match ReadinessBindingPurpose.',
     'The verifier can exercise ValidateVenueReadinessEvidence independently.',
-    'Validation rejects stale or expired ReadinessBinding credential validity and freshness windows.',
-    'ValidateVenueReadinessEvidence fetches the ReadinessBinding and checks binding id, parties, credential kind, subject, evidence hash, venue profile, and purpose mapping.'
+    'Validation rejects revoked, stale, or expired ReadinessBinding source credentials through ReadinessCredentialActiveStatus.',
+    'ValidateVenueReadinessEvidence fetches the ReadinessBinding and its live ReadinessCredentialActiveStatus, then checks binding id, parties, credential kind, subject, evidence hash, venue profile, and purpose mapping.'
   ],
   visibility: 'VenueReadinessEvidence is visible to holder, attester, and verifier',
   boundaryAssertions: [

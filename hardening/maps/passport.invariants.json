@@ -521,7 +521,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.ledger-schema",
         "status": "breakdown",
-        "notes": "Generic readiness account, policy, request, credential, presentation, binding, revocation, and audit grant templates."
+        "notes": "Generic readiness account, policy, request, credential, active-status, presentation, binding, revocation, and audit grant templates."
       },
       {
         "path": "packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml",
@@ -545,7 +545,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.ledger-schema",
         "status": "breakdown",
-        "notes": "VenueReadinessEvidence wrapper over readiness bindings with explicit validation against copied binding fields."
+        "notes": "VenueReadinessEvidence wrapper over readiness bindings with explicit validation against copied binding fields and active-status liveness."
       },
       {
         "path": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml",
@@ -585,7 +585,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "Readiness license attestation, license scope jurisdiction, binding purpose, and policy approval negative coverage."
+        "notes": "Readiness license attestation, license scope jurisdiction, binding purpose, source revocation, and policy approval negative coverage."
       },
       {
         "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessPrivacyTests.daml",
@@ -593,7 +593,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "Readiness revocation, audit grant, and unauthorized visibility coverage."
+        "notes": "Readiness revocation, audit grant, active-status visibility, and unauthorized visibility coverage."
       },
       {
         "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessScenario.daml",
@@ -641,7 +641,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "VenueReadinessEvidence positive and negative canonicality, verifier-only validation, and stale binding coverage against ReadinessBinding."
+        "notes": "VenueReadinessEvidence positive and negative canonicality, verifier-only validation, stale binding coverage against ReadinessBinding, and revoked source credential rejection."
       },
       {
         "path": "README.md",
@@ -800,9 +800,9 @@
       "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
       "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.",
-      "Daml readiness tests t100-t128 must pass with 100% template and choice coverage.",
-      "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, or evidence hash.",
-      "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, or consumer cross-check docs are removed.",
+      "Daml readiness tests t100-t130 must pass with 100% template and choice coverage.",
+      "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, evidence hash, stale binding, or revoked source credential.",
+      "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, active-status fetches, or consumer cross-check docs are removed.",
       "npm run readiness:claim-gate must reject license, venue, trade, clearing, settlement, custody, asset-transfer, token, and wallet overclaims."
     ]
   },
@@ -915,6 +915,11 @@
               {
                 "id": "fn.daml.revoke-readiness-credential",
                 "name": "RevokeReadinessCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.deactivate-readiness-credential-active-status",
+                "name": "DeactivateReadinessCredentialActiveStatus",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
               },
               {
@@ -1108,10 +1113,11 @@
                     "id": "prop.daml.readiness-scoped-visibility",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Verifiers see scoped presentations and bindings, auditors see scoped audit grants, and outsiders see no readiness credential, presentation, binding, venue evidence, or audit grant.",
+                    "statement": "Verifiers see scoped presentations, bindings, and minimal active-status witnesses, auditors see scoped audit grants, and outsiders see no readiness credential, active status, presentation, binding, venue evidence, or audit grant.",
                     "enforcing_functions": [
                       "fn.daml.present-readiness-to-verifier",
                       "fn.daml.bind-readiness-to-context",
+                      "fn.daml.deactivate-readiness-credential-active-status",
                       "fn.daml.grant-readiness-audit-disclosure"
                     ]
                   },
@@ -1132,9 +1138,10 @@
                     "id": "prop.daml.venue-readiness-evidence-canonical",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "VenueReadinessEvidence must be treated as a wrapper around ReadinessBinding and must validate copied binding fields, venue profile, evidence hash, and VenueReadinessUse to ReadinessBindingPurpose before consumers rely on it.",
+                    "statement": "VenueReadinessEvidence must be treated as a wrapper around ReadinessBinding and must validate copied binding fields, live source credential active status, venue profile, evidence hash, and VenueReadinessUse to ReadinessBindingPurpose before consumers rely on it.",
                     "enforcing_functions": [
                       "fn.daml.bind-readiness-to-context",
+                      "fn.daml.deactivate-readiness-credential-active-status",
                       "fn.daml.validate-venue-readiness-evidence",
                       "fn.daml.readiness-use-matches-binding-purpose"
                     ]
@@ -2317,12 +2324,12 @@
         "severity": "high",
         "attacker_control": "indirect",
         "status": "guarded",
-        "description": "A future readiness template observer or choice leaks raw credentials, presentations, bindings, venue evidence, or audit grants to unauthorized parties.",
+        "description": "A future readiness template observer or choice leaks raw credentials, active-status witnesses, presentations, bindings, venue evidence, or audit grants to unauthorized parties.",
         "evidence": [
           "test.daml.coverage-suite"
         ],
         "exploit_path_ids": [],
-        "kill_gate": "Readiness privacy Daml Script tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts."
+        "kill_gate": "Readiness privacy Daml Script tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts and approved-verifier active-status witnesses."
       },
       {
         "id": "bd.daml.venue-readiness-wrapper-drift",
@@ -2331,13 +2338,13 @@
         "severity": "high",
         "attacker_control": "direct",
         "status": "guarded",
-        "description": "A directly created VenueReadinessEvidence copies fields that drift from the referenced ReadinessBinding, allowing a consumer to rely on a mismatched binding id, use, venue profile, or evidence hash.",
+        "description": "A directly created VenueReadinessEvidence copies fields that drift from the referenced ReadinessBinding or a binding whose active-status witness was consumed by source credential revocation, allowing a consumer to rely on a mismatched binding id, use, venue profile, evidence hash, or revoked source credential.",
         "evidence": [
           "test.daml.coverage-suite",
           "test.hardening.architecture-gate"
         ],
         "exploit_path_ids": [],
-        "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, and wrong evidence hash, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping."
+        "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, wrong evidence hash, stale binding, and revoked source credential, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping and active-status fetch."
       },
       {
         "id": "bd.scope.readiness-venue-operation-overclaim",

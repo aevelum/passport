@@ -82,6 +82,7 @@ function checkPassportScopeBoundary() {
   const visibilityChecks = {
     'README.md': [
       'readinesscredential is visible',
+      'readinesscredentialactivestatus',
       'readinesspresentation',
       'readinessbinding',
       'readinessauditdisclosuregrant',
@@ -91,6 +92,7 @@ function checkPassportScopeBoundary() {
     ],
     'docs/02_foundation_release_scope.md': [
       'readinesscredential is visible',
+      'readinesscredentialactivestatus',
       'readinesspresentation',
       'readinessbinding',
       'readinessauditdisclosuregrant',
@@ -100,6 +102,7 @@ function checkPassportScopeBoundary() {
     ],
     'docs/05_privacy_model.md': [
       'readinesscredential is visible',
+      'readinesscredentialactivestatus',
       'readinesspresentation',
       'readinessbinding',
       'readinessauditdisclosuregrant',
@@ -109,6 +112,7 @@ function checkPassportScopeBoundary() {
     ],
     'docs/07_non_goals.md': [
       'readinesscredential is visible',
+      'readinesscredentialactivestatus',
       'readinesspresentation',
       'readinessbinding',
       'readinessauditdisclosuregrant',
@@ -123,6 +127,7 @@ function checkPassportScopeBoundary() {
     ],
     'artifacts/readiness_demo_transcript.json': [
       'readinesscredential',
+      'readinesscredentialactivestatus',
       'readinesspresentation',
       'readinessbinding',
       'readinessauditdisclosuregrant'
@@ -417,6 +422,7 @@ checkContains(readinessFoundation, [
   'template ReadinessPolicy',
   'template ReadinessPolicyLifecycleEvent',
   'template ReadinessCredentialRequest',
+  'template ReadinessCredentialActiveStatus',
   'template ReadinessCredential',
   'template ReadinessPresentation',
   'template ReadinessBinding',
@@ -430,6 +436,12 @@ checkContains(readinessFoundation, [
   'BindReadinessToContext',
   'GrantReadinessAuditDisclosure',
   'RevokeReadinessCredential',
+  'DeactivateReadinessCredentialActiveStatus',
+  'sourceCredentialCid : ContractId ReadinessCredential',
+  'sourceCredentialActiveStatusCid : ContractId ReadinessCredentialActiveStatus',
+  'credential <- fetch sourceCredentialCid',
+  'activeStatus <- fetch sourceCredentialActiveStatusCid',
+  'sourceCredentialCid',
   'validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope',
   'bindingPurpose == presentationPurpose'
 ]);
@@ -440,8 +452,11 @@ checkContains(venueReadinessFoundation, [
   'VenueReadinessUse',
   'ValidateVenueReadinessEvidence',
   'controller verifier',
+  'activeStatus <- fetch binding.sourceCredentialActiveStatusCid',
   'binding.credentialValidUntilTime',
   'binding.credentialFreshUntilTime',
+  'activeStatus.credentialId == binding.credentialId',
+  'activeStatus.evidenceHash == binding.evidenceHash',
   'binding.venueProfileRef == Some venueProfileRef'
 ]);
 
@@ -518,7 +533,8 @@ checkContains(testReadinessBoundary, [
   't111_reject_unapproved_activity',
   't119_readiness_binding_is_non_executing_evidence_only',
   't127_reject_license_scope_jurisdiction_mismatch',
-  't128_reject_binding_purpose_mismatch'
+  't128_reject_binding_purpose_mismatch',
+  't129_reject_binding_after_readiness_credential_revocation'
 ]);
 
 checkContains(testReadinessTemporal, [
@@ -531,7 +547,8 @@ checkContains(testReadinessPrivacy, [
   't114_revoke_readiness_credential',
   't115_grant_readiness_audit_disclosure',
   't116_auditor_cannot_see_full_readiness_credential',
-  't117_unauthorized_party_cannot_see_readiness_credential'
+  't117_unauthorized_party_cannot_see_readiness_credential',
+  't131_active_status_visibility_is_liveness_only'
 ]);
 
 checkContains(testVenueReadiness, [
@@ -542,6 +559,7 @@ checkContains(testVenueReadiness, [
   't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
   't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
   't126_reject_venue_readiness_evidence_after_binding_freshness_expiry',
+  't130_reject_venue_readiness_evidence_after_credential_revocation',
   'venueReadinessStaleValidationTime',
   'submit bound.presented.base.actors.verifier',
   'submitMustFail',
@@ -747,7 +765,7 @@ try {
     'Markets Phase C must not trust string readiness refs or copied wrapper fields alone.',
     'VenueReadinessUse must match ReadinessBindingPurpose.',
     'The verifier can exercise ValidateVenueReadinessEvidence independently.',
-    'Validation rejects stale or expired ReadinessBinding credential validity and freshness windows.'
+    'Validation rejects revoked, stale, or expired ReadinessBinding source credentials through ReadinessCredentialActiveStatus.'
   ]) {
     if (!transcript.validation?.includes(validation)) fail.push(`venue_readiness_demo_transcript missing validation rule ${validation}`);
     else pass.push(`venue_readiness_demo_transcript includes validation rule ${validation}`);

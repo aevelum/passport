@@ -17,9 +17,9 @@ Venue readiness in Passport means evidence that a holder, product, capability, o
 
 These records are references and attestations only. Passport does not admit participants to a venue, operate a venue, create trades, match orders, execute trades, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
 
-The Daml validation path fetches the referenced `ReadinessBinding` and checks holder, attester, verifier, binding id, credential kind, subject, evidence hash, venue profile, and the `VenueReadinessUse` to `ReadinessBindingPurpose` mapping. Markets Phase C should mirror that rule when it consumes Passport readiness evidence.
+The Daml validation path fetches the referenced `ReadinessBinding`, fetches the binding's `ReadinessCredentialActiveStatus`, and checks holder, attester, verifier, binding id, credential kind, subject, evidence hash, venue profile, and the `VenueReadinessUse` to `ReadinessBindingPurpose` mapping. Markets Phase C should mirror that rule when it consumes Passport readiness evidence.
 
-The verifier can exercise `ValidateVenueReadinessEvidence` independently before relying on the wrapper. Validation also checks ledger time against the binding's typed `credentialValidUntilTime` and `credentialFreshUntilTime`, so stale or expired readiness evidence does not validate.
+The verifier can exercise `ValidateVenueReadinessEvidence` independently before relying on the wrapper. Validation also checks ledger time against the live active-status witness and the binding's typed `credentialValidUntilTime` and `credentialFreshUntilTime`, so revoked, stale, or expired readiness evidence does not validate.
 
 ## Visibility
 

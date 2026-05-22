@@ -185,3 +185,24 @@ t128_reject_binding_purpose_mismatch = script do
       bindingPurpose = VenueParticipantAdmissionBinding
       boundAt = "2026-05-10T00:04:00Z"
   return ()
+
+t129_reject_binding_after_readiness_credential_revocation : Script ()
+t129_reject_binding_after_readiness_credential_revocation = script do
+  presented <- createPresentedReadinessContext
+  setTime readinessAuditLedgerTime
+  _revocationCid <- submit presented.base.actors.attester do
+    exerciseCmd presented.base.credentialCid RevokeReadinessCredential with
+      revocationId = "readiness-revocation-before-binding-001"
+      reasonCode = ReadinessAttesterCorrection
+      revokedAt = "2026-05-10T00:05:00Z"
+      priorVerifiers = [presented.base.actors.verifier]
+      supersedingCredentialId = None
+  submitMustFail (actAs presented.base.actors.holder <> actAs presented.base.actors.attester <> actAs presented.base.actors.verifier) do
+    exerciseCmd presented.presentationCid BindReadinessToContext with
+      bindingId = "readiness-binding-after-revocation-001"
+      workflowRef = Some "markets-workflow:participant-check"
+      venueProfileRef = Some "venue-profile:demo"
+      venueRulebookRef = None
+      bindingPurpose = WorkflowEligibilityBinding
+      boundAt = "2026-05-10T00:05:00Z"
+  return ()

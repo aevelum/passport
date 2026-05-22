@@ -14,7 +14,7 @@ External legal, regulatory, licensing, custody, settlement, and clearing systems
 
 `VenueReadinessEvidence` is a wrapper around a `ReadinessBinding`. Consumers must validate or cross-check the underlying `ReadinessBinding` before relying on `VenueReadinessEvidence`. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. `VenueReadinessUse` must match the `ReadinessBindingPurpose`.
 
-The verifier can exercise Passport's venue-readiness validation path independently. Markets Phase C should also reject stale or expired readiness bindings by checking `credentialFreshUntilTime` and `credentialValidUntilTime`.
+The verifier can exercise Passport's venue-readiness validation path independently. Markets Phase C should also reject revoked, stale, or expired readiness evidence by fetching or cross-checking the binding's `ReadinessCredentialActiveStatus` and checking `credentialFreshUntilTime` and `credentialValidUntilTime`.
 
 ## Markets Owns
 

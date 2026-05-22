@@ -20,6 +20,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 | C.1 review | Readiness audit grant typed validity review. | Done | Fixed `GrantReadinessAuditDisclosure` to validate against the credential validity window and added a negative expired-credential audit grant test. |
 | C.1 review | Venue-readiness verifier validation and freshness review. | Done | Made `ValidateVenueReadinessEvidence` verifier-exercisable and added stale binding validation coverage. |
 | C.1 review | License scope and binding purpose review. | Done | Bound license scope jurisdiction to credential jurisdiction and rejected binding purposes that differ from presentation purpose. |
+| C.1 review | Source credential revocation review. | Done | `BindReadinessToContext` fetches the source `ReadinessCredential`; venue validation fetches `ReadinessCredentialActiveStatus`, with negative tests for binding or validating after revocation. |
 
 ## Required Boundary Checks
 
@@ -29,7 +30,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 - Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.
 - Markets Phase C must not trust string readiness refs or copied wrapper fields alone.
 - VenueReadinessUse must match ReadinessBindingPurpose.
-- Venue-readiness validation must be exercisable by the verifier and reject stale or expired readiness bindings.
+- Venue-readiness validation must be exercisable by the verifier and reject revoked, stale, or expired readiness bindings.
 - Verifiers must receive scoped presentations and bindings, not raw credentials.
 - Auditors must receive scoped audit grants only.
 - Unauthorized outsiders must see no readiness credential, presentation, binding, or audit grant.

@@ -67,6 +67,7 @@
   ],
   "privacyAssertions": [
     "Holder and Attester see the raw ReadinessCredential",
+    "Approved verifiers see only ReadinessCredentialActiveStatus for revocation liveness before presentation",
     "Verifier receives scoped ReadinessPresentation and ReadinessBinding",
     "Auditor receives ReadinessAuditDisclosureGrant only",
     "Outsider sees no readiness credential, presentation, binding, or audit grant"

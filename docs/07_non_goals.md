@@ -2,7 +2,7 @@
 
 Passport records attested readiness and scoped evidence only: eligibility, presentation, binding, reservation, revocation, expiry-by-validity, audit, bounded interop artifacts, and adapter readiness reports. Passport may record a reservation handoff notice.
 
-ReadinessCredential is visible to holder and attester. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+ReadinessCredential is visible to holder and attester. ReadinessCredentialActiveStatus is visible to holder, attester, and approved verifiers as a minimal revocation liveness witness, not as a raw credential. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Passport intentionally excludes:
 

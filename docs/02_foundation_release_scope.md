@@ -10,7 +10,7 @@ Passport may record a reservation handoff notice. The notice is for downstream r
 
 Passport 0.3.0 adds generic regulated-market readiness templates and keeps ledger-comparable Daml `Time` fields authoritative for policy validity, credential validity/freshness, presentation validity, binding freshness, audit validity, and event times. ISO timestamp text fields are retained as display and interop metadata only.
 
-ReadinessCredential is visible to holder and attester. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+ReadinessCredential is visible to holder and attester. ReadinessCredentialActiveStatus is visible to holder, attester, and approved verifiers as a minimal revocation liveness witness, not as a raw credential. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 
 Aevelum Passport demonstrates a roomless Canton-native collateral credential account for repo pre-trade capacity verification and reservation.
 

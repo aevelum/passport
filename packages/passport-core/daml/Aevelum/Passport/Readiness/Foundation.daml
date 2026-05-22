@@ -209,8 +209,21 @@ template ReadinessCredentialRequest
         assertMsg "license registration readiness requires valid attestation-only scope"
           (validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope)
 
+        activeStatusCid <- create ReadinessCredentialActiveStatus with
+          statusId = credentialId <> ":active"
+          credentialId
+          holder
+          attester
+          approvedVerifiers = policy.approvedVerifiers
+          evidenceHash
+          validFromTime
+          validUntilTime
+          freshUntilTime
+          schemaVersion
+
         create ReadinessCredential with
           credentialId
+          activeStatusCid
           holder
           attester
           policyPublisher
@@ -235,9 +248,39 @@ template ReadinessCredentialRequest
           status = ReadinessCredentialActive
           schemaVersion
 
+template ReadinessCredentialActiveStatus
+  with
+    statusId : Text
+    credentialId : ReadinessCredentialId
+    holder : Party
+    attester : Party
+    approvedVerifiers : [Party]
+    evidenceHash : EvidenceHash
+    validFromTime : Time
+    validUntilTime : Time
+    freshUntilTime : Time
+    schemaVersion : Text
+  where
+    signatory holder, attester
+    observer approvedVerifiers
+
+    ensure
+      statusId /= ""
+        && credentialId /= ""
+        && not (null approvedVerifiers)
+        && evidenceHash /= ""
+        && coherentTimeWindow validFromTime validUntilTime
+        && freshUntilTime > validFromTime
+
+    choice DeactivateReadinessCredentialActiveStatus : ()
+      controller attester
+      do
+        return ()
+
 template ReadinessCredential
   with
     credentialId : ReadinessCredentialId
+    activeStatusCid : ContractId ReadinessCredentialActiveStatus
     holder : Party
     attester : Party
     policyPublisher : Party
@@ -301,6 +344,7 @@ template ReadinessCredential
         create ReadinessPresentation with
           presentationId
           sourceCredentialCid = self
+          sourceCredentialActiveStatusCid = activeStatusCid
           credentialId
           holder
           attester
@@ -373,6 +417,7 @@ template ReadinessCredential
       controller attester
       do
         now <- getTime
+        exercise activeStatusCid DeactivateReadinessCredentialActiveStatus
         create ReadinessRevocation with
           revocationId
           credentialId
@@ -389,6 +434,7 @@ template ReadinessPresentation
   with
     presentationId : ReadinessPresentationId
     sourceCredentialCid : ContractId ReadinessCredential
+    sourceCredentialActiveStatusCid : ContractId ReadinessCredentialActiveStatus
     credentialId : ReadinessCredentialId
     holder : Party
     attester : Party
@@ -443,13 +489,39 @@ template ReadinessPresentation
       controller holder, attester, verifier
       do
         now <- getTime
+        credential <- fetch sourceCredentialCid
+        activeStatus <- fetch sourceCredentialActiveStatusCid
         assertMsg "readiness binding id must be present" (bindingId /= "")
+        assertMsg "readiness binding source credential must be active" (credential.status == ReadinessCredentialActive)
+        assertMsg "readiness binding source active status id must match presentation" (activeStatus.credentialId == credentialId)
+        assertMsg "readiness binding source active status holder must match presentation" (activeStatus.holder == holder)
+        assertMsg "readiness binding source active status attester must match presentation" (activeStatus.attester == attester)
+        assertMsg "readiness binding source active status evidence hash must match presentation" (activeStatus.evidenceHash == evidenceHash)
+        assertMsg "readiness binding source active status must be active at binding ledger time" (withinTimeWindow now activeStatus.validFromTime activeStatus.validUntilTime)
+        assertMsg "readiness binding source active status must be fresh at binding ledger time" (now < activeStatus.freshUntilTime)
+        assertMsg "readiness binding source credential id must match presentation" (credential.credentialId == credentialId)
+        assertMsg "readiness binding source credential holder must match presentation" (credential.holder == holder)
+        assertMsg "readiness binding source credential attester must match presentation" (credential.attester == attester)
+        assertMsg "readiness binding source credential policy publisher must match presentation" (credential.policyPublisher == policyPublisher)
+        assertMsg "readiness binding source credential policy id must match presentation" (credential.policyId == policyId)
+        assertMsg "readiness binding source credential policy version must match presentation" (credential.policyVersion == policyVersion)
+        assertMsg "readiness binding source credential kind must match presentation" (credential.credentialKind == credentialKind)
+        assertMsg "readiness binding source credential subject must match presentation" (credential.subject == subject)
+        assertMsg "readiness binding source credential jurisdiction must match presentation" (credential.jurisdiction == jurisdiction)
+        assertMsg "readiness binding source credential activities must match presentation" (credential.activityRefs == activityRefs)
+        assertMsg "readiness binding source credential license scope must match presentation" (credential.licenseScope == licenseScope)
+        assertMsg "readiness binding source credential evidence hash must match presentation" (credential.evidenceHash == evidenceHash)
+        assertMsg "readiness binding source credential calculation method hash must match presentation" (credential.calculationMethodHash == calculationMethodHash)
+        assertMsg "readiness binding source credential must be active at binding ledger time" (withinTimeWindow now credential.validFromTime credential.validUntilTime)
+        assertMsg "readiness binding source credential must be fresh at binding ledger time" (now < credential.freshUntilTime)
         assertMsg "readiness presentation expired at binding ledger time" (now < presentationValidUntilTime)
         assertMsg "readiness binding must name workflow, venue profile, or rulebook context" (hasReadinessContext workflowRef venueProfileRef venueRulebookRef)
         assertMsg "readiness binding purpose must match presentation purpose" (bindingPurpose == presentationPurpose)
         create ReadinessBinding with
           bindingId
           presentationId
+          sourceCredentialCid
+          sourceCredentialActiveStatusCid
           credentialId
           holder
           attester
@@ -478,6 +550,8 @@ template ReadinessBinding
   with
     bindingId : ReadinessBindingId
     presentationId : ReadinessPresentationId
+    sourceCredentialCid : ContractId ReadinessCredential
+    sourceCredentialActiveStatusCid : ContractId ReadinessCredentialActiveStatus
     credentialId : ReadinessCredentialId
     holder : Party
     attester : Party
