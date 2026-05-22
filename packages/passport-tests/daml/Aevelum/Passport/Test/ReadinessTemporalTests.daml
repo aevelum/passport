@@ -1,0 +1,78 @@
+module Aevelum.Passport.Test.ReadinessTemporalTests where
+
+import DA.Date
+import DA.Time (time)
+import Daml.Script
+import Aevelum.Passport.Readiness.Types
+import Aevelum.Passport.Readiness.Foundation
+import Aevelum.Passport.Test.ReadinessScenario
+
+t112_reject_expired_readiness_policy : Script ()
+t112_reject_expired_readiness_policy = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  let expiredPolicyUntil = time (date 2026 May 10) 0 1 30
+  policyCid <- createReadinessPolicyWith actors [ParticipantEligibilityCredential] ["US-NY"] ["participant-eligibility"] 24 expiredPolicyUntil
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ParticipantEligibilityCredential
+    (PartySubject actors.holder)
+    "US-NY"
+    ["participant-eligibility"]
+    None
+  setTime readinessIssueLedgerTime
+  submitMustFail (actAs actors.holder <> actAs actors.attester) do
+    exerciseCmd requestCid IssueReadinessCredential with
+      credentialId = "expired-policy-credential-001"
+      policyCid
+      evidenceHash = "sha256:readiness-evidence-expired-policy"
+      calculationMethodHash = "sha256:readiness-calculation-expired-policy"
+      validFrom = "2026-05-10T00:02:00Z"
+      validFromTime = readinessIssueLedgerTime
+      validUntil = "2026-05-12T00:02:00Z"
+      validUntilTime = readinessCredentialValidUntilTime
+      issuedAt = "2026-05-10T00:02:00Z"
+  return ()
+
+t113_reject_stale_readiness_presentation : Script ()
+t113_reject_stale_readiness_presentation = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  policyCid <- createReadinessPolicyWith actors [ParticipantEligibilityCredential] ["US-NY"] ["participant-eligibility"] 1 readinessPolicyValidUntilTime
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ParticipantEligibilityCredential
+    (PartySubject actors.holder)
+    "US-NY"
+    ["participant-eligibility"]
+    None
+  credentialCid <- issueReadinessCredential requestCid policyCid actors "stale-readiness-credential-001"
+  setTime readinessStaleLedgerTime
+  submitMustFail actors.holder do
+    exerciseCmd credentialCid PresentReadinessToVerifier with
+      presentationId = "stale-readiness-presentation-001"
+      verifier = actors.verifier
+      presentationPurpose = WorkflowEligibilityBinding
+      allowedFields = ["credentialId", "policyId"]
+      presentedAt = "2026-05-10T02:03:00Z"
+  return ()
+
+t125_reject_readiness_audit_grant_after_credential_expiry : Script ()
+t125_reject_readiness_audit_grant_after_credential_expiry = script do
+  base <- createBaseReadinessContext
+  let afterCredentialExpiryTime = time (date 2026 May 12) 0 3 0
+  let auditGrantUntilTime = time (date 2026 May 12) 0 10 0
+  setTime afterCredentialExpiryTime
+  submitMustFail (actAs base.actors.holder <> actAs base.actors.attester) do
+    exerciseCmd base.credentialCid GrantReadinessAuditDisclosure with
+      grantId = "readiness-audit-grant-expired-credential-001"
+      auditor = base.actors.auditor
+      allowedFields = ["credentialId", "evidenceHash"]
+      validFrom = "2026-05-12T00:03:00Z"
+      validFromTime = afterCredentialExpiryTime
+      validUntil = "2026-05-12T00:10:00Z"
+      validUntilTime = auditGrantUntilTime
+      legalBasisRef = "audit-request:expired-readiness-credential"
+  return ()

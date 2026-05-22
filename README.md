@@ -1,24 +1,39 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/banner.svg">
-  <img alt="Aevelum Passport Foundation - Canton-native collateral capacity credentials" src="assets/banner.svg">
+  <img alt="Aevelum Passport Foundation - Canton-native regulated-market readiness credentials" src="assets/banner.svg">
 </picture>
 
-Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.
+Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.
 
-It models collateral-capacity accounts, collateral policies, credential requests, credential issuance, counterparty-scoped presentation, bounded reservation, residual capacity, revocation, expiry, dispute metadata, reservation handoff metadata, and scoped audit disclosure. Passport may emit bounded interop artifacts and adapter-readiness reports.
+It models readiness accounts, readiness policies, externally attested credential requests, credential issuance, scoped presentation, context binding, revocation, expiry-by-validity, venue-readiness evidence wrappers, and scoped audit disclosure. The existing collateral-capacity account, policy, presentation, reservation, residual capacity, revocation, expiry, dispute metadata, reservation handoff metadata, and audit disclosure templates remain available as the first credential family and demo workflow.
 
-Passport records readiness. Passport may record a reservation handoff notice. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, or move collateral.
+Passport records attested readiness and scoped evidence only. Passport may record a reservation handoff notice. Passport does not grant licenses or legal permissions. Passport does not admit participants to a venue. Passport does not determine legal compliance. Passport does not operate a venue, exchange, ATS, SEF, MTF, regulated market, matching engine, order book, clearinghouse, custodian, settlement system, wallet, token issuer, legal-title oracle, credit engine, or production identity system. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, clear, or move collateral or assets.
 
-Passport 0.2.0 exposes authoritative Daml `Time` fields for policy validity, credential valuation and freshness, presentation validity, and reservation validity. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
+Passport 0.3.0 adds generic readiness credential templates with typed Daml `Time` fields for policy validity, credential validity/freshness, presentation validity, binding freshness, revocation event time, audit grant validity, and venue-readiness evidence creation time. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
 
-CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
-Aevelum Passport demonstrates a roomless Canton-native collateral credential account for repo pre-trade capacity verification and reservation.
+The verifier can exercise VenueReadinessEvidence validation independently. Validation fetches the binding's live `ReadinessCredentialActiveStatus`, so revoked credentials, stale credentials, or expired readiness bindings do not validate.
 
-The public core proves one narrow readiness workflow:
+ReadinessCredential is visible to holder and attester. ReadinessCredentialActiveStatus is visible to holder, attester, and approved verifiers as a minimal revocation liveness witness, not as a raw credential. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
+
+Aevelum Passport demonstrates a roomless Canton-native readiness credential foundation for future regulated-market workflows, with collateral capacity still demonstrated through repo pre-trade capacity verification and reservation.
+
+The public core now proves two readiness workflows:
 
 ```text
+Policy publisher creates ReadinessPolicy.
+Holder creates ReadinessAccount.
+Holder requests participant eligibility or license / registration attestation.
+Attester issues ReadinessCredential.
+Holder presents ReadinessPresentation to a verifier.
+Holder, attester, and verifier bind ReadinessBinding to workflow or venue-profile context.
+Auditor receives only scoped ReadinessAuditDisclosureGrant.
+VenueReadinessEvidence references a valid readiness binding.
+Markets fetches or cross-checks the underlying ReadinessBinding before relying on VenueReadinessEvidence.
+Markets rejects venue readiness evidence if the binding's source ReadinessCredential has been revoked.
+
 Dealer publishes collateral policy.
 Holder creates Passport Account.
 Holder requests capacity credential.
@@ -37,19 +52,29 @@ Auditor receives only scoped audit metadata.
 ## What this is
 
 - A Daml-as-spec package.
-- A roomless collateral capacity credential account.
+- A regulated-market readiness credential foundation.
+- A roomless collateral capacity credential account as the first credential family.
 - A repo pre-trade capacity credential demo.
+- A license / registration attestation model that records external evidence only.
+- A venue-readiness evidence wrapper for Markets to fetch without making Passport a venue.
 - A reservation, residual-capacity, revocation, expiry, dispute, handoff, and scoped-audit model.
-- A committee-facing foundation for Canton collateral workflows.
+- A committee-facing foundation for Canton regulated-market readiness workflows.
 
 ## What this is not
 
 - Not a repo venue.
 - Not a securities-lending venue.
+- Not an exchange, ATS, SEF, MTF, regulated market, matching engine, or order book.
+- Not a licensing authority.
+- Not legal-compliance determination.
+- Not venue admission.
 - Not a margin engine.
 - Not a custody provider.
+- Not a clearinghouse.
 - Not a settlement rail.
 - Not a collateral-transfer system.
+- Not an asset-transfer system.
+- Not a token issuer.
 - Not a collateral optimizer.
 - Not a credit decision engine.
 - Not a wallet.
@@ -71,6 +96,8 @@ packages/
     daml.yaml
     daml/Aevelum/Passport/Types.daml
     daml/Aevelum/Passport/Foundation.daml
+    daml/Aevelum/Passport/Readiness/*.daml
+    daml/Aevelum/Passport/VenueReadiness/*.daml
   passport-tests/
     daml.yaml
     daml/Aevelum/Passport/Test/*.daml
@@ -86,6 +113,11 @@ docs/
   08_brand_ui_system.md
   09_adapter_readiness_levels.md
   10_release_notes.md
+  11_readiness_credential_framework.md
+  12_venue_readiness_credentials.md
+  13_license_registration_attestations.md
+  14_passport_markets_boundary.md
+  15_release_notes_passport_0_3.md
 design/
   tokens/colors.json
   change-log.md
@@ -108,6 +140,8 @@ scripts/
   gates.mjs
   daml-coverage-gate.mjs
   export-demo-transcript.mjs
+  export-readiness-demo-transcript.mjs
+  readiness-claim-gate.mjs
   interop-generate.mjs
   interop-validate.mjs
   interop-vendor-cdm.mjs
@@ -117,6 +151,8 @@ scripts/
   package.mjs
 artifacts/
   demo_transcript.json
+  readiness_demo_transcript.json
+  venue_readiness_demo_transcript.json
   interop/report.json
   hardening_report.json
   hardening_map_report.json
@@ -139,6 +175,8 @@ npm run hardening:frontier
 npm run hardening:formal
 npm run hardening:gate
 ```
+
+The readiness claim gate rejects overclaims that frame Passport as granting licenses, registering participants, admitting venue participants, operating venues, executing trades, clearing, settling, custodying assets, issuing tokens, or operating wallets.
 
 The interop adapter gate generates CDM collateral eligibility artifacts from a Passport sample input and validates their JSON shape offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset. CDM adapter readiness is Level 2 — Artifact Conformance. `CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
 

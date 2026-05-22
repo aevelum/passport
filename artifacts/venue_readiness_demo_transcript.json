@@ -1,0 +1,35 @@
+{
+  "artifact": "venue_readiness_demo_transcript",
+  "package": "aevelum-passport-foundation",
+  "version": "0.3.0",
+  "workflow": "venue-readiness-evidence-wrapper",
+  "ids": {
+    "bindingId": "readiness-binding-001",
+    "venueReadinessEvidenceId": "venue-readiness-evidence-001",
+    "venueId": "venue:demo-markets",
+    "venueProfileRef": "venue-profile:demo"
+  },
+  "use": "VenueParticipantAdmissionUse",
+  "source": "VenueReadinessEvidence is a wrapper around a ReadinessBinding",
+  "validation": [
+    "Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.",
+    "Markets Phase C must not trust string readiness refs or copied wrapper fields alone.",
+    "VenueReadinessUse must match ReadinessBindingPurpose.",
+    "The verifier can exercise ValidateVenueReadinessEvidence independently.",
+    "Validation rejects revoked, stale, or expired ReadinessBinding source credentials through ReadinessCredentialActiveStatus.",
+    "ValidateVenueReadinessEvidence fetches the ReadinessBinding and its live ReadinessCredentialActiveStatus, then checks binding id, parties, credential kind, subject, evidence hash, venue profile, and purpose mapping."
+  ],
+  "visibility": "VenueReadinessEvidence is visible to holder, attester, and verifier",
+  "boundaryAssertions": [
+    "readiness evidence only",
+    "not venue operation",
+    "not participant admission decision",
+    "not order matching",
+    "not trade formation",
+    "not execution",
+    "not clearing",
+    "not settlement",
+    "not custody",
+    "not asset transfer"
+  ]
+}

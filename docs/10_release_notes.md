@@ -1,5 +1,38 @@
 # 10 Release Notes
 
+## 0.3.0 - Generic Regulated-Market Readiness Credentials
+
+Passport 0.3.0 upgrades the public Canton/Daml foundation from collateral-readiness-only to regulated-market readiness credentials, with collateral capacity remaining the first credential family.
+
+### Schema changes
+
+- Adds `Aevelum.Passport.Readiness.Types` and `Aevelum.Passport.Readiness.Foundation`.
+- Adds `ReadinessAccount`, `ReadinessPolicy`, `ReadinessPolicyLifecycleEvent`, `ReadinessCredentialRequest`, `ReadinessCredential`, `ReadinessPresentation`, `ReadinessBinding`, `ReadinessRevocation`, and `ReadinessAuditDisclosureGrant`.
+- Adds `ReadinessCredentialKind` values for participant eligibility, license or registration attestation, venue access readiness, product eligibility, operational capability, disclosure consent, settlement or clearing readiness evidence, collateral capacity readiness, and other readiness credentials.
+- Adds `LicenseAttestationScope` and requires `attestationOnly = True` for license or registration attestation credentials.
+- Adds `Aevelum.Passport.VenueReadiness.Types`, `Aevelum.Passport.VenueReadiness.Foundation`, and `VenueReadinessEvidence`.
+
+### Validation behavior
+
+- Readiness policies, credentials, presentations, bindings, revocations, audit grants, and venue-readiness evidence use typed Daml `Time` fields where ledger-time validation matters.
+- Readiness credential issuance checks holder, attester, credential kind, jurisdiction, activity refs, policy validity, and credential validity.
+- Readiness presentation rejects expired or stale credentials.
+- Readiness binding is a non-executing evidence record tied to workflow, venue profile, or rulebook context.
+
+### Migration notes for Markets
+
+- Update Markets DAR dependency from `aevelum-passport-core-0.2.0.dar` to `aevelum-passport-core-0.3.0.dar`.
+- Use generic readiness templates for participant eligibility, license or registration attestation, venue access readiness, product eligibility, operational capability, disclosure consent, and settlement or clearing readiness evidence.
+- Continue using collateral-capacity templates for the existing repo pre-trade capacity credential and reservation demo until Markets migrates that family onto generic readiness objects.
+
+### Release artifact
+
+- DAR: `packages/passport-core/.daml/dist/aevelum-passport-core-0.3.0.dar`
+
+### Boundary
+
+Passport records attested readiness and scoped evidence only. Passport does not grant licenses, register participants, approve legal compliance, admit participants to a venue, operate a venue, execute trades, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, determine legal title, provide production identity, or provide live external integration.
+
 ## 0.2.0 - Typed Time Policy And Reservation Freshness
 
 Passport 0.2.0 upgrades the Daml schema so downstream Canton/Daml consumers can validate policy validity, credential freshness, presentation freshness, and reservation validity with typed `Time` values instead of parsing ISO timestamp `Text`.

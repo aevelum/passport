@@ -24,10 +24,10 @@ Passport records readiness. Passport may record a reservation handoff notice. Pa
 
 ## Kill Gates
 
-- Hardening gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.
-- Hardening gate fails if Passport-owned Daml contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.
-- Structural gate fails if README or docs lose the canonical scope or non-goal language.
-- Tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.
+- Hardening gate rejects Passport-owned Daml that contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.
+- Hardening gate rejects Passport-owned Daml that contains reservation-level handoff observers, reservation-level optional auditors, or a handoff status variant.
+- Structural gate rejects README or docs changes that lose the canonical scope or non-goal language.
+- Tests reject reservation handoff metadata gaps or visibility to the handoff recipient through a reservation-level observer.
 - Generated artifacts must be current.
 - CDM remains Level 2 — Artifact Conformance and does not overclaim.
 

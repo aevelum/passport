@@ -8,7 +8,7 @@ fs.mkdirSync(artifacts, { recursive: true });
 const transcript = {
   artifact: 'demo_transcript',
   package: 'aevelum-passport-foundation',
-  version: '0.2.0',
+  version: '0.3.0',
   workflow: 'repo-pretrade-collateral-capacity',
   parties: {
     holder: 'AevelumDemoHolder',

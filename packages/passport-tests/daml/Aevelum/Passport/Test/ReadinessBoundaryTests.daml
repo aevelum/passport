@@ -1,0 +1,208 @@
+module Aevelum.Passport.Test.ReadinessBoundaryTests where
+
+import Daml.Script
+import Aevelum.Passport.Readiness.Types
+import Aevelum.Passport.Readiness.Foundation
+import Aevelum.Passport.Test.ReadinessScenario
+
+licenseScopeNotAttestationOnly : LicenseAttestationScope
+licenseScopeNotAttestationOnly = LicenseAttestationScope with
+  jurisdiction = "US-NY"
+  externalAuthorityRef = "external-authority:ny-registry"
+  registrationRef = "registration:holder-001"
+  licensedActivityRefs = ["broker-dealer-readiness"]
+  attestationOnly = False
+
+licenseScopeWrongJurisdiction : LicenseAttestationScope
+licenseScopeWrongJurisdiction = LicenseAttestationScope with
+  jurisdiction = "EU-DE"
+  externalAuthorityRef = "external-authority:de-registry"
+  registrationRef = "registration:holder-001"
+  licensedActivityRefs = ["broker-dealer-readiness"]
+  attestationOnly = True
+
+t107_reject_license_attestation_without_scope : Script ()
+t107_reject_license_attestation_without_scope = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  submitMustFail actors.holder do
+    exerciseCmd accountCid RequestReadinessCredential with
+      requestId = "license-request-without-scope-001"
+      policyId = "readiness-policy-001"
+      policyVersion = "v1"
+      policyPublisher = actors.policyPublisher
+      attester = actors.attester
+      credentialKind = LicenseOrRegistrationAttestation
+      subject = PartySubject actors.holder
+      jurisdiction = "US-NY"
+      activityRefs = ["broker-dealer-readiness"]
+      licenseScope = None
+      requestedAt = "2026-05-10T00:01:00Z"
+  return ()
+
+t108_reject_license_scope_when_attestation_only_false : Script ()
+t108_reject_license_scope_when_attestation_only_false = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  submitMustFail actors.holder do
+    exerciseCmd accountCid RequestReadinessCredential with
+      requestId = "license-request-non-attestation-001"
+      policyId = "readiness-policy-001"
+      policyVersion = "v1"
+      policyPublisher = actors.policyPublisher
+      attester = actors.attester
+      credentialKind = LicenseOrRegistrationAttestation
+      subject = PartySubject actors.holder
+      jurisdiction = "US-NY"
+      activityRefs = ["broker-dealer-readiness"]
+      licenseScope = Some licenseScopeNotAttestationOnly
+      requestedAt = "2026-05-10T00:01:00Z"
+  return ()
+
+t109_reject_unapproved_credential_kind : Script ()
+t109_reject_unapproved_credential_kind = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  policyCid <- createReadinessPolicyWith actors [ParticipantEligibilityCredential] ["US-NY"] ["treasury-product"] 24 readinessPolicyValidUntilTime
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ProductEligibilityCredential
+    (ProductSubject "UST")
+    "US-NY"
+    ["treasury-product"]
+    None
+  setTime readinessIssueLedgerTime
+  submitMustFail (actAs actors.holder <> actAs actors.attester) do
+    exerciseCmd requestCid IssueReadinessCredential with
+      credentialId = "unapproved-kind-credential-001"
+      policyCid
+      evidenceHash = "sha256:readiness-evidence-unapproved-kind"
+      calculationMethodHash = "sha256:readiness-calculation-unapproved-kind"
+      validFrom = "2026-05-10T00:02:00Z"
+      validFromTime = readinessIssueLedgerTime
+      validUntil = "2026-05-12T00:02:00Z"
+      validUntilTime = readinessCredentialValidUntilTime
+      issuedAt = "2026-05-10T00:02:00Z"
+  return ()
+
+t110_reject_unapproved_jurisdiction : Script ()
+t110_reject_unapproved_jurisdiction = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  policyCid <- createReadinessPolicyWith actors [ParticipantEligibilityCredential] ["US-NY"] ["participant-eligibility"] 24 readinessPolicyValidUntilTime
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ParticipantEligibilityCredential
+    (PartySubject actors.holder)
+    "EU-DE"
+    ["participant-eligibility"]
+    None
+  setTime readinessIssueLedgerTime
+  submitMustFail (actAs actors.holder <> actAs actors.attester) do
+    exerciseCmd requestCid IssueReadinessCredential with
+      credentialId = "unapproved-jurisdiction-credential-001"
+      policyCid
+      evidenceHash = "sha256:readiness-evidence-unapproved-jurisdiction"
+      calculationMethodHash = "sha256:readiness-calculation-unapproved-jurisdiction"
+      validFrom = "2026-05-10T00:02:00Z"
+      validFromTime = readinessIssueLedgerTime
+      validUntil = "2026-05-12T00:02:00Z"
+      validUntilTime = readinessCredentialValidUntilTime
+      issuedAt = "2026-05-10T00:02:00Z"
+  return ()
+
+t111_reject_unapproved_activity : Script ()
+t111_reject_unapproved_activity = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  policyCid <- createReadinessPolicyWith actors [ParticipantEligibilityCredential] ["US-NY"] ["participant-eligibility"] 24 readinessPolicyValidUntilTime
+  requestCid <- requestReadinessCredential
+    accountCid
+    actors
+    ParticipantEligibilityCredential
+    (PartySubject actors.holder)
+    "US-NY"
+    ["unapproved-activity"]
+    None
+  setTime readinessIssueLedgerTime
+  submitMustFail (actAs actors.holder <> actAs actors.attester) do
+    exerciseCmd requestCid IssueReadinessCredential with
+      credentialId = "unapproved-activity-credential-001"
+      policyCid
+      evidenceHash = "sha256:readiness-evidence-unapproved-activity"
+      calculationMethodHash = "sha256:readiness-calculation-unapproved-activity"
+      validFrom = "2026-05-10T00:02:00Z"
+      validFromTime = readinessIssueLedgerTime
+      validUntil = "2026-05-12T00:02:00Z"
+      validUntilTime = readinessCredentialValidUntilTime
+      issuedAt = "2026-05-10T00:02:00Z"
+  return ()
+
+t119_readiness_binding_is_non_executing_evidence_only : Script ()
+t119_readiness_binding_is_non_executing_evidence_only = script do
+  bound <- createBoundReadinessContext
+  verifierBindings <- query @ReadinessBinding bound.presented.base.actors.verifier
+  verifierPresentations <- query @ReadinessPresentation bound.presented.base.actors.verifier
+  case verifierBindings of
+    [(_, binding)] -> do
+      assertMsg "readiness binding keeps workflow context as reference metadata" (binding.workflowRef == Some "markets-workflow:participant-check")
+      assertMsg "readiness binding carries evidence hash only" (binding.evidenceHash == "sha256:readiness-evidence-001")
+    _ -> assertMsg "verifier should see exactly one readiness binding" False
+  assertMsg "binding is nonconsuming and leaves the presentation visible to verifier" (length verifierPresentations == 1)
+  return ()
+
+t127_reject_license_scope_jurisdiction_mismatch : Script ()
+t127_reject_license_scope_jurisdiction_mismatch = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  submitMustFail actors.holder do
+    exerciseCmd accountCid RequestReadinessCredential with
+      requestId = "license-request-wrong-jurisdiction-001"
+      policyId = "readiness-policy-001"
+      policyVersion = "v1"
+      policyPublisher = actors.policyPublisher
+      attester = actors.attester
+      credentialKind = LicenseOrRegistrationAttestation
+      subject = PartySubject actors.holder
+      jurisdiction = "US-NY"
+      activityRefs = ["broker-dealer-readiness"]
+      licenseScope = Some licenseScopeWrongJurisdiction
+      requestedAt = "2026-05-10T00:01:00Z"
+  return ()
+
+t128_reject_binding_purpose_mismatch : Script ()
+t128_reject_binding_purpose_mismatch = script do
+  presented <- createPresentedReadinessContext
+  setTime readinessBindingLedgerTime
+  submitMustFail (actAs presented.base.actors.holder <> actAs presented.base.actors.attester <> actAs presented.base.actors.verifier) do
+    exerciseCmd presented.presentationCid BindReadinessToContext with
+      bindingId = "readiness-binding-purpose-mismatch-001"
+      workflowRef = Some "markets-workflow:participant-check"
+      venueProfileRef = Some "venue-profile:demo"
+      venueRulebookRef = None
+      bindingPurpose = VenueParticipantAdmissionBinding
+      boundAt = "2026-05-10T00:04:00Z"
+  return ()
+
+t129_reject_binding_after_readiness_credential_revocation : Script ()
+t129_reject_binding_after_readiness_credential_revocation = script do
+  presented <- createPresentedReadinessContext
+  setTime readinessAuditLedgerTime
+  _revocationCid <- submit presented.base.actors.attester do
+    exerciseCmd presented.base.credentialCid RevokeReadinessCredential with
+      revocationId = "readiness-revocation-before-binding-001"
+      reasonCode = ReadinessAttesterCorrection
+      revokedAt = "2026-05-10T00:05:00Z"
+      priorVerifiers = [presented.base.actors.verifier]
+      supersedingCredentialId = None
+  submitMustFail (actAs presented.base.actors.holder <> actAs presented.base.actors.attester <> actAs presented.base.actors.verifier) do
+    exerciseCmd presented.presentationCid BindReadinessToContext with
+      bindingId = "readiness-binding-after-revocation-001"
+      workflowRef = Some "markets-workflow:participant-check"
+      venueProfileRef = Some "venue-profile:demo"
+      venueRulebookRef = None
+      bindingPurpose = WorkflowEligibilityBinding
+      boundAt = "2026-05-10T00:05:00Z"
+  return ()

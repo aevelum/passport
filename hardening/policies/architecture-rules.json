@@ -23,7 +23,15 @@
         "hardening/rounds/round-0002.md",
         "hardening/rounds/round-0003.md",
         "hardening/rounds/round-0004.md",
-        "hardening/rounds/round-0005.md"
+        "hardening/rounds/round-0005.md",
+        "hardening/rounds/round-0010.md",
+        "docs/11_readiness_credential_framework.md",
+        "docs/12_venue_readiness_credentials.md",
+        "docs/13_license_registration_attestations.md",
+        "docs/14_passport_markets_boundary.md",
+        "docs/15_release_notes_passport_0_3.md",
+        "docs/decisions/0002-readiness-credential-expansion.md",
+        "scripts/readiness-claim-gate.mjs"
       ]
     },
     {
@@ -40,6 +48,7 @@
         "npm run hardening:gate",
         "design/tokens/colors.json",
         "Adapter behavior, adapter docs, interop reports, framework claims, partner/sandbox/production language, or readiness level changes are hardening-sensitive.",
+        "Passport may now model generic regulated-market readiness credentials",
         "Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands."
       ]
     },
@@ -266,11 +275,14 @@
         "docs/02_foundation_release_scope.md"
       ],
       "contains": [
-        "Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.",
-        "Passport records readiness.",
+        "Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.",
+        "Passport records attested readiness and scoped evidence only.",
         "Passport may record a reservation handoff notice.",
         "Passport does not execute the downstream trade.",
-        "Passport does not custody, transfer, settle, or move collateral.",
+        "Passport does not custody, transfer, settle, clear, or move collateral or assets.",
+        "ReadinessCredential is visible to holder and attester.",
+        "ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier.",
+        "ReadinessAuditDisclosureGrant is visible to the auditor.",
         "CapacityReservation is visible to holder, attester, and verifier.",
         "ReservationHandoffInstruction is visible to the handoff recipient.",
         "AuditDisclosureGrant is visible to the auditor."

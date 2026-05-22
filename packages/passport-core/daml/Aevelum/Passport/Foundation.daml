@@ -5,7 +5,7 @@ import Aevelum.Passport.Types
 
 -- Aevelum Passport Foundation.
 -- Daml templates and choices are the normative specification.
--- The product is a Canton-native collateral credential account.
+-- The product is a Canton-native regulated-market readiness credential foundation.
 -- It supports issue, presentation, reservation, revocation, and scoped audit disclosure.
 
 template PassportAccount

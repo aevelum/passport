@@ -1,0 +1,182 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const fail = [];
+const pass = [];
+
+const claimPatterns = [
+  ['license grant', /\bPassport\b[^.\n|;]{0,120}\bgrants?\b[^.\n|;]{0,80}\blicen[sc]es?\b/i],
+  ['license issue', /\bPassport\b[^.\n|;]{0,120}\bissues?\b[^.\n|;]{0,80}\blicen[sc]es?\b/i],
+  ['participant registration', /\bPassport\b[^.\n|;]{0,120}\bregisters?\b[^.\n|;]{0,80}\bparticipants?\b/i],
+  ['legal compliance approval', /\bPassport\b[^.\n|;]{0,120}\bapproves?\b[^.\n|;]{0,80}\blegal compliance\b/i],
+  ['venue admission', /\bPassport\b[^.\n|;]{0,120}\badmits?\b[^.\n|;]{0,80}\bparticipants?\b[^.\n|;]{0,80}\bvenue\b/i],
+  ['venue operation', /\bPassport\b[^.\n|;]{0,120}\boperates?\b[^.\n|;]{0,80}\bvenue\b/i],
+  ['trade execution', /\bPassport\b[^.\n|;]{0,120}\bexecutes?\b[^.\n|;]{0,80}\btrades?\b/i],
+  ['trade formation', /\bPassport\b[^.\n|;]{0,120}\bforms?\b[^.\n|;]{0,80}\btrades?\b/i],
+  ['settlement', /\bPassport\b[^.\n|;]{0,120}\b(?:settles?|settlement)\b/i],
+  ['clearing', /\bPassport\b[^.\n|;]{0,120}\b(?:clears?|clearing)\b/i],
+  ['custody', /\bPassport\b[^.\n|;]{0,120}\b(?:custodies|custody|custodian)\b/i],
+  ['asset transfer', /\bPassport\b[^.\n|;]{0,120}\b(?:transfers?|transfer|asset-transfer)\b[^.\n|;]{0,80}\bassets?\b/i],
+  ['token issuance', /\bPassport\b[^.\n|;]{0,120}\b(?:issues?|issuance)\b[^.\n|;]{0,80}\btokens?\b/i],
+  ['wallet operation', /\bPassport\b[^.\n|;]{0,120}\b(?:operates?|operation)\b[^.\n|;]{0,80}\bwallets?\b/i]
+];
+
+const claimArtifactFiles = [
+  'artifacts/demo_transcript.json',
+  'artifacts/readiness_demo_transcript.json',
+  'artifacts/venue_readiness_demo_transcript.json'
+];
+
+const files = [
+  'README.md',
+  'AGENTS.md',
+  '.agents/skills/passport-hardening-loop/SKILL.md',
+  ...walk('docs').filter(file => file.endsWith('.md')),
+  ...walk('hardening/rounds').filter(file => file.endsWith('.md')),
+  'hardening/change-log.md',
+  ...claimArtifactFiles
+].filter(file => fs.existsSync(path.join(root, file)));
+
+for (const fixture of unsafeClaimFixtures()) {
+  const labels = matchingClaimLabels(fixture);
+  if (!labels.length) {
+    fail.push(`unsafe fixture did not match prohibited claim: ${fixture}`);
+  } else if (isSafeBoundaryClaim(fixture)) {
+    fail.push(`unsafe fixture treated as safe boundary claim: ${fixture}`);
+  } else {
+    pass.push(`unsafe fixture rejected: ${labels.join(', ')}`);
+  }
+}
+
+for (const fixture of safeClaimFixtures()) {
+  const labels = matchingClaimLabels(fixture);
+  if (!labels.length) {
+    fail.push(`safe fixture did not match prohibited claim: ${fixture}`);
+  } else if (!isSafeBoundaryClaim(fixture)) {
+    fail.push(`safe fixture rejected as unsafe claim: ${fixture}`);
+  } else {
+    pass.push(`safe fixture bounded: ${labels.join(', ')}`);
+  }
+}
+
+for (const rel of files) {
+  const text = fs.readFileSync(path.join(root, rel), 'utf8');
+  for (const unit of claimUnits(text)) {
+    for (const label of matchingClaimLabels(unit.text)) {
+      if (isSafeBoundaryClaim(unit.text)) {
+        pass.push(`${rel}:${unit.line} bounds ${label}`);
+      } else {
+        fail.push(`${rel}:${unit.line} unsafe readiness claim: ${label}`);
+      }
+    }
+  }
+}
+
+const report = {
+  artifact: 'readiness_claim_gate_report',
+  status: fail.length ? 'failed' : 'passed',
+  scannedFiles: files.length,
+  pass,
+  fail
+};
+
+fs.mkdirSync(path.join(root, 'artifacts'), { recursive: true });
+fs.writeFileSync(path.join(root, 'artifacts/readiness_claim_gate_report.json'), JSON.stringify(report, null, 2) + '\n');
+
+if (fail.length) {
+  console.error(`readiness claim gate failed: ${fail.length} issue(s)`);
+  for (const item of fail) console.error(` - ${item}`);
+  process.exit(1);
+}
+
+console.log(`readiness claim gate passed: ${pass.length} bounded claim(s), ${files.length} file(s) scanned`);
+
+function walk(dir, acc = []) {
+  const abs = path.join(root, dir);
+  if (!fs.existsSync(abs)) return acc;
+  for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+    const rel = path.join(dir, ent.name);
+    if (ent.isDirectory()) {
+      if (['.git', 'node_modules', '.daml', 'log'].includes(ent.name)) continue;
+      walk(rel, acc);
+    } else {
+      acc.push(rel);
+    }
+  }
+  return acc;
+}
+
+function claimUnits(text) {
+  const units = [];
+  const lines = text.split('\n');
+  let inFence = false;
+  for (let i = 0; i < lines.length; i += 1) {
+    const raw = lines[i];
+    if (/^\s*```/.test(raw)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    const clean = raw
+      .replace(/^\s*[-*]\s+/, '')
+      .replace(/^\s*\d+\.\s+/, '')
+      .replace(/^\s*\|?/, '')
+      .trim();
+    if (!clean || /^#/.test(clean)) continue;
+    for (const part of clean
+      .split(/(?<=[.!?])\s+|;\s*/)
+      .map(part => part.replace(/\|/g, ' ').trim())
+      .filter(Boolean)) {
+      units.push({ text: part, line: i + 1 });
+    }
+  }
+  return units;
+}
+
+function isSafeBoundaryClaim(text) {
+  return hasExplicitBoundaryNegation(text)
+    || hasBoundaryScopePhrase(text)
+    || hasGateOrTestBoundary(text);
+}
+
+function matchingClaimLabels(text) {
+  return claimPatterns
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([label]) => label);
+}
+
+function unsafeClaimFixtures() {
+  return [
+    'Passport clears trades when upstream checks fail.',
+    'Passport provides custody of assets if venue validation fails.',
+    'Passport not only clears trades but also settles them.',
+    'Passport should not only clear trades but also settle them.',
+    'Passport rejects failed venue checks and admits participants to a venue.'
+  ];
+}
+
+function safeClaimFixtures() {
+  return [
+    'Passport does not clear or settle trades.',
+    'The readiness claim gate rejects docs that imply Passport grants licenses.'
+  ];
+}
+
+function hasExplicitBoundaryNegation(text) {
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
+    || /\bcannot\b|\bcan not\b/i.test(text)
+    || /\bmust\s+never\b/i.test(text)
+    || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
+    || /\bwithout\b[^.\n|;]{0,100}\b(?:grant|issue|register|approve|admit|operate|execute|form|clear|settle|custody|transfer|wallet|token|license|legal permission|venue)\b/i.test(text)
+    || /\bno\b[^.\n|;]{0,100}\b(?:license|legal permission|venue admission|venue operation|trade execution|trade formation|clearing|settlement|custody|asset transfer|token issuance|wallet operation|production integration|live external integration)\b/i.test(text);
+}
+
+function hasBoundaryScopePhrase(text) {
+  return /\b(non-executing|evidence only|attestation only|out of scope|excludes|excluded|rewritten|external systems remain external)\b/i.test(text);
+}
+
+function hasGateOrTestBoundary(text) {
+  return /\b(?:claim gate|readiness claim gate|hardening gate|structural gate|static gates?|tests?)\b[^.\n|;]{0,120}\b(?:must\s+)?rejects?\b/i.test(text)
+    || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
+}

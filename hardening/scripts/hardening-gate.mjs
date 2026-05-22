@@ -263,11 +263,11 @@ function checkPassportScopeBoundary() {
   }
 
   const requiredScopeStatements = [
-    'Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.',
-    'Passport records readiness.',
+    'Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.',
+    'Passport records attested readiness and scoped evidence only.',
     'Passport may record a reservation handoff notice.',
     'Passport does not execute the downstream trade.',
-    'Passport does not custody, transfer, settle, or move collateral.'
+    'Passport does not custody, transfer, settle, clear, or move collateral or assets.'
   ];
   for (const rel of ['README.md', 'docs/02_foundation_release_scope.md']) {
     const text = readText(rel);
@@ -296,24 +296,19 @@ function checkPassportScopeBoundary() {
     ok(nonGoalDoc.includes(required), `docs/07_non_goals.md includes non-goal ${required}`);
   }
 
-  for (const rel of [
-    'README.md',
-    'docs/02_foundation_release_scope.md',
-    'docs/05_privacy_model.md',
-    'docs/07_non_goals.md',
-    'artifacts/demo_transcript.json'
-  ]) {
+  const visibilityChecks = {
+    'README.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/02_foundation_release_scope.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/05_privacy_model.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'docs/07_non_goals.md': ['readinesscredential is visible', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant', 'capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'artifacts/demo_transcript.json': ['capacityreservation is visible', 'reservationhandoffinstruction', 'auditdisclosuregrant'],
+    'artifacts/readiness_demo_transcript.json': ['readinesscredential', 'readinesscredentialactivestatus', 'readinesspresentation', 'readinessbinding', 'readinessauditdisclosuregrant'],
+    'artifacts/venue_readiness_demo_transcript.json': ['venuereadinessevidence', 'holder', 'attester', 'verifier']
+  };
+  for (const [rel, needles] of Object.entries(visibilityChecks)) {
+    if (!fs.existsSync(abs(rel))) continue;
     const text = readText(rel).toLowerCase();
-    for (const needle of [
-      'capacityreservation is visible',
-      'holder',
-      'attester',
-      'verifier',
-      'reservationhandoffinstruction',
-      'handoff recipient',
-      'auditdisclosuregrant',
-      'auditor'
-    ]) {
+    for (const needle of needles) {
       ok(text.includes(needle), `${rel} includes dedicated visibility language`);
     }
   }
@@ -336,8 +331,11 @@ function checkPassportScopeBoundary() {
     { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
     { label: 'custodying assets', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:custodies|custodying|custody|custodian)\b[^.\n|;]{0,80}\b(?:asset|assets|collateral)\b/i },
     { label: 'settling transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:settles?|settling|settlement)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
+    { label: 'clearing transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:clears?|clearing)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
     { label: 'operating a wallet', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bwallet\b/i },
     { label: 'operating a venue', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bvenue\b/i },
+    { label: 'granting licenses', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:grants?|granting|issues?|issuing)\b[^.\n|;]{0,80}\blicen[sc]es?\b/i },
+    { label: 'venue admission', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:admits?|admitting)\b[^.\n|;]{0,80}\bvenue\b/i },
     { label: 'live external integration', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:has|provides?|providing|is)\b[^.\n|;]{0,80}\blive external integration\b/i }
   ];
 
@@ -351,6 +349,82 @@ function checkPassportScopeBoundary() {
   }
 }
 
+function checkVenueReadinessCanonicality() {
+  const venueTypes = readText('packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml');
+  const venueFoundation = readText('packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml');
+  const venueTests = readText('packages/passport-tests/daml/Aevelum/Passport/Test/VenueReadinessScenario.daml');
+
+  for (const needle of [
+    'readinessUseMatchesBindingPurpose',
+    'VenueParticipantAdmissionUse -> purpose == VenueParticipantAdmissionBinding',
+    'VenueProductAdmissionUse -> purpose == VenueProductAdmissionBinding',
+    'VenueSessionAccessUse -> purpose == VenueSessionAccessBinding',
+    'VenueTradingInterestSubmissionUse -> purpose == TradingInterestSubmissionBinding',
+    'VenueSurveillanceUse -> purpose == SurveillanceAuditBinding',
+    'VenueReportingUse -> purpose == ReportingAuditBinding'
+  ]) {
+    ok(venueTypes.includes(needle), `VenueReadiness.Types contains ${needle}`);
+  }
+
+  for (const needle of [
+    'ValidateVenueReadinessEvidence',
+    'controller verifier',
+    'binding.bindingId == bindingId',
+    'activeStatus <- fetch binding.sourceCredentialActiveStatusCid',
+    'activeStatus.credentialId == binding.credentialId',
+    'activeStatus.evidenceHash == binding.evidenceHash',
+    'binding.credentialValidUntilTime',
+    'binding.credentialFreshUntilTime',
+    'binding.holder == holder',
+    'binding.attester == attester',
+    'binding.verifier == verifier',
+    'binding.credentialKind == credentialKind',
+    'binding.subject == subject',
+    'binding.evidenceHash == evidenceHash',
+    'readinessUseMatchesBindingPurpose use binding.bindingPurpose',
+    'binding.venueProfileRef == Some venueProfileRef'
+  ]) {
+    ok(venueFoundation.includes(needle), `VenueReadiness.Foundation validates ${needle}`);
+  }
+
+  for (const needle of [
+    't120_validate_venue_readiness_evidence',
+    't121_reject_venue_readiness_evidence_with_wrong_binding_id',
+    't122_reject_venue_readiness_evidence_with_wrong_use',
+    't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
+    't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
+    't126_reject_venue_readiness_evidence_after_binding_freshness_expiry',
+    't130_reject_venue_readiness_evidence_after_credential_revocation',
+    'venueReadinessStaleValidationTime',
+    'submit bound.presented.base.actors.verifier',
+    'submitMustFail',
+    'VenueProductAdmissionUse',
+    'venue-profile:wrong',
+    'sha256:wrong-readiness-evidence'
+  ]) {
+    ok(venueTests.includes(needle), `VenueReadinessScenario contains ${needle}`);
+  }
+
+  for (const rel of [
+    'README.md',
+    'docs/12_venue_readiness_credentials.md',
+    'docs/14_passport_markets_boundary.md',
+    'docs/15_release_notes_passport_0_3.md',
+    'docs/decisions/0002-readiness-credential-expansion.md',
+    'docs/trackers/phase-a-readiness-credential-upgrade.md'
+  ]) {
+    const text = readText(rel);
+    for (const needle of [
+      'Consumers must validate or cross-check the underlying',
+      'Markets Phase C must not trust string readiness refs or copied wrapper fields alone',
+      'VenueReadinessUse',
+      'ReadinessBindingPurpose'
+    ]) {
+      ok(text.includes(needle), `${rel} documents venue readiness canonicality rule ${needle}`);
+    }
+  }
+}
+
 function passportScopeDocs() {
   const files = new Set([
     'README.md',
@@ -359,13 +433,35 @@ function passportScopeDocs() {
     ...walkFiles('design', { extensions: ['.md'] }),
     ...walkFiles('hardening', { extensions: ['.md'] }),
     ...walkFiles('.agents/skills', { extensions: ['.md'] }),
-    'artifacts/demo_transcript.json'
+    'artifacts/demo_transcript.json',
+    'artifacts/readiness_demo_transcript.json',
+    'artifacts/venue_readiness_demo_transcript.json'
   ]);
   return [...files].filter(file => fs.existsSync(abs(file))).sort();
 }
 
 function isSafeScopeBoundaryClaim(text) {
-  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|out of scope|excludes|excluded)\b/i.test(text);
+  return hasExplicitBoundaryNegation(text)
+    || hasBoundaryScopePhrase(text)
+    || hasGateOrTestBoundary(text);
+}
+
+function hasExplicitBoundaryNegation(text) {
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
+    || /\bcannot\b|\bcan not\b/i.test(text)
+    || /\bmust\s+never\b/i.test(text)
+    || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
+    || /\bwithout\b[^.\n|;]{0,100}\b(?:grant|issue|register|approve|admit|operate|execute|form|clear|settle|custody|transfer|wallet|token|license|legal permission|venue)\b/i.test(text)
+    || /\bno\b[^.\n|;]{0,100}\b(?:license|legal permission|venue admission|venue operation|trade execution|trade formation|clearing|settlement|custody|asset transfer|token issuance|wallet operation|production integration|live external integration)\b/i.test(text);
+}
+
+function hasBoundaryScopePhrase(text) {
+  return /\b(non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|rewritten)\b/i.test(text);
+}
+
+function hasGateOrTestBoundary(text) {
+  return /\b(?:claim gate|readiness claim gate|hardening gate|structural gate|static gates?|tests?)\b[^.\n|;]{0,120}\b(?:must\s+)?rejects?\b/i.test(text)
+    || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
 }
 
 function visit(value, onKey) {
@@ -474,6 +570,7 @@ checkInteropReportReadiness();
 checkCdmPayloadPurity();
 checkCdmReadinessDocs();
 checkPassportScopeBoundary();
+checkVenueReadinessCanonicality();
 checkCiOrder();
 checkDpmSdkPins();
 
@@ -483,7 +580,7 @@ ok(packageScript.includes("file !== 'artifacts/daml_test_coverage.txt'"), 'packa
 const report = {
   artifact: 'hardening_report',
   package: 'aevelum-passport-foundation',
-  version: '0.2.0',
+  version: '0.3.0',
   generatedAt: getGeneratedAt(),
   status: fail.length ? 'failed' : 'passed',
   mapPath: 'hardening/maps/passport.invariants.json',
@@ -972,7 +1069,10 @@ function isBoundedReadinessClaim(text) {
 }
 
 function hasSameSentenceNegation(text) {
-  return /\b(not|no|without|does not|must not|non-claim|non-claims|excluded|out of scope|not shipped)\b/i.test(text);
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
+    || /\bcannot\b|\bcan not\b/i.test(text)
+    || /\bnot\b(?!\s+only\b)|\bno\b|\bwithout\b/i.test(text)
+    || /\b(non-claim|non-claims|excluded|out of scope|outside passport|not shipped)\b/i.test(text);
 }
 
 function hasSameSentencePromotionBoundary(text) {
@@ -993,6 +1093,8 @@ function overclaimNegativeFixtures() {
     'The CDM adapter provides Rosetta Engine execution.',
     'Passport has live external integration.',
     'The current CDM adapter is certified.',
-    'The adapter supports custody and settlement.'
+    'The adapter supports custody and settlement.',
+    'The adapter not only supports custody but also settlement.',
+    'The adapter should not only support custody but also settlement.'
   ];
 }

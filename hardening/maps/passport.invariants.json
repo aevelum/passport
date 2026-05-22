@@ -14,8 +14,9 @@
       "Adapter readiness claims are evidence-bound: Level 2 means offline artifact conformance only until executable, sandbox, or production evidence is committed.",
       "Registered adapters cannot use Level 0; Level 0 is concept-only for future adapter candidates with no registered plugin implementation.",
       "Level 3 and higher readiness cannot be self-attested by category names alone or generic existing files; higher levels require existing references in category-appropriate proof-bearing paths.",
-      "Passport records collateral readiness and may record reservation handoff metadata; it does not execute downstream trades, custody assets, transfer collateral, settle transactions, operate a wallet or venue, optimize collateral, decide credit, determine legal title, implement proof systems, provide production identity, or provide live external integration.",
-      "Reservation visibility is limited to holder, attester, and verifier; handoff visibility is isolated to ReservationHandoffInstruction; audit visibility is isolated to AuditDisclosureGrant."
+      "Passport records regulated-market readiness and scoped evidence only. Collateral capacity is the first credential family. Passport may record reservation handoff metadata; it does not grant licenses, admit participants to a venue, determine legal compliance, execute downstream trades, custody assets, transfer collateral or assets, clear, settle transactions, operate a wallet or venue, issue tokens, optimize collateral, decide credit, determine legal title, implement proof systems, provide production identity, or provide live external integration.",
+      "Reservation visibility is limited to holder, attester, and verifier; handoff visibility is isolated to ReservationHandoffInstruction; audit visibility is isolated to AuditDisclosureGrant.",
+      "License or registration readiness credentials are attestation-only: Passport records external evidence references and must not grant, issue, approve, register, authorize, or legally certify licenses or legal permissions."
     ],
     "source_inventory": [
       {
@@ -153,6 +154,62 @@
         "primary_component_id": "cmp.release.package",
         "status": "semantics",
         "notes": "Release notes and Markets migration guidance for schema-changing releases."
+      },
+      {
+        "path": "docs/11_readiness_credential_framework.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Generic readiness credential framework documentation."
+      },
+      {
+        "path": "docs/12_venue_readiness_credentials.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Venue readiness credential wrapper documentation."
+      },
+      {
+        "path": "docs/13_license_registration_attestations.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "License and registration attestation-only documentation."
+      },
+      {
+        "path": "docs/14_passport_markets_boundary.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "Passport versus Markets ownership boundary."
+      },
+      {
+        "path": "docs/15_release_notes_passport_0_3.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.release.package",
+        "status": "semantics",
+        "notes": "Passport 0.3 release notes."
+      },
+      {
+        "path": "docs/decisions/0002-readiness-credential-expansion.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.interop.adapter-core",
+        "status": "semantics",
+        "notes": "ADR for the Phase A readiness credential expansion."
+      },
+      {
+        "path": "docs/trackers/phase-a-readiness-credential-upgrade.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Phase A implementation tracker and round status."
       },
       {
         "path": "docs/trackers/typed-time-policy-reservation-freshness.md",
@@ -297,6 +354,14 @@
         "primary_component_id": "cmp.daml.ledger-schema",
         "status": "breakdown",
         "notes": "Typed Time temporal validity hardening round record."
+      },
+      {
+        "path": "hardening/rounds/round-0010.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "semantics",
+        "notes": "Generic readiness credential expansion hardening round record."
       },
       {
         "path": "hardening/scripts/hardening-gate.mjs",
@@ -451,12 +516,44 @@
         "notes": "Normative templates, choices, parties, and state-transition guards."
       },
       {
+        "path": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "breakdown",
+        "notes": "Generic readiness account, policy, request, credential, active-status, presentation, binding, revocation, and audit grant templates."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.domain-types",
+        "status": "semantics",
+        "notes": "Generic readiness credential identifiers, kinds, subjects, binding purposes, revocation reasons, and jurisdiction-bound license attestation scope helpers."
+      },
+      {
         "path": "packages/passport-core/daml/Aevelum/Passport/Types.daml",
         "language": "daml",
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.domain-types",
         "status": "semantics",
         "notes": "Domain enums, identifiers, amount helpers, and non-goal boundary comments."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "breakdown",
+        "notes": "VenueReadinessEvidence wrapper over readiness bindings with explicit validation against copied binding fields and active-status liveness."
+      },
+      {
+        "path": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.domain-types",
+        "status": "semantics",
+        "notes": "Venue-readiness semantic labels and use-to-binding-purpose mapping used by Markets-facing evidence wrappers."
       },
       {
         "path": "packages/passport-tests/daml.yaml",
@@ -483,6 +580,38 @@
         "notes": "Visibility and scoped audit disclosure negative coverage."
       },
       {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessBoundaryTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Readiness license attestation, license scope jurisdiction, binding purpose, source revocation, and policy approval negative coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessPrivacyTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Readiness revocation, audit grant, active-status visibility, and unauthorized visibility coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessScenario.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Readiness happy path, lifecycle, presentation, binding, and license attestation-only Daml Script coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessTemporalTests.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "Readiness policy expiry, stale presentation, and audit grant credential-expiry coverage."
+      },
+      {
         "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
         "language": "daml",
         "pin": "git:HEAD",
@@ -505,6 +634,14 @@
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
         "notes": "Typed Time validity and freshness Daml Script coverage."
+      },
+      {
+        "path": "packages/passport-tests/daml/Aevelum/Passport/Test/VenueReadinessScenario.daml",
+        "language": "daml",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.tests",
+        "status": "breakdown",
+        "notes": "VenueReadinessEvidence positive and negative canonicality, verifier-only validation, stale binding coverage against ReadinessBinding, and revoked source credential rejection."
       },
       {
         "path": "README.md",
@@ -545,6 +682,14 @@
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
         "notes": "Generated demo transcript writer."
+      },
+      {
+        "path": "scripts/export-readiness-demo-transcript.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Generated readiness and venue readiness demo transcript writer."
       },
       {
         "path": "scripts/gates.mjs",
@@ -595,6 +740,14 @@
         "notes": "Review archive source selection."
       },
       {
+        "path": "scripts/readiness-claim-gate.mjs",
+        "language": "javascript",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Static overclaim gate for readiness, license, venue, trade, clearing, settlement, custody, asset transfer, token, and wallet claims."
+      },
+      {
         "path": "scripts/run-daml-tests.sh",
         "language": "bash",
         "pin": "git:HEAD",
@@ -605,7 +758,7 @@
     ]
   },
   "frontier": {
-    "round_id": "round-0009",
+    "round_id": "round-0010",
     "selected_surfaces": [
       "inv.daml.domain-boundary",
       "inv.daml.capacity-conservation",
@@ -624,9 +777,16 @@
       "prop.daml.typed-time-authoritative",
       "prop.daml.no-freshness-refresh-on-residual-release",
       "bd.daml.typed-time-authority-drift",
-      "bd.daml.freshness-refresh-drift"
+      "bd.daml.freshness-refresh-drift",
+      "inv.daml.readiness-credential-core",
+      "prop.daml.license-attestation-only",
+      "prop.daml.readiness-scoped-visibility",
+      "prop.daml.readiness-temporal-validity",
+      "prop.daml.venue-readiness-evidence-canonical",
+      "bd.daml.venue-readiness-wrapper-drift",
+      "prop.scope.readiness-overclaim-gate"
     ],
-    "selection_reason": "Round 0009 upgrades Passport from ISO timestamp text-only temporal metadata to authoritative Daml Time validity and freshness fields for downstream ledger-time validation.",
+    "selection_reason": "Phase C.1 closes the venue-readiness wrapper canonicality gap by validating copied VenueReadinessEvidence fields against the referenced ReadinessBinding.",
     "kill_gates": [
       "hardening:formal fails if typed temporal validity obligations lose invariant-map properties, source assertions, active evidence commands, or bounded model coverage.",
       "Daml temporal tests fail if policy validity, credential freshness, presentation validity, reservation validity, or legacy text timestamp metadata semantics stop using typed Time fields.",
@@ -639,7 +799,11 @@
       "structural gate fails if README or docs lose canonical scope or non-goal language.",
       "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
-      "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration."
+      "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.",
+      "Daml readiness tests t100-t130 must pass with 100% template and choice coverage.",
+      "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, evidence hash, stale binding, or revoked source credential.",
+      "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, active-status fetches, or consumer cross-check docs are removed.",
+      "npm run readiness:claim-gate must reject license, venue, trade, clearing, settlement, custody, asset-transfer, token, and wallet overclaims."
     ]
   },
   "tree": {
@@ -653,7 +817,9 @@
             "name": "Passport ledger templates and choices",
             "mapping_depth": "breakdown",
             "source_files": [
-              "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              "packages/passport-core/daml/Aevelum/Passport/Foundation.daml",
+              "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml",
+              "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml"
             ],
             "functions": [
               {
@@ -710,6 +876,56 @@
                 "id": "fn.daml.dispute-reservation",
                 "name": "DisputeReservation",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.request-readiness-credential",
+                "name": "RequestReadinessCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.validate-readiness-policy-active-at-ledger-time",
+                "name": "ValidateReadinessPolicyActiveAtLedgerTime",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.retire-readiness-policy",
+                "name": "RetireReadinessPolicy",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.issue-readiness-credential",
+                "name": "IssueReadinessCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.present-readiness-to-verifier",
+                "name": "PresentReadinessToVerifier",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.bind-readiness-to-context",
+                "name": "BindReadinessToContext",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.grant-readiness-audit-disclosure",
+                "name": "GrantReadinessAuditDisclosure",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.revoke-readiness-credential",
+                "name": "RevokeReadinessCredential",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.deactivate-readiness-credential-active-status",
+                "name": "DeactivateReadinessCredentialActiveStatus",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml"
+              },
+              {
+                "id": "fn.daml.validate-venue-readiness-evidence",
+                "name": "ValidateVenueReadinessEvidence",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml"
               }
             ],
             "invariants": [
@@ -852,6 +1068,83 @@
                       "fn.test.daml-suite",
                       "fn.ci.local-gate"
                     ]
+                  },
+                  {
+                    "id": "prop.scope.readiness-overclaim-gate",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "Docs and artifacts must not imply Passport grants licenses, registers participants, approves legal compliance, admits participants to a venue, operates venues, executes trades, forms trades, clears, settles, custodies, transfers assets, issues tokens, or operates wallets.",
+                    "enforcing_functions": [
+                      "fn.ci.local-gate",
+                      "fn.ci.adapter-readiness-gate",
+                      "fn.ci.readiness-claim-gate"
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "inv.daml.readiness-credential-core",
+                "statement": "Generic readiness credentials remain externally attested, scoped, time-bounded evidence records rather than legal permissions, venue operations, execution, clearing, settlement, custody, token, wallet, credit, or legal-title systems.",
+                "properties": [
+                  {
+                    "id": "prop.daml.readiness-policy-issue-bounds",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Readiness issuance must require an active policy, approved holder, approved attester, approved credential kind, approved jurisdiction, approved activity refs, coherent typed validity, and ledger-time policy validity.",
+                    "enforcing_functions": [
+                      "fn.daml.request-readiness-credential",
+                      "fn.daml.issue-readiness-credential",
+                      "fn.daml.validate-readiness-policy-active-at-ledger-time"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.license-attestation-only",
+                    "type": "guarantee",
+                    "severity": "critical",
+                    "statement": "LicenseOrRegistrationAttestation must require LicenseAttestationScope with attestationOnly = True and must remain external evidence rather than a license grant, registration, authorization, or legal-compliance decision.",
+                    "enforcing_functions": [
+                      "fn.daml.request-readiness-credential",
+                      "fn.daml.issue-readiness-credential",
+                      "fn.daml.valid-readiness-kind-scope-for-jurisdiction",
+                      "fn.ci.readiness-claim-gate"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.readiness-scoped-visibility",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Verifiers see scoped presentations, bindings, and minimal active-status witnesses, auditors see scoped audit grants, and outsiders see no readiness credential, active status, presentation, binding, venue evidence, or audit grant.",
+                    "enforcing_functions": [
+                      "fn.daml.present-readiness-to-verifier",
+                      "fn.daml.bind-readiness-to-context",
+                      "fn.daml.deactivate-readiness-credential-active-status",
+                      "fn.daml.grant-readiness-audit-disclosure"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.readiness-temporal-validity",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "Readiness policy validity, credential validity/freshness, presentation validity, binding freshness, and audit grant validity use typed Daml Time fields where ledger-time validation matters.",
+                    "enforcing_functions": [
+                      "fn.daml.validate-readiness-policy-active-at-ledger-time",
+                      "fn.daml.issue-readiness-credential",
+                      "fn.daml.present-readiness-to-verifier",
+                      "fn.daml.bind-readiness-to-context",
+                      "fn.daml.grant-readiness-audit-disclosure"
+                    ]
+                  },
+                  {
+                    "id": "prop.daml.venue-readiness-evidence-canonical",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "VenueReadinessEvidence must be treated as a wrapper around ReadinessBinding and must validate copied binding fields, live source credential active status, venue profile, evidence hash, and VenueReadinessUse to ReadinessBindingPurpose before consumers rely on it.",
+                    "enforcing_functions": [
+                      "fn.daml.bind-readiness-to-context",
+                      "fn.daml.deactivate-readiness-credential-active-status",
+                      "fn.daml.validate-venue-readiness-evidence",
+                      "fn.daml.readiness-use-matches-binding-purpose"
+                    ]
                   }
                 ]
               }
@@ -862,7 +1155,9 @@
             "name": "Passport domain types",
             "mapping_depth": "semantics",
             "source_files": [
-              "packages/passport-core/daml/Aevelum/Passport/Types.daml"
+              "packages/passport-core/daml/Aevelum/Passport/Types.daml",
+              "packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml",
+              "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml"
             ],
             "functions": [
               {
@@ -874,6 +1169,16 @@
                 "id": "fn.daml.non-negative",
                 "name": "nonNegative",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/Types.daml"
+              },
+              {
+                "id": "fn.daml.readiness-use-matches-binding-purpose",
+                "name": "readinessUseMatchesBindingPurpose",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml"
+              },
+              {
+                "id": "fn.daml.valid-readiness-kind-scope-for-jurisdiction",
+                "name": "validReadinessKindScopeForJurisdiction",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml"
               }
             ],
             "invariants": [
@@ -903,7 +1208,12 @@
               "packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml",
               "packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml",
               "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
-              "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml"
+              "packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessScenario.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessPrivacyTests.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessTemporalTests.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessBoundaryTests.daml",
+              "packages/passport-tests/daml/Aevelum/Passport/Test/VenueReadinessScenario.daml"
             ],
             "functions": [
               {
@@ -1352,7 +1662,9 @@
               "hardening/scripts/validate-map.mjs",
               "hardening/scripts/score-frontier.mjs",
               "hardening/scripts/select-round.mjs",
-              "hardening/scripts/hardening-gate.mjs"
+              "hardening/scripts/hardening-gate.mjs",
+              "scripts/readiness-claim-gate.mjs",
+              "scripts/export-readiness-demo-transcript.mjs"
             ],
             "functions": [
               {
@@ -1399,6 +1711,11 @@
                 "id": "fn.ci.dpm-sdk-pin-gate",
                 "name": "checkDpmSdkPins",
                 "source_ref": "hardening/scripts/hardening-gate.mjs"
+              },
+              {
+                "id": "fn.ci.readiness-claim-gate",
+                "name": "npm run readiness:claim-gate",
+                "source_ref": "scripts/readiness-claim-gate.mjs"
               }
             ],
             "invariants": [
@@ -1533,7 +1850,13 @@
           "prop.scope.reservation-handoff-covered",
           "inv.daml.temporal-validity",
           "prop.daml.typed-time-authoritative",
-          "prop.daml.no-freshness-refresh-on-residual-release"
+          "prop.daml.no-freshness-refresh-on-residual-release",
+          "inv.daml.readiness-credential-core",
+          "prop.daml.readiness-policy-issue-bounds",
+          "prop.daml.license-attestation-only",
+          "prop.daml.readiness-scoped-visibility",
+          "prop.daml.readiness-temporal-validity",
+          "prop.daml.venue-readiness-evidence-canonical"
         ]
       },
       {
@@ -1606,7 +1929,10 @@
           "inv.scope.passport-public-core-boundary",
           "prop.scope.canonical-docs-required",
           "prop.scope.no-out-of-scope-daml-language",
-          "prop.scope.reservation-handoff-covered"
+          "prop.scope.reservation-handoff-covered",
+          "prop.scope.readiness-overclaim-gate",
+          "prop.daml.license-attestation-only",
+          "prop.daml.venue-readiness-evidence-canonical"
         ]
       },
       {
@@ -1645,7 +1971,22 @@
           "inv.scope.passport-public-core-boundary",
           "prop.scope.canonical-docs-required",
           "prop.scope.no-out-of-scope-daml-language",
-          "prop.scope.reservation-handoff-covered"
+          "prop.scope.reservation-handoff-covered",
+          "inv.daml.readiness-credential-core",
+          "prop.scope.readiness-overclaim-gate",
+          "prop.daml.license-attestation-only",
+          "prop.daml.venue-readiness-evidence-canonical"
+        ]
+      },
+      {
+        "id": "test.gate.readiness-claim",
+        "kind": "node-script",
+        "command": "npm run readiness:claim-gate",
+        "status": "active",
+        "covers": [
+          "inv.scope.passport-public-core-boundary",
+          "prop.scope.readiness-overclaim-gate",
+          "prop.daml.license-attestation-only"
         ]
       }
     ],
@@ -1959,6 +2300,67 @@
           "xp.daml.release-refreshes-stale-credential"
         ],
         "kill_gate": "Daml tests and hardening:formal fail if residual or released credentials stop preserving source valuation, validity, and freshness fields."
+      },
+      {
+        "id": "bd.daml.license-attestation-overclaim",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.license-attestation-only",
+        "severity": "critical",
+        "attacker_control": "indirect",
+        "status": "guarded",
+        "description": "A future Daml or prose change frames a license or registration readiness credential as a Passport-granted legal permission or registration.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.gate.readiness-claim",
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [],
+        "kill_gate": "Daml boundary tests fail if license attestations omit scope or set attestationOnly = False, and readiness:claim-gate fails on Passport license-grant, registration, authorization, or legal-compliance overclaims."
+      },
+      {
+        "id": "bd.daml.readiness-visibility-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.readiness-scoped-visibility",
+        "severity": "high",
+        "attacker_control": "indirect",
+        "status": "guarded",
+        "description": "A future readiness template observer or choice leaks raw credentials, active-status witnesses, presentations, bindings, venue evidence, or audit grants to unauthorized parties.",
+        "evidence": [
+          "test.daml.coverage-suite"
+        ],
+        "exploit_path_ids": [],
+        "kill_gate": "Readiness privacy Daml Script tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts and approved-verifier active-status witnesses."
+      },
+      {
+        "id": "bd.daml.venue-readiness-wrapper-drift",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.daml.venue-readiness-evidence-canonical",
+        "severity": "high",
+        "attacker_control": "direct",
+        "status": "guarded",
+        "description": "A directly created VenueReadinessEvidence copies fields that drift from the referenced ReadinessBinding or a binding whose active-status witness was consumed by source credential revocation, allowing a consumer to rely on a mismatched binding id, use, venue profile, evidence hash, or revoked source credential.",
+        "evidence": [
+          "test.daml.coverage-suite",
+          "test.hardening.architecture-gate"
+        ],
+        "exploit_path_ids": [],
+        "kill_gate": "Daml validation tests fail on wrong binding id, wrong use, wrong venue profile, wrong evidence hash, stale binding, and revoked source credential, and static gates require ValidateVenueReadinessEvidence plus the use-to-purpose mapping and active-status fetch."
+      },
+      {
+        "id": "bd.scope.readiness-venue-operation-overclaim",
+        "component_id": "cmp.daml.ledger-schema",
+        "property_id": "prop.scope.readiness-overclaim-gate",
+        "severity": "critical",
+        "attacker_control": "indirect",
+        "status": "guarded",
+        "description": "Docs or artifacts claim Passport grants licenses, admits participants to a venue, operates a venue, forms or executes trades, clears, settles, custodies, transfers assets, issues tokens, or operates wallets.",
+        "evidence": [
+          "test.gate.readiness-claim",
+          "test.hardening.architecture-gate",
+          "test.ci.full"
+        ],
+        "exploit_path_ids": [],
+        "kill_gate": "npm run readiness:claim-gate and npm run gate reject unsafe claim units unless they are explicit negative or boundary statements."
       }
     ],
     "exploit_paths": [

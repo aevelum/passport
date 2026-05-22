@@ -1,5 +1,24 @@
 # Hardening Change Log
 
+## 2026-05-22 - phase-c.1
+
+- Added `readinessUseMatchesBindingPurpose` and `ValidateVenueReadinessEvidence` so venue-readiness evidence can be validated against the referenced `ReadinessBinding`.
+- Added positive and negative Daml Script coverage for wrong binding id, wrong venue use, wrong venue profile, and wrong evidence hash.
+- Made venue-readiness validation verifier-exercisable and added stale binding rejection against typed credential validity and freshness fields.
+- Bound license attestation scope jurisdiction to the credential/request jurisdiction, preserved presentation purpose during binding, and broadened readiness claim gate noun-form coverage.
+- Tightened readiness overclaim safe-boundary classifiers and added unsafe claim fixtures so failure-condition or `not only` language cannot whitelist prohibited Passport capability claims.
+- Required readiness bindings to fetch the live source readiness credential and venue-readiness validation to fetch `ReadinessCredentialActiveStatus`, with negative coverage for binding or validating after credential revocation.
+- Updated docs, demo transcript generation, gates, and the invariant map so Markets Phase C must fetch or cross-check the binding before relying on copied venue-readiness wrapper fields.
+- Addressed Codex review feedback by making `GrantReadinessAuditDisclosure` validate against the source credential's typed validity window rather than the grant argument window, with an expired-credential negative test.
+
+## 2026-05-22 - round-0010
+
+- Upgraded Passport scope from collateral-readiness-only to regulated-market readiness credentialing, with collateral capacity preserved as the first credential family.
+- Added generic readiness and venue-readiness Daml modules, including readiness accounts, policies, credential requests, credentials, presentations, bindings, revocations, audit disclosure grants, and venue-readiness evidence.
+- Added license or registration attestation-only enforcement through `LicenseAttestationScope.attestationOnly = True`, negative Daml tests, and a static readiness claim gate.
+- Added Daml Script tests `t100` through `t119` covering lifecycle, policy approval, typed-time freshness, scoped presentation/binding, privacy, revocation, audit disclosure, venue evidence, and non-executing binding boundaries.
+- Updated canonical docs, repo guidance, ADRs, demo transcripts, gate expectations, invariant-map coverage, and the hardening frontier for the Phase A readiness expansion.
+
 ## 2026-05-12 - round-0001
 
 - Added a repo-local Passport hardening loop with an invariant/property map, scored frontier, bounded round record, and architecture policy gate.

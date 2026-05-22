@@ -1,0 +1,28 @@
+module Aevelum.Passport.VenueReadiness.Types where
+
+import Aevelum.Passport.Readiness.Types
+
+type VenueId = Text
+type VenueParticipantId = Text
+type VenueProductId = Text
+type VenueSessionId = Text
+type VenueProtocolRef = Text
+
+data VenueReadinessUse
+  = VenueParticipantAdmissionUse
+  | VenueProductAdmissionUse
+  | VenueSessionAccessUse
+  | VenueTradingInterestSubmissionUse
+  | VenueSurveillanceUse
+  | VenueReportingUse
+  deriving (Eq, Show)
+
+readinessUseMatchesBindingPurpose : VenueReadinessUse -> ReadinessBindingPurpose -> Bool
+readinessUseMatchesBindingPurpose use purpose =
+  case use of
+    VenueParticipantAdmissionUse -> purpose == VenueParticipantAdmissionBinding
+    VenueProductAdmissionUse -> purpose == VenueProductAdmissionBinding
+    VenueSessionAccessUse -> purpose == VenueSessionAccessBinding
+    VenueTradingInterestSubmissionUse -> purpose == TradingInterestSubmissionBinding
+    VenueSurveillanceUse -> purpose == SurveillanceAuditBinding
+    VenueReportingUse -> purpose == ReportingAuditBinding

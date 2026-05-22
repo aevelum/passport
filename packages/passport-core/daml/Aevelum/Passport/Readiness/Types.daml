@@ -1,0 +1,117 @@
+module Aevelum.Passport.Readiness.Types where
+
+type ReadinessPolicyId = Text
+type ReadinessPolicyVersion = Text
+type ReadinessAccountId = Text
+type ReadinessRequestId = Text
+type ReadinessCredentialId = Text
+type ReadinessPresentationId = Text
+type ReadinessBindingId = Text
+type ReadinessRevocationId = Text
+type ReadinessGrantId = Text
+type WorkflowRef = Text
+type VenueProfileRef = Text
+type VenueRulebookRef = Text
+type JurisdictionRef = Text
+type ExternalAuthorityRef = Text
+type RegistrationRef = Text
+type CapabilityRef = Text
+type ProductRef = Text
+type EvidenceHash = Text
+
+data ReadinessAccountStatus
+  = ReadinessAccountActive
+  | ReadinessAccountClosed
+  deriving (Eq, Show)
+
+data ReadinessPolicyStatus
+  = ReadinessPolicyActive
+  | ReadinessPolicyRetired
+  | ReadinessPolicyAmended
+  deriving (Eq, Show)
+
+data ReadinessCredentialStatus
+  = ReadinessCredentialActive
+  | ReadinessCredentialRevoked
+  | ReadinessCredentialExpired
+  | ReadinessCredentialSuperseded
+  deriving (Eq, Show)
+
+data ReadinessCredentialKind
+  = ParticipantEligibilityCredential
+  | LicenseOrRegistrationAttestation
+  | VenueAccessReadinessCredential
+  | ProductEligibilityCredential
+  | OperationalCapabilityCredential
+  | DisclosureConsentCredential
+  | SettlementOrClearingReadinessCredential
+  | CollateralCapacityReadinessCredential
+  | OtherReadinessCredential Text
+  deriving (Eq, Show)
+
+data ReadinessSubject
+  = PartySubject Party
+  | ProductSubject ProductRef
+  | CapabilitySubject CapabilityRef
+  | VenueProfileSubject VenueProfileRef
+  | OtherSubject Text
+  deriving (Eq, Show)
+
+data ReadinessBindingPurpose
+  = WorkflowEligibilityBinding
+  | VenueParticipantAdmissionBinding
+  | VenueProductAdmissionBinding
+  | VenueSessionAccessBinding
+  | TradingInterestSubmissionBinding
+  | SurveillanceAuditBinding
+  | ReportingAuditBinding
+  | ExternalHandoffReadinessBinding
+  deriving (Eq, Show)
+
+data ReadinessRevocationReason
+  = ReadinessEvidenceStale
+  | ReadinessPolicyChanged
+  | ReadinessEligibilityChanged
+  | ReadinessAttesterCorrection
+  | ReadinessHolderRequested
+  | ReadinessComplianceEvent
+  | ReadinessExpiredReason
+  deriving (Eq, Show)
+
+data LicenseAttestationScope = LicenseAttestationScope
+  with
+    jurisdiction : JurisdictionRef
+    externalAuthorityRef : ExternalAuthorityRef
+    registrationRef : RegistrationRef
+    licensedActivityRefs : [Text]
+    attestationOnly : Bool
+  deriving (Eq, Show)
+
+jurisdictionNotEmpty : JurisdictionRef -> Bool
+jurisdictionNotEmpty jurisdiction = jurisdiction /= ""
+
+validLicenseAttestationScope : LicenseAttestationScope -> Bool
+validLicenseAttestationScope scope =
+  jurisdictionNotEmpty scope.jurisdiction
+    && scope.externalAuthorityRef /= ""
+    && scope.registrationRef /= ""
+    && not (null scope.licensedActivityRefs)
+    && scope.attestationOnly
+
+validReadinessKindScope : ReadinessCredentialKind -> Optional LicenseAttestationScope -> Bool
+validReadinessKindScope credentialKind licenseScope =
+  case credentialKind of
+    LicenseOrRegistrationAttestation ->
+      case licenseScope of
+        Some scope -> validLicenseAttestationScope scope
+        None -> False
+    _ -> True
+
+validReadinessKindScopeForJurisdiction : ReadinessCredentialKind -> JurisdictionRef -> Optional LicenseAttestationScope -> Bool
+validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope =
+  case credentialKind of
+    LicenseOrRegistrationAttestation ->
+      case licenseScope of
+        Some scope -> validLicenseAttestationScope scope && scope.jurisdiction == jurisdiction
+        None -> False
+    _ -> True

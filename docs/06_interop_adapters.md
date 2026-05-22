@@ -2,7 +2,9 @@
 
 Passport keeps its Daml templates as the Canton ledger schema and emits external standards artifacts through a small framework-neutral adapter surface.
 
-Interop artifacts are bounded readiness artifacts. They do not make Passport a venue, custody system, settlement system, wallet, token-transfer system, optimizer, credit decision engine, production identity system, or live external integration.
+Interop artifacts are bounded readiness artifacts. They do not make Passport a venue, exchange, ATS, SEF, MTF, regulated market, custody system, clearinghouse, settlement system, wallet, token-transfer system, token issuer, optimizer, credit decision engine, licensing authority, legal-compliance engine, production identity system, or live external integration.
+
+Passport 0.3.0 can produce regulated-market readiness evidence and collateral-capacity artifacts. Adapter outputs remain external-format views over attested readiness; they do not grant licenses, admit participants to a venue, execute trades, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
 
 The adapter surface is deliberately narrow:
 
@@ -55,7 +57,7 @@ It is not FINOS certification, Rosetta Engine execution, CDM eligibility-engine 
 
 ## CDM plugin
 
-The CDM plugin generates collateral eligibility artifacts from `interop/samples/repo-pretrade-passport-input.json`.
+The CDM plugin remains the collateral-capacity family adapter. It generates collateral eligibility artifacts from `interop/samples/repo-pretrade-passport-input.json`.
 `CheckEligibilityResult` mirrors the Passport sample decision; no CDM eligibility engine is executed.
 
 It validates generated artifacts offline against the plugin-scoped FINOS CDM 6.0 JSON Schema subset in `interop/plugins/cdm/assets/schemas/6.0/`.

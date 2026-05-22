@@ -42,13 +42,13 @@ function walk(dir, acc = []) {
 }
 
 function checkPassportScopeBoundary() {
-  const canonicalScope = 'Aevelum Passport is the public Canton/Daml foundation for private collateral-readiness credentials.';
+  const canonicalScope = 'Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.';
   const requiredScopeStatements = [
     canonicalScope,
-    'Passport records readiness.',
+    'Passport records attested readiness and scoped evidence only.',
     'Passport may record a reservation handoff notice.',
     'Passport does not execute the downstream trade.',
-    'Passport does not custody, transfer, settle, or move collateral.'
+    'Passport does not custody, transfer, settle, clear, or move collateral or assets.'
   ];
   for (const rel of ['README.md', 'docs/02_foundation_release_scope.md']) {
     const text = read(rel);
@@ -79,25 +79,70 @@ function checkPassportScopeBoundary() {
     else pass.push(`docs/07_non_goals.md includes non-goal ${required}`);
   }
 
-  const visibilityFiles = [
-    'README.md',
-    'docs/02_foundation_release_scope.md',
-    'docs/05_privacy_model.md',
-    'docs/07_non_goals.md',
-    'artifacts/demo_transcript.json'
-  ];
-  for (const rel of visibilityFiles) {
-    const text = read(rel).toLowerCase();
-    for (const needle of [
+  const visibilityChecks = {
+    'README.md': [
+      'readinesscredential is visible',
+      'readinesscredentialactivestatus',
+      'readinesspresentation',
+      'readinessbinding',
+      'readinessauditdisclosuregrant',
       'capacityreservation is visible',
+      'reservationhandoffinstruction',
+      'auditdisclosuregrant'
+    ],
+    'docs/02_foundation_release_scope.md': [
+      'readinesscredential is visible',
+      'readinesscredentialactivestatus',
+      'readinesspresentation',
+      'readinessbinding',
+      'readinessauditdisclosuregrant',
+      'capacityreservation is visible',
+      'reservationhandoffinstruction',
+      'auditdisclosuregrant'
+    ],
+    'docs/05_privacy_model.md': [
+      'readinesscredential is visible',
+      'readinesscredentialactivestatus',
+      'readinesspresentation',
+      'readinessbinding',
+      'readinessauditdisclosuregrant',
+      'capacityreservation is visible',
+      'reservationhandoffinstruction',
+      'auditdisclosuregrant'
+    ],
+    'docs/07_non_goals.md': [
+      'readinesscredential is visible',
+      'readinesscredentialactivestatus',
+      'readinesspresentation',
+      'readinessbinding',
+      'readinessauditdisclosuregrant',
+      'capacityreservation is visible',
+      'reservationhandoffinstruction',
+      'auditdisclosuregrant'
+    ],
+    'artifacts/demo_transcript.json': [
+      'capacityreservation is visible',
+      'reservationhandoffinstruction',
+      'auditdisclosuregrant'
+    ],
+    'artifacts/readiness_demo_transcript.json': [
+      'readinesscredential',
+      'readinesscredentialactivestatus',
+      'readinesspresentation',
+      'readinessbinding',
+      'readinessauditdisclosuregrant'
+    ],
+    'artifacts/venue_readiness_demo_transcript.json': [
+      'venuereadinessevidence',
       'holder',
       'attester',
-      'verifier',
-      'reservationhandoffinstruction',
-      'handoff recipient',
-      'auditdisclosuregrant',
-      'auditor'
-    ]) {
+      'verifier'
+    ]
+  };
+  for (const [rel, needles] of Object.entries(visibilityChecks)) {
+    if (!fs.existsSync(path.join(root, rel))) continue;
+    const text = read(rel).toLowerCase();
+    for (const needle of needles) {
       if (!text.includes(needle)) fail.push(`${rel} missing dedicated visibility language: ${needle}`);
       else pass.push(`${rel} includes dedicated visibility language: ${needle}`);
     }
@@ -122,8 +167,11 @@ function checkPassportScopeBoundary() {
     { label: 'moving collateral', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:moves?|moving|move|transfers?|transferring|transfer)\b[^.\n|;]{0,80}\bcollateral\b/i },
     { label: 'custodying assets', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:custodies|custodying|custody|custodian)\b[^.\n|;]{0,80}\b(?:asset|assets|collateral)\b/i },
     { label: 'settling transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:settles?|settling|settlement)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
+    { label: 'clearing transactions', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:clears?|clearing)\b[^.\n|;]{0,80}\b(?:transaction|transactions|trade|trades|repo)\b/i },
     { label: 'operating a wallet', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bwallet\b/i },
     { label: 'operating a venue', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:operates?|operating|provides?|providing|implements?|implementing)\b[^.\n|;]{0,80}\bvenue\b/i },
+    { label: 'granting licenses', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:grants?|granting|issues?|issuing)\b[^.\n|;]{0,80}\blicen[sc]es?\b/i },
+    { label: 'venue admission', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:admits?|admitting)\b[^.\n|;]{0,80}\bvenue\b/i },
     { label: 'live external integration', pattern: /\b(?:passport|foundation release|public core|aevelum passport)\b[^.\n|;]{0,120}\b(?:has|provides?|providing|is)\b[^.\n|;]{0,80}\blive external integration\b/i }
   ];
 
@@ -163,16 +211,45 @@ function claimUnits(text) {
 }
 
 function isSafeNegativeOrBoundary(text) {
-  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|out of scope|excludes|excluded)\b/i.test(text);
+  return hasExplicitBoundaryNegation(text)
+    || hasBoundaryScopePhrase(text)
+    || hasGateOrTestBoundary(text);
+}
+
+function hasExplicitBoundaryNegation(text) {
+  return /\b(?:does|do|did|will|would|can|could|may|must|shall|should|is|are|was|were)\s+not\b(?!\s+only\b)/i.test(text)
+    || /\bcannot\b|\bcan not\b/i.test(text)
+    || /\bmust\s+never\b/i.test(text)
+    || /\bnot\s+(?:a|an)\b[^.\n|;]{0,100}\b(?:venue|licensing authority|legal-compliance engine|custodian|settlement system|clearinghouse|wallet|token issuer|credit engine|legal-title oracle)\b/i.test(text)
+    || /\bwithout\b[^.\n|;]{0,100}\b(?:grant|issue|register|approve|admit|operate|execute|form|clear|settle|custody|transfer|wallet|token|license|legal permission|venue)\b/i.test(text)
+    || /\bno\b[^.\n|;]{0,100}\b(?:license|legal permission|venue admission|venue operation|trade execution|trade formation|clearing|settlement|custody|asset transfer|token issuance|wallet operation|production integration|live external integration)\b/i.test(text);
+}
+
+function hasBoundaryScopePhrase(text) {
+  return /\b(non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|rewritten)\b/i.test(text);
+}
+
+function hasGateOrTestBoundary(text) {
+  return /\b(?:claim gate|readiness claim gate|hardening gate|structural gate|static gates?|tests?)\b[^.\n|;]{0,120}\b(?:must\s+)?rejects?\b/i.test(text)
+    || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
 }
 
 const coreFoundation = 'packages/passport-core/daml/Aevelum/Passport/Foundation.daml';
 const coreTypes = 'packages/passport-core/daml/Aevelum/Passport/Types.daml';
+const readinessTypes = 'packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml';
+const readinessFoundation = 'packages/passport-core/daml/Aevelum/Passport/Readiness/Foundation.daml';
+const venueReadinessTypes = 'packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml';
+const venueReadinessFoundation = 'packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Foundation.daml';
 const testFoundation = 'packages/passport-tests/daml/Aevelum/Passport/Test/FoundationScenario.daml';
 const testPrivacy = 'packages/passport-tests/daml/Aevelum/Passport/Test/PrivacyTests.daml';
 const testReservation = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml';
 const testRevocation = 'packages/passport-tests/daml/Aevelum/Passport/Test/RevocationTests.daml';
 const testTemporal = 'packages/passport-tests/daml/Aevelum/Passport/Test/TemporalTests.daml';
+const testReadinessScenario = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessScenario.daml';
+const testReadinessPrivacy = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessPrivacyTests.daml';
+const testReadinessTemporal = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessTemporalTests.daml';
+const testReadinessBoundary = 'packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessBoundaryTests.daml';
+const testVenueReadiness = 'packages/passport-tests/daml/Aevelum/Passport/Test/VenueReadinessScenario.daml';
 const interopDoc = 'docs/06_interop_adapters.md';
 const interopSample = 'interop/samples/repo-pretrade-passport-input.json';
 const cdmSchemaRoot = 'interop/plugins/cdm/assets/schemas/6.0';
@@ -184,7 +261,9 @@ const docsScopeFiles = [
   ...walk('docs').filter(file => file.endsWith('.md')),
   ...walk('design').filter(file => file.endsWith('.md')),
   ...walk('hardening').filter(file => file.endsWith('.md')),
-  'artifacts/demo_transcript.json'
+  'artifacts/demo_transcript.json',
+  'artifacts/readiness_demo_transcript.json',
+  'artifacts/venue_readiness_demo_transcript.json'
 ];
 const damlSourceRoots = [
   'packages/passport-core/daml',
@@ -200,11 +279,20 @@ const requiredFiles = [
   'packages/passport-tests/daml.yaml',
   coreTypes,
   coreFoundation,
+  readinessTypes,
+  readinessFoundation,
+  venueReadinessTypes,
+  venueReadinessFoundation,
   testFoundation,
   testPrivacy,
   testReservation,
   testRevocation,
   testTemporal,
+  testReadinessScenario,
+  testReadinessPrivacy,
+  testReadinessTemporal,
+  testReadinessBoundary,
+  testVenueReadiness,
   'docs/00_product_thesis.md',
   'docs/01_daml_as_spec.md',
   'docs/02_foundation_release_scope.md',
@@ -216,6 +304,12 @@ const requiredFiles = [
   'docs/08_brand_ui_system.md',
   'docs/09_adapter_readiness_levels.md',
   'docs/10_release_notes.md',
+  'docs/11_readiness_credential_framework.md',
+  'docs/12_venue_readiness_credentials.md',
+  'docs/13_license_registration_attestations.md',
+  'docs/14_passport_markets_boundary.md',
+  'docs/15_release_notes_passport_0_3.md',
+  'docs/decisions/0002-readiness-credential-expansion.md',
   'design/tokens/colors.json',
   'design/change-log.md',
   'AGENTS.md',
@@ -241,6 +335,8 @@ const requiredFiles = [
   `${cdmArtifactRoot}/eligibility-query.json`,
   `${cdmArtifactRoot}/check-eligibility-result.json`,
   'artifacts/demo_transcript.json',
+  'artifacts/readiness_demo_transcript.json',
+  'artifacts/venue_readiness_demo_transcript.json',
   'artifacts/interop/report.json',
   'artifacts/hardening_report.json',
   'artifacts/hardening_map_report.json',
@@ -273,6 +369,8 @@ const requiredFiles = [
   'scripts/interop-vendor-cdm.mjs',
   'scripts/run-daml-tests.sh',
   'scripts/daml-coverage-gate.mjs',
+  'scripts/readiness-claim-gate.mjs',
+  'scripts/export-readiness-demo-transcript.mjs',
   'scripts/canton-smoke.sh'
 ];
 
@@ -301,6 +399,75 @@ checkContains(coreFoundation, [
   'presentedAtTime',
   'reservedAtTime',
   'ValidatePolicyActiveAtLedgerTime'
+]);
+
+checkContains(readinessTypes, [
+  'ReadinessCredentialKind',
+  'ParticipantEligibilityCredential',
+  'LicenseOrRegistrationAttestation',
+  'VenueAccessReadinessCredential',
+  'ProductEligibilityCredential',
+  'OperationalCapabilityCredential',
+  'DisclosureConsentCredential',
+  'SettlementOrClearingReadinessCredential',
+  'CollateralCapacityReadinessCredential',
+  'LicenseAttestationScope',
+  'attestationOnly',
+  'validReadinessKindScope',
+  'validReadinessKindScopeForJurisdiction'
+]);
+
+checkContains(readinessFoundation, [
+  'template ReadinessAccount',
+  'template ReadinessPolicy',
+  'template ReadinessPolicyLifecycleEvent',
+  'template ReadinessCredentialRequest',
+  'template ReadinessCredentialActiveStatus',
+  'template ReadinessCredential',
+  'template ReadinessPresentation',
+  'template ReadinessBinding',
+  'template ReadinessRevocation',
+  'template ReadinessAuditDisclosureGrant',
+  'RequestReadinessCredential',
+  'ValidateReadinessPolicyActiveAtLedgerTime',
+  'RetireReadinessPolicy',
+  'IssueReadinessCredential',
+  'PresentReadinessToVerifier',
+  'BindReadinessToContext',
+  'GrantReadinessAuditDisclosure',
+  'RevokeReadinessCredential',
+  'DeactivateReadinessCredentialActiveStatus',
+  'sourceCredentialCid : ContractId ReadinessCredential',
+  'sourceCredentialActiveStatusCid : ContractId ReadinessCredentialActiveStatus',
+  'credential <- fetch sourceCredentialCid',
+  'activeStatus <- fetch sourceCredentialActiveStatusCid',
+  'sourceCredentialCid',
+  'validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope',
+  'bindingPurpose == presentationPurpose'
+]);
+
+checkContains(venueReadinessFoundation, [
+  'template VenueReadinessEvidence',
+  'readinessBindingCid',
+  'VenueReadinessUse',
+  'ValidateVenueReadinessEvidence',
+  'controller verifier',
+  'activeStatus <- fetch binding.sourceCredentialActiveStatusCid',
+  'binding.credentialValidUntilTime',
+  'binding.credentialFreshUntilTime',
+  'activeStatus.credentialId == binding.credentialId',
+  'activeStatus.evidenceHash == binding.evidenceHash',
+  'binding.venueProfileRef == Some venueProfileRef'
+]);
+
+checkContains(venueReadinessTypes, [
+  'readinessUseMatchesBindingPurpose',
+  'VenueParticipantAdmissionUse -> purpose == VenueParticipantAdmissionBinding',
+  'VenueProductAdmissionUse -> purpose == VenueProductAdmissionBinding',
+  'VenueSessionAccessUse -> purpose == VenueSessionAccessBinding',
+  'VenueTradingInterestSubmissionUse -> purpose == TradingInterestSubmissionBinding',
+  'VenueSurveillanceUse -> purpose == SurveillanceAuditBinding',
+  'VenueReportingUse -> purpose == ReportingAuditBinding'
 ]);
 
 checkContains(testFoundation, [
@@ -348,6 +515,75 @@ checkContains(testTemporal, [
   't030_legacy_text_timestamps_metadata_only'
 ]);
 
+checkContains(testReadinessScenario, [
+  't100_create_readiness_account',
+  't101_publish_readiness_policy',
+  't102_request_participant_eligibility_credential',
+  't103_issue_readiness_credential',
+  't104_present_readiness_to_verifier',
+  't105_bind_readiness_to_workflow_context',
+  't106_issue_license_registration_attestation_only'
+]);
+
+checkContains(testReadinessBoundary, [
+  't107_reject_license_attestation_without_scope',
+  't108_reject_license_scope_when_attestation_only_false',
+  't109_reject_unapproved_credential_kind',
+  't110_reject_unapproved_jurisdiction',
+  't111_reject_unapproved_activity',
+  't119_readiness_binding_is_non_executing_evidence_only',
+  't127_reject_license_scope_jurisdiction_mismatch',
+  't128_reject_binding_purpose_mismatch',
+  't129_reject_binding_after_readiness_credential_revocation'
+]);
+
+checkContains(testReadinessTemporal, [
+  't112_reject_expired_readiness_policy',
+  't113_reject_stale_readiness_presentation',
+  't125_reject_readiness_audit_grant_after_credential_expiry'
+]);
+
+checkContains(testReadinessPrivacy, [
+  't114_revoke_readiness_credential',
+  't115_grant_readiness_audit_disclosure',
+  't116_auditor_cannot_see_full_readiness_credential',
+  't117_unauthorized_party_cannot_see_readiness_credential',
+  't131_active_status_visibility_is_liveness_only'
+]);
+
+checkContains(testVenueReadiness, [
+  't118_create_venue_readiness_evidence_from_binding',
+  't120_validate_venue_readiness_evidence',
+  't121_reject_venue_readiness_evidence_with_wrong_binding_id',
+  't122_reject_venue_readiness_evidence_with_wrong_use',
+  't123_reject_venue_readiness_evidence_with_wrong_venue_profile_ref',
+  't124_reject_venue_readiness_evidence_with_wrong_evidence_hash',
+  't126_reject_venue_readiness_evidence_after_binding_freshness_expiry',
+  't130_reject_venue_readiness_evidence_after_credential_revocation',
+  'venueReadinessStaleValidationTime',
+  'submit bound.presented.base.actors.verifier',
+  'submitMustFail',
+  'ValidateVenueReadinessEvidence'
+]);
+
+for (const rel of [
+  'README.md',
+  'docs/12_venue_readiness_credentials.md',
+  'docs/14_passport_markets_boundary.md',
+  'docs/15_release_notes_passport_0_3.md',
+  'docs/decisions/0002-readiness-credential-expansion.md',
+  'docs/trackers/phase-a-readiness-credential-upgrade.md'
+]) {
+  checkContains(rel, [
+    'Consumers must validate or cross-check the underlying',
+    'before relying on',
+    'VenueReadinessEvidence',
+    'Markets Phase C must not trust string readiness refs or copied wrapper fields alone',
+    'VenueReadinessUse',
+    'ReadinessBindingPurpose'
+  ]);
+}
+
 checkContains(interopDoc, [
   'framework-neutral adapter surface',
   'static plugin registry only',
@@ -362,11 +598,15 @@ checkContains('AGENTS.md', [
   '.agents/skills/passport-ui-design-system/SKILL.md',
   'design/tokens/colors.json',
   'npm run hardening:gate',
+  'Readiness Credential Expansion',
+  'Passport may now model generic regulated-market readiness credentials',
   'Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands.'
 ]);
 
 checkContains('.agents/skills/passport-hardening-loop/SKILL.md', [
   'Passport Hardening Loop',
+  'Passport scope is regulated-market readiness credentialing',
+  'License or registration credential changes must preserve attestation-only semantics',
   'hardening/maps/passport.invariants.json',
   'npm run hardening:gate'
 ]);
@@ -400,7 +640,8 @@ checkContains('scripts/ci.sh', [
 ]);
 
 checkContains('package.json', [
-  '"hardening:formal": "node hardening/scripts/validate-formal.mjs"'
+  '"hardening:formal": "node hardening/scripts/validate-formal.mjs"',
+  '"readiness:claim-gate": "node scripts/readiness-claim-gate.mjs"'
 ]);
 
 checkContains('hardening/formal/daml-ledger-core/FORMAL_LADDER.md', [
@@ -497,6 +738,44 @@ try {
   else pass.push('demo_transcript privacyAssertions complete');
 } catch (e) {
   fail.push(`demo_transcript JSON parse failed: ${e.message}`);
+}
+
+try {
+  const transcript = JSON.parse(read('artifacts/readiness_demo_transcript.json'));
+  for (const key of ['accountId', 'policyId', 'requestId', 'credentialId', 'presentationId', 'bindingId', 'auditGrantId']) {
+    if (!transcript.ids?.[key]) fail.push(`readiness_demo_transcript missing ids.${key}`);
+    else pass.push(`readiness_demo_transcript contains ids.${key}`);
+  }
+  if (transcript.licenseScope?.attestationOnly !== true) fail.push('readiness_demo_transcript licenseScope.attestationOnly is not true');
+  else pass.push('readiness_demo_transcript records attestation-only license scope');
+  for (const assertion of ['attestation only', 'not license grant', 'not venue admission', 'not legal compliance determination', 'not trade formation', 'not execution']) {
+    if (!transcript.boundaryAssertions?.includes(assertion)) fail.push(`readiness_demo_transcript missing boundary assertion ${assertion}`);
+    else pass.push(`readiness_demo_transcript includes boundary assertion ${assertion}`);
+  }
+} catch (e) {
+  fail.push(`readiness_demo_transcript JSON parse failed: ${e.message}`);
+}
+
+try {
+  const transcript = JSON.parse(read('artifacts/venue_readiness_demo_transcript.json'));
+  if (!transcript.ids?.venueReadinessEvidenceId) fail.push('venue_readiness_demo_transcript missing venue readiness evidence id');
+  else pass.push('venue_readiness_demo_transcript contains venue readiness evidence id');
+  for (const validation of [
+    'Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence.',
+    'Markets Phase C must not trust string readiness refs or copied wrapper fields alone.',
+    'VenueReadinessUse must match ReadinessBindingPurpose.',
+    'The verifier can exercise ValidateVenueReadinessEvidence independently.',
+    'Validation rejects revoked, stale, or expired ReadinessBinding source credentials through ReadinessCredentialActiveStatus.'
+  ]) {
+    if (!transcript.validation?.includes(validation)) fail.push(`venue_readiness_demo_transcript missing validation rule ${validation}`);
+    else pass.push(`venue_readiness_demo_transcript includes validation rule ${validation}`);
+  }
+  for (const assertion of ['readiness evidence only', 'not venue operation', 'not participant admission decision', 'not order matching']) {
+    if (!transcript.boundaryAssertions?.includes(assertion)) fail.push(`venue_readiness_demo_transcript missing boundary assertion ${assertion}`);
+    else pass.push(`venue_readiness_demo_transcript includes boundary assertion ${assertion}`);
+  }
+} catch (e) {
+  fail.push(`venue_readiness_demo_transcript JSON parse failed: ${e.message}`);
 }
 
 try {
@@ -611,7 +890,7 @@ try {
 const report = {
   artifact: 'gate_report',
   package: 'aevelum-passport-foundation',
-  version: '0.2.0',
+  version: '0.3.0',
   generatedAt: getGeneratedAt(),
   dpmSdk: '3.4.11',
   note: 'This local gate validates repository structure and generated artifacts. Run scripts/run-daml-tests.sh for DPM compile, Daml Script, and coverage gates.',
