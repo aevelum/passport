@@ -58,3 +58,21 @@ t113_reject_stale_readiness_presentation = script do
       allowedFields = ["credentialId", "policyId"]
       presentedAt = "2026-05-10T02:03:00Z"
   return ()
+
+t125_reject_readiness_audit_grant_after_credential_expiry : Script ()
+t125_reject_readiness_audit_grant_after_credential_expiry = script do
+  base <- createBaseReadinessContext
+  let afterCredentialExpiryTime = time (date 2026 May 12) 0 3 0
+  let auditGrantUntilTime = time (date 2026 May 12) 0 10 0
+  setTime afterCredentialExpiryTime
+  submitMustFail (actAs base.actors.holder <> actAs base.actors.attester) do
+    exerciseCmd base.credentialCid GrantReadinessAuditDisclosure with
+      grantId = "readiness-audit-grant-expired-credential-001"
+      auditor = base.actors.auditor
+      allowedFields = ["credentialId", "evidenceHash"]
+      validFrom = "2026-05-12T00:03:00Z"
+      validFromTime = afterCredentialExpiryTime
+      validUntil = "2026-05-12T00:10:00Z"
+      validUntilTime = auditGrantUntilTime
+      legalBasisRef = "audit-request:expired-readiness-credential"
+  return ()

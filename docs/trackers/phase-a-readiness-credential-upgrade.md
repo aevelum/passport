@@ -17,6 +17,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 | 4 | Hardening map/frontier/round records and generated reports. | Done | Updated invariant map, added `round-0010`, regenerated frontier, and passed `hardening:map`, `hardening:frontier`, `hardening:formal`, and `hardening:gate`. |
 | 5 | Validation and package handoff. | Done | `daml:build`, `daml:test`, `canton:smoke`, `ci`, and `package` passed. `npm run ci` passed after regenerated artifacts were stabilized in the working tree. |
 | C.1 | Venue-readiness evidence canonicality before merge. | Done | Added `ValidateVenueReadinessEvidence`, `readinessUseMatchesBindingPurpose`, and negative tests for wrong binding id, use, venue profile, and evidence hash. |
+| C.1 review | Readiness audit grant typed validity review. | Done | Fixed `GrantReadinessAuditDisclosure` to validate against the credential validity window and added a negative expired-credential audit grant test. |
 
 ## Required Boundary Checks
 

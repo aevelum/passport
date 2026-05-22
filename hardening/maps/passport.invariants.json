@@ -609,7 +609,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "Readiness policy expiry and stale presentation coverage."
+        "notes": "Readiness policy expiry, stale presentation, and audit grant credential-expiry coverage."
       },
       {
         "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReservationTests.daml",
@@ -800,7 +800,7 @@
       "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
       "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.",
-      "Daml readiness tests t100-t124 must pass with 100% template and choice coverage.",
+      "Daml readiness tests t100-t125 must pass with 100% template and choice coverage.",
       "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, or evidence hash.",
       "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, or consumer cross-check docs are removed.",
       "npm run readiness:claim-gate must reject license, venue, trade, clearing, settlement, custody, asset-transfer, token, and wallet overclaims."

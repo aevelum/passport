@@ -496,7 +496,8 @@ checkContains(testReadinessBoundary, [
 
 checkContains(testReadinessTemporal, [
   't112_reject_expired_readiness_policy',
-  't113_reject_stale_readiness_presentation'
+  't113_reject_stale_readiness_presentation',
+  't125_reject_readiness_audit_grant_after_credential_expiry'
 ]);
 
 checkContains(testReadinessPrivacy, [

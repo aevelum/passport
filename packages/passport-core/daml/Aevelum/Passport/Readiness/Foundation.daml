@@ -341,10 +341,13 @@ template ReadinessCredential
       controller holder, attester
       do
         now <- getTime
+        credential <- fetch self
         assertMsg "readiness audit grant id must be present" (grantId /= "")
         assertMsg "readiness audit grant must name allowed fields" (not (null allowedFields))
         assertMsg "readiness audit grant validity window must be coherent" (coherentTimeWindow validFromTime validUntilTime)
-        assertMsg "readiness credential must be active at audit grant ledger time" (withinTimeWindow now validFromTime validUntilTime)
+        assertMsg "readiness credential must be active at audit grant ledger time" (withinTimeWindow now credential.validFromTime credential.validUntilTime)
+        assertMsg "readiness audit grant must start inside credential validity" (validFromTime >= credential.validFromTime)
+        assertMsg "readiness audit grant must not outlive credential validity" (validUntilTime <= credential.validUntilTime)
         create ReadinessAuditDisclosureGrant with
           grantId
           credentialId

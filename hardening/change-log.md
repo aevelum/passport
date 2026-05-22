@@ -5,6 +5,7 @@
 - Added `readinessUseMatchesBindingPurpose` and `ValidateVenueReadinessEvidence` so venue-readiness evidence can be validated against the referenced `ReadinessBinding`.
 - Added positive and negative Daml Script coverage for wrong binding id, wrong venue use, wrong venue profile, and wrong evidence hash.
 - Updated docs, demo transcript generation, gates, and the invariant map so Markets Phase C must fetch or cross-check the binding before relying on copied venue-readiness wrapper fields.
+- Addressed Codex review feedback by making `GrantReadinessAuditDisclosure` validate against the source credential's typed validity window rather than the grant argument window, with an expired-credential negative test.
 
 ## 2026-05-22 - round-0010
 
