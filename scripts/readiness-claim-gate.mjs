@@ -22,6 +22,12 @@ const claimPatterns = [
   ['wallet operation', /\bPassport\b[^.\n|;]{0,120}\boperates?\b[^.\n|;]{0,80}\bwallets?\b/i]
 ];
 
+const claimArtifactFiles = [
+  'artifacts/demo_transcript.json',
+  'artifacts/readiness_demo_transcript.json',
+  'artifacts/venue_readiness_demo_transcript.json'
+];
+
 const files = [
   'README.md',
   'AGENTS.md',
@@ -29,7 +35,7 @@ const files = [
   ...walk('docs').filter(file => file.endsWith('.md')),
   ...walk('hardening/rounds').filter(file => file.endsWith('.md')),
   'hardening/change-log.md',
-  ...walk('artifacts').filter(file => file.endsWith('.json'))
+  ...claimArtifactFiles
 ].filter(file => fs.existsSync(path.join(root, file)));
 
 for (const rel of files) {

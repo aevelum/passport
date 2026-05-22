@@ -1,7 +1,7 @@
 {
   "artifact": "readiness_claim_gate_report",
   "status": "passed",
-  "scannedFiles": 44,
+  "scannedFiles": 36,
   "pass": [
     "README.md:11 bounds license grant",
     "README.md:11 bounds venue admission",
@@ -74,31 +74,7 @@
     "hardening/rounds/round-0010.md:53 bounds legal compliance approval",
     "hardening/rounds/round-0010.md:53 bounds venue admission",
     "hardening/rounds/round-0010.md:53 bounds trade execution",
-    "hardening/change-log.md:45 bounds trade execution",
-    "artifacts/gate_report.json:284 bounds trade execution",
-    "artifacts/gate_report.json:285 bounds settlement",
-    "artifacts/gate_report.json:285 bounds clearing",
-    "artifacts/gate_report.json:285 bounds asset transfer",
-    "artifacts/gate_report.json:289 bounds trade execution",
-    "artifacts/gate_report.json:290 bounds settlement",
-    "artifacts/gate_report.json:290 bounds clearing",
-    "artifacts/gate_report.json:290 bounds asset transfer",
-    "artifacts/hardening_report.json:1535 bounds trade execution",
-    "artifacts/hardening_report.json:1536 bounds settlement",
-    "artifacts/hardening_report.json:1536 bounds clearing",
-    "artifacts/hardening_report.json:1536 bounds asset transfer",
-    "artifacts/hardening_report.json:1546 bounds trade execution",
-    "artifacts/hardening_report.json:1547 bounds settlement",
-    "artifacts/hardening_report.json:1547 bounds clearing",
-    "artifacts/hardening_report.json:1547 bounds asset transfer",
-    "artifacts/hardening_report.json:2286 bounds trade execution",
-    "artifacts/hardening_report.json:2287 bounds settlement",
-    "artifacts/hardening_report.json:2287 bounds clearing",
-    "artifacts/hardening_report.json:2287 bounds asset transfer",
-    "artifacts/hardening_report.json:2291 bounds trade execution",
-    "artifacts/hardening_report.json:2292 bounds settlement",
-    "artifacts/hardening_report.json:2292 bounds clearing",
-    "artifacts/hardening_report.json:2292 bounds asset transfer"
+    "hardening/change-log.md:45 bounds trade execution"
   ],
   "fail": []
 }
