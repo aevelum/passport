@@ -529,7 +529,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.domain-types",
         "status": "semantics",
-        "notes": "Generic readiness credential identifiers, kinds, subjects, binding purposes, revocation reasons, and license attestation scope helpers."
+        "notes": "Generic readiness credential identifiers, kinds, subjects, binding purposes, revocation reasons, and jurisdiction-bound license attestation scope helpers."
       },
       {
         "path": "packages/passport-core/daml/Aevelum/Passport/Types.daml",
@@ -585,7 +585,7 @@
         "pin": "git:HEAD",
         "primary_component_id": "cmp.daml.tests",
         "status": "breakdown",
-        "notes": "Readiness license attestation and policy approval negative coverage."
+        "notes": "Readiness license attestation, license scope jurisdiction, binding purpose, and policy approval negative coverage."
       },
       {
         "path": "packages/passport-tests/daml/Aevelum/Passport/Test/ReadinessPrivacyTests.daml",
@@ -800,7 +800,7 @@
       "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
       "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.",
-      "Daml readiness tests t100-t126 must pass with 100% template and choice coverage.",
+      "Daml readiness tests t100-t128 must pass with 100% template and choice coverage.",
       "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, or evidence hash.",
       "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, or consumer cross-check docs are removed.",
       "npm run readiness:claim-gate must reject license, venue, trade, clearing, settlement, custody, asset-transfer, token, and wallet overclaims."
@@ -1100,6 +1100,7 @@
                     "enforcing_functions": [
                       "fn.daml.request-readiness-credential",
                       "fn.daml.issue-readiness-credential",
+                      "fn.daml.valid-readiness-kind-scope-for-jurisdiction",
                       "fn.ci.readiness-claim-gate"
                     ]
                   },
@@ -1133,6 +1134,7 @@
                     "severity": "high",
                     "statement": "VenueReadinessEvidence must be treated as a wrapper around ReadinessBinding and must validate copied binding fields, venue profile, evidence hash, and VenueReadinessUse to ReadinessBindingPurpose before consumers rely on it.",
                     "enforcing_functions": [
+                      "fn.daml.bind-readiness-to-context",
                       "fn.daml.validate-venue-readiness-evidence",
                       "fn.daml.readiness-use-matches-binding-purpose"
                     ]
@@ -1165,6 +1167,11 @@
                 "id": "fn.daml.readiness-use-matches-binding-purpose",
                 "name": "readinessUseMatchesBindingPurpose",
                 "source_ref": "packages/passport-core/daml/Aevelum/Passport/VenueReadiness/Types.daml"
+              },
+              {
+                "id": "fn.daml.valid-readiness-kind-scope-for-jurisdiction",
+                "name": "validReadinessKindScopeForJurisdiction",
+                "source_ref": "packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml"
               }
             ],
             "invariants": [

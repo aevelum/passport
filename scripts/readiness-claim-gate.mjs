@@ -14,12 +14,12 @@ const claimPatterns = [
   ['venue operation', /\bPassport\b[^.\n|;]{0,120}\boperates?\b[^.\n|;]{0,80}\bvenue\b/i],
   ['trade execution', /\bPassport\b[^.\n|;]{0,120}\bexecutes?\b[^.\n|;]{0,80}\btrades?\b/i],
   ['trade formation', /\bPassport\b[^.\n|;]{0,120}\bforms?\b[^.\n|;]{0,80}\btrades?\b/i],
-  ['settlement', /\bPassport\b[^.\n|;]{0,120}\bsettles?\b/i],
-  ['clearing', /\bPassport\b[^.\n|;]{0,120}\bclears?\b/i],
-  ['custody', /\bPassport\b[^.\n|;]{0,120}\bcustodies\b/i],
-  ['asset transfer', /\bPassport\b[^.\n|;]{0,120}\btransfers?\b[^.\n|;]{0,80}\bassets?\b/i],
-  ['token issuance', /\bPassport\b[^.\n|;]{0,120}\bissues?\b[^.\n|;]{0,80}\btokens?\b/i],
-  ['wallet operation', /\bPassport\b[^.\n|;]{0,120}\boperates?\b[^.\n|;]{0,80}\bwallets?\b/i]
+  ['settlement', /\bPassport\b[^.\n|;]{0,120}\b(?:settles?|settlement)\b/i],
+  ['clearing', /\bPassport\b[^.\n|;]{0,120}\b(?:clears?|clearing)\b/i],
+  ['custody', /\bPassport\b[^.\n|;]{0,120}\b(?:custodies|custody|custodian)\b/i],
+  ['asset transfer', /\bPassport\b[^.\n|;]{0,120}\b(?:transfers?|transfer|asset-transfer)\b[^.\n|;]{0,80}\bassets?\b/i],
+  ['token issuance', /\bPassport\b[^.\n|;]{0,120}\b(?:issues?|issuance)\b[^.\n|;]{0,80}\btokens?\b/i],
+  ['wallet operation', /\bPassport\b[^.\n|;]{0,120}\b(?:operates?|operation)\b[^.\n|;]{0,80}\bwallets?\b/i]
 ];
 
 const claimArtifactFiles = [

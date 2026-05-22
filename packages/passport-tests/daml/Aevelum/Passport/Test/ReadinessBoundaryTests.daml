@@ -13,6 +13,14 @@ licenseScopeNotAttestationOnly = LicenseAttestationScope with
   licensedActivityRefs = ["broker-dealer-readiness"]
   attestationOnly = False
 
+licenseScopeWrongJurisdiction : LicenseAttestationScope
+licenseScopeWrongJurisdiction = LicenseAttestationScope with
+  jurisdiction = "EU-DE"
+  externalAuthorityRef = "external-authority:de-registry"
+  registrationRef = "registration:holder-001"
+  licensedActivityRefs = ["broker-dealer-readiness"]
+  attestationOnly = True
+
 t107_reject_license_attestation_without_scope : Script ()
 t107_reject_license_attestation_without_scope = script do
   actors <- mkReadinessActors
@@ -143,4 +151,37 @@ t119_readiness_binding_is_non_executing_evidence_only = script do
       assertMsg "readiness binding carries evidence hash only" (binding.evidenceHash == "sha256:readiness-evidence-001")
     _ -> assertMsg "verifier should see exactly one readiness binding" False
   assertMsg "binding is nonconsuming and leaves the presentation visible to verifier" (length verifierPresentations == 1)
+  return ()
+
+t127_reject_license_scope_jurisdiction_mismatch : Script ()
+t127_reject_license_scope_jurisdiction_mismatch = script do
+  actors <- mkReadinessActors
+  accountCid <- createReadinessAccount actors
+  submitMustFail actors.holder do
+    exerciseCmd accountCid RequestReadinessCredential with
+      requestId = "license-request-wrong-jurisdiction-001"
+      policyId = "readiness-policy-001"
+      policyVersion = "v1"
+      policyPublisher = actors.policyPublisher
+      attester = actors.attester
+      credentialKind = LicenseOrRegistrationAttestation
+      subject = PartySubject actors.holder
+      jurisdiction = "US-NY"
+      activityRefs = ["broker-dealer-readiness"]
+      licenseScope = Some licenseScopeWrongJurisdiction
+      requestedAt = "2026-05-10T00:01:00Z"
+  return ()
+
+t128_reject_binding_purpose_mismatch : Script ()
+t128_reject_binding_purpose_mismatch = script do
+  presented <- createPresentedReadinessContext
+  setTime readinessBindingLedgerTime
+  submitMustFail (actAs presented.base.actors.holder <> actAs presented.base.actors.attester <> actAs presented.base.actors.verifier) do
+    exerciseCmd presented.presentationCid BindReadinessToContext with
+      bindingId = "readiness-binding-purpose-mismatch-001"
+      workflowRef = Some "markets-workflow:participant-check"
+      venueProfileRef = Some "venue-profile:demo"
+      venueRulebookRef = None
+      bindingPurpose = VenueParticipantAdmissionBinding
+      boundAt = "2026-05-10T00:04:00Z"
   return ()

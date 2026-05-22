@@ -12,6 +12,8 @@ License or registration credentials in Passport are attestations of external evi
 
 The Daml model requires `attestationOnly = True` for `LicenseOrRegistrationAttestation`.
 
+The `LicenseAttestationScope.jurisdiction` must match the credential/request jurisdiction. A policy-approved top-level jurisdiction cannot carry a mismatched embedded license scope jurisdiction.
+
 ## Required Semantics
 
 Passport may record that an attester has seen or stands behind external license or registration evidence. Passport does not grant licenses, issue licenses, register participants, authorize legal permissions, legally certify a party, approve legal compliance, or admit participants to a venue.

@@ -19,6 +19,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 | C.1 | Venue-readiness evidence canonicality before merge. | Done | Added `ValidateVenueReadinessEvidence`, `readinessUseMatchesBindingPurpose`, and negative tests for wrong binding id, use, venue profile, and evidence hash. |
 | C.1 review | Readiness audit grant typed validity review. | Done | Fixed `GrantReadinessAuditDisclosure` to validate against the credential validity window and added a negative expired-credential audit grant test. |
 | C.1 review | Venue-readiness verifier validation and freshness review. | Done | Made `ValidateVenueReadinessEvidence` verifier-exercisable and added stale binding validation coverage. |
+| C.1 review | License scope and binding purpose review. | Done | Bound license scope jurisdiction to credential jurisdiction and rejected binding purposes that differ from presentation purpose. |
 
 ## Required Boundary Checks
 

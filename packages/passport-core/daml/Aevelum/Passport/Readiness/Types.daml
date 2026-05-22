@@ -106,3 +106,12 @@ validReadinessKindScope credentialKind licenseScope =
         Some scope -> validLicenseAttestationScope scope
         None -> False
     _ -> True
+
+validReadinessKindScopeForJurisdiction : ReadinessCredentialKind -> JurisdictionRef -> Optional LicenseAttestationScope -> Bool
+validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope =
+  case credentialKind of
+    LicenseOrRegistrationAttestation ->
+      case licenseScope of
+        Some scope -> validLicenseAttestationScope scope && scope.jurisdiction == jurisdiction
+        None -> False
+    _ -> True

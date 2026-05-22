@@ -388,7 +388,8 @@ checkContains(readinessTypes, [
   'CollateralCapacityReadinessCredential',
   'LicenseAttestationScope',
   'attestationOnly',
-  'validReadinessKindScope'
+  'validReadinessKindScope',
+  'validReadinessKindScopeForJurisdiction'
 ]);
 
 checkContains(readinessFoundation, [
@@ -409,7 +410,8 @@ checkContains(readinessFoundation, [
   'BindReadinessToContext',
   'GrantReadinessAuditDisclosure',
   'RevokeReadinessCredential',
-  'validReadinessKindScope credentialKind licenseScope'
+  'validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope',
+  'bindingPurpose == presentationPurpose'
 ]);
 
 checkContains(venueReadinessFoundation, [
@@ -494,7 +496,9 @@ checkContains(testReadinessBoundary, [
   't109_reject_unapproved_credential_kind',
   't110_reject_unapproved_jurisdiction',
   't111_reject_unapproved_activity',
-  't119_readiness_binding_is_non_executing_evidence_only'
+  't119_readiness_binding_is_non_executing_evidence_only',
+  't127_reject_license_scope_jurisdiction_mismatch',
+  't128_reject_binding_purpose_mismatch'
 ]);
 
 checkContains(testReadinessTemporal, [

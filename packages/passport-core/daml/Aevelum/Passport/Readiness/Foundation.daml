@@ -43,7 +43,7 @@ template ReadinessAccount
         assertMsg "readiness jurisdiction must be present" (jurisdiction /= "")
         assertMsg "readiness request must name at least one activity" (not (null activityRefs))
         assertMsg "license registration readiness requires valid attestation-only scope"
-          (validReadinessKindScope credentialKind licenseScope)
+          (validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope)
         create ReadinessCredentialRequest with
           requestId
           accountId
@@ -172,7 +172,7 @@ template ReadinessCredentialRequest
         && accountId /= ""
         && jurisdiction /= ""
         && not (null activityRefs)
-        && validReadinessKindScope credentialKind licenseScope
+        && validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope
 
     choice IssueReadinessCredential : ContractId ReadinessCredential
       with
@@ -207,7 +207,7 @@ template ReadinessCredentialRequest
         assertMsg "readiness credential must be active at issuance ledger time" (withinTimeWindow now validFromTime validUntilTime)
         assertMsg "readiness request activities must be policy approved" (all (\activity -> elem activity policy.approvedActivityRefs) activityRefs)
         assertMsg "license registration readiness requires valid attestation-only scope"
-          (validReadinessKindScope credentialKind licenseScope)
+          (validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope)
 
         create ReadinessCredential with
           credentialId
@@ -272,7 +272,7 @@ template ReadinessCredential
         && not (null activityRefs)
         && evidenceHash /= ""
         && calculationMethodHash /= ""
-        && validReadinessKindScope credentialKind licenseScope
+        && validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope
         && coherentTimeWindow validFromTime validUntilTime
         && withinTimeWindow issuedAtTime validFromTime validUntilTime
         && freshnessWindowHours > 0
@@ -425,7 +425,7 @@ template ReadinessPresentation
         && jurisdiction /= ""
         && not (null activityRefs)
         && not (null allowedFields)
-        && validReadinessKindScope credentialKind licenseScope
+        && validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope
         && coherentTimeWindow validFromTime validUntilTime
         && presentedAtTime >= validFromTime
         && presentedAtTime < presentationValidUntilTime
@@ -446,6 +446,7 @@ template ReadinessPresentation
         assertMsg "readiness binding id must be present" (bindingId /= "")
         assertMsg "readiness presentation expired at binding ledger time" (now < presentationValidUntilTime)
         assertMsg "readiness binding must name workflow, venue profile, or rulebook context" (hasReadinessContext workflowRef venueProfileRef venueRulebookRef)
+        assertMsg "readiness binding purpose must match presentation purpose" (bindingPurpose == presentationPurpose)
         create ReadinessBinding with
           bindingId
           presentationId
@@ -511,7 +512,7 @@ template ReadinessBinding
         && not (null activityRefs)
         && evidenceHash /= ""
         && calculationMethodHash /= ""
-        && validReadinessKindScope credentialKind licenseScope
+        && validReadinessKindScopeForJurisdiction credentialKind jurisdiction licenseScope
         && hasReadinessContext workflowRef venueProfileRef venueRulebookRef
         && boundAtTime < credentialValidUntilTime
         && boundAtTime < credentialFreshUntilTime
