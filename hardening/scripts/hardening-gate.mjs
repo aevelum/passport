@@ -437,7 +437,7 @@ function passportScopeDocs() {
 }
 
 function isSafeScopeBoundaryClaim(text) {
-  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|fail|fails|rewritten)\b/i.test(text);
+  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|rewritten)\b/i.test(text);
 }
 
 function visit(value, onKey) {
@@ -1045,7 +1045,7 @@ function isBoundedReadinessClaim(text) {
 }
 
 function hasSameSentenceNegation(text) {
-  return /\b(not|no|without|does not|must not|non-claim|non-claims|excluded|out of scope|outside passport|not shipped|reject|rejects|fail|fails)\b/i.test(text);
+  return /\b(not|no|without|does not|must not|non-claim|non-claims|excluded|out of scope|outside passport|not shipped|reject|rejects)\b/i.test(text);
 }
 
 function hasSameSentencePromotionBoundary(text) {

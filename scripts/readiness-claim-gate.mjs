@@ -38,11 +38,21 @@ const files = [
   ...claimArtifactFiles
 ].filter(file => fs.existsSync(path.join(root, file)));
 
+for (const fixture of unsafeClaimFixtures()) {
+  const labels = matchingClaimLabels(fixture);
+  if (!labels.length) {
+    fail.push(`unsafe fixture did not match prohibited claim: ${fixture}`);
+  } else if (isSafeBoundaryClaim(fixture)) {
+    fail.push(`unsafe fixture treated as safe boundary claim: ${fixture}`);
+  } else {
+    pass.push(`unsafe fixture rejected: ${labels.join(', ')}`);
+  }
+}
+
 for (const rel of files) {
   const text = fs.readFileSync(path.join(root, rel), 'utf8');
   for (const unit of claimUnits(text)) {
-    for (const [label, pattern] of claimPatterns) {
-      if (!pattern.test(unit.text)) continue;
+    for (const label of matchingClaimLabels(unit.text)) {
       if (isSafeBoundaryClaim(unit.text)) {
         pass.push(`${rel}:${unit.line} bounds ${label}`);
       } else {
@@ -114,5 +124,18 @@ function claimUnits(text) {
 }
 
 function isSafeBoundaryClaim(text) {
-  return /\b(not|no|without|does not|must not|non-executing|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|fail|fails|rewritten|external systems remain external)\b/i.test(text);
+  return /\b(not|no|without|does not|must not|non-executing|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|rewritten|external systems remain external)\b/i.test(text);
+}
+
+function matchingClaimLabels(text) {
+  return claimPatterns
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([label]) => label);
+}
+
+function unsafeClaimFixtures() {
+  return [
+    'Passport clears trades when upstream checks fail.',
+    'Passport provides custody of assets if venue validation fails.'
+  ];
 }

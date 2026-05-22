@@ -206,7 +206,7 @@ function claimUnits(text) {
 }
 
 function isSafeNegativeOrBoundary(text) {
-  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|fail|fails|rewritten)\b/i.test(text);
+  return /\b(not|no|without|does not|must not|non-executing|metadata-only|readiness only|evidence only|attestation only|out of scope|excludes|excluded|reject|rejects|rejected|rewritten)\b/i.test(text);
 }
 
 const coreFoundation = 'packages/passport-core/daml/Aevelum/Passport/Foundation.daml';

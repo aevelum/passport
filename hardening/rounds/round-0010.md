@@ -50,7 +50,7 @@ License or registration credentials require `LicenseAttestationScope.attestation
 - Daml tests fail if license or registration attestations can be requested without valid attestation-only scope.
 - Daml tests fail if unapproved credential kind, jurisdiction, activity, expired policy, or stale presentation is accepted.
 - Daml privacy tests fail if verifier, auditor, or outsider visibility widens beyond scoped contracts.
-- The readiness claim gate fails if docs or artifacts imply Passport grants licenses, registers participants, approves legal compliance, admits participants to a venue, operates venues, executes trades, forms trades, clears, settles, custodies, transfers assets, issues tokens, or operates wallets.
+- The readiness claim gate rejects docs or artifacts that imply Passport grants licenses, registers participants, approves legal compliance, admits participants to a venue, operates venues, executes trades, forms trades, clears, settles, custodies, transfers assets, issues tokens, or operates wallets.
 
 ## Boundary
 

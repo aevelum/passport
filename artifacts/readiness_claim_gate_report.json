@@ -3,6 +3,8 @@
   "status": "passed",
   "scannedFiles": 36,
   "pass": [
+    "unsafe fixture rejected: clearing",
+    "unsafe fixture rejected: custody",
     "README.md:11 bounds license grant",
     "README.md:11 bounds venue admission",
     "README.md:11 bounds venue operation",
@@ -100,8 +102,8 @@
     "hardening/rounds/round-0010.md:53 bounds legal compliance approval",
     "hardening/rounds/round-0010.md:53 bounds venue admission",
     "hardening/rounds/round-0010.md:53 bounds trade execution",
-    "hardening/change-log.md:54 bounds trade execution",
-    "hardening/change-log.md:54 bounds custody"
+    "hardening/change-log.md:55 bounds trade execution",
+    "hardening/change-log.md:55 bounds custody"
   ],
   "fail": []
 }
