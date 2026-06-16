@@ -433,6 +433,7 @@ function passportScopeDocs() {
     ...walkFiles('design', { extensions: ['.md'] }),
     ...walkFiles('hardening', { extensions: ['.md'] }),
     ...walkFiles('.agents/skills', { extensions: ['.md'] }),
+    ...walkFiles('assets', { extensions: ['.svg'] }),
     'artifacts/demo_transcript.json',
     'artifacts/readiness_demo_transcript.json',
     'artifacts/venue_readiness_demo_transcript.json'
@@ -515,6 +516,10 @@ function checkDpmSdkPins() {
   const workflow = readText('.github/workflows/ci.yml');
   const readme = readText('README.md');
   const runDamlTests = readText('scripts/run-daml-tests.sh');
+  const ci = readText('scripts/ci.sh');
+  const cantonSmoke = readText('scripts/canton-smoke.sh');
+  const damlBuild = readText('scripts/daml-build.sh');
+  const packageJson = readText('package.json');
   const policy = readText('hardening/policies/architecture-rules.json');
   const gate = readText('scripts/gates.mjs');
   const docsMinor = (expected ?? '').split('.').slice(0, 2).join('.');
@@ -526,6 +531,12 @@ function checkDpmSdkPins() {
   ok(workflow.includes(`expected DPM SDK ${expected}`), `.github workflow verifies DPM SDK ${expected}`);
   ok(readme.includes(`SDK \`${expected}\``), `README documents DPM SDK ${expected}`);
   ok(readme.includes(`/build/${docsMinor}/dpm/dpm.html`), `README links DPM docs for ${docsMinor}`);
+  ok(fs.existsSync(abs('scripts/dpm-sdk-env.sh')), 'shared DPM SDK pin helper exists');
+  ok(ci.includes('. "$ROOT/scripts/dpm-sdk-env.sh"'), 'ci sources shared DPM SDK pin helper');
+  ok(runDamlTests.includes('. "$ROOT/scripts/dpm-sdk-env.sh"'), 'run-daml-tests sources shared DPM SDK pin helper');
+  ok(cantonSmoke.includes('. "$ROOT/scripts/dpm-sdk-env.sh"'), 'canton-smoke sources shared DPM SDK pin helper');
+  ok(damlBuild.includes('. "$ROOT/scripts/dpm-sdk-env.sh"'), 'daml-build sources shared DPM SDK pin helper');
+  ok(packageJson.includes('"daml:build": "./scripts/daml-build.sh"'), 'daml:build script uses DPM SDK pin helper');
   ok(runDamlTests.includes(`pin SDK ${expected}`), `run-daml-tests missing-DPM message pins ${expected}`);
   ok(runDamlTests.includes('cd "$ROOT/packages/passport-tests"'), 'run-daml-tests enters passport-tests package before dpm test');
   ok(!runDamlTests.includes('--package-root'), 'run-daml-tests avoids brittle dpm test --package-root invocation');
@@ -577,6 +588,8 @@ checkDpmSdkPins();
 
 const packageScript = readText('scripts/package.mjs');
 ok(packageScript.includes("file !== 'artifacts/daml_test_coverage.txt'"), 'package excludes Daml coverage artifact');
+ok(packageScript.includes("'packages/passport-core/.daml/dist/aevelum-passport-core-0.3.0.dar'"), 'package includes generated core DAR artifact');
+ok(packageScript.includes('missing generated release artifact'), 'package fails clearly when generated release artifact is missing');
 
 const report = {
   artifact: 'hardening_report',
@@ -689,6 +702,20 @@ function checkReadinessNegativeCases() {
       })
     },
     {
+      id: 'unsafe-adapter-framework-segment',
+      run: () => assertPluginShape({
+        ...fakePlugin(),
+        framework: '../escape'
+      })
+    },
+    {
+      id: 'unsafe-adapter-artifact-segment',
+      run: () => assertPluginShape({
+        ...fakePlugin(),
+        artifactTypes: ['../../README']
+      })
+    },
+    {
       id: 'level-name-mismatch',
       run: () => assertPluginShape(fakePlugin({
         level: 2,
@@ -730,6 +757,22 @@ function checkReadinessNegativeCases() {
       id: 'level-3-category-without-proof-reference',
       run: () => {
         const readiness = fakeLevel3Readiness([]);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
+    },
+    {
+      id: 'readiness-evidence-absolute-path-reference',
+      run: () => {
+        const readiness = fakeLevel3Readiness(['/etc/passwd', 'scripts/interop-validate.mjs']);
+        assertReadinessEvidenceBound(readiness);
+        assertReadinessEvidenceReferences(readiness, { root: abs('.') });
+      }
+    },
+    {
+      id: 'readiness-evidence-parent-path-reference',
+      run: () => {
+        const readiness = fakeLevel3Readiness(['../passport/package.json', 'scripts/interop-validate.mjs']);
         assertReadinessEvidenceBound(readiness);
         assertReadinessEvidenceReferences(readiness, { root: abs('.') });
       }
@@ -1054,7 +1097,7 @@ function claimUnits(text) {
     }
     const parts = clean
       .split(/(?<=[.!?])\s+|;\s*/)
-      .map(part => part.replace(/\|/g, ' ').trim())
+      .map(part => part.replace(/<[^>]+>/g, ' ').replace(/\|/g, ' ').trim())
       .filter(Boolean);
     for (const part of parts) units.push({ text: part, line: i + 1 });
   }
@@ -1096,6 +1139,7 @@ function overclaimNegativeFixtures() {
     'The current CDM adapter is certified.',
     'The adapter supports custody and settlement.',
     'The adapter not only supports custody but also settlement.',
-    'The adapter should not only support custody but also settlement.'
+    'The adapter should not only support custody but also settlement.',
+    '<text>Passport has live external integration.</text>'
   ];
 }

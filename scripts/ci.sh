@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+. "$ROOT/scripts/dpm-sdk-env.sh"
 
 FRESHNESS_BASELINE="$(mktemp)"
 FRESHNESS_CURRENT="$(mktemp)"

@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+. "$ROOT/scripts/dpm-sdk-env.sh"
 
 if ! command -v dpm >/dev/null 2>&1; then
   echo "dpm CLI not found. Install DPM outside the default CI path and pin SDK 3.4.11." >&2

@@ -7,6 +7,7 @@ const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const samplePath = path.join(root, 'interop', 'samples', 'repo-pretrade-passport-input.json');
 const artifactsRoot = path.join(root, 'artifacts', 'interop');
 const packageManifest = readJson(path.join(root, 'package.json'));
+const SAFE_SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 export async function generateInteropArtifacts({ validate = false } = {}) {
   const input = readJson(samplePath);
@@ -21,7 +22,9 @@ export async function generateInteropArtifacts({ validate = false } = {}) {
   for (const plugin of adapterRegistry) {
     const generated = await plugin.generate(input, context);
     for (const result of generated) {
+      assertAdapterResult(plugin, result);
       const finalResult = validate ? await plugin.validate(result, context) : result;
+      assertAdapterResult(plugin, finalResult);
       writePayload(finalResult);
       results.push(resultForReport(finalResult));
     }
@@ -67,7 +70,11 @@ function resultForReport(result) {
 }
 
 function writePayload(result) {
-  writeJson(path.join(root, artifactPath(result)), result.payload);
+  const target = path.resolve(root, artifactPath(result));
+  if (!target.startsWith(`${artifactsRoot}${path.sep}`)) {
+    throw new Error(`interop artifact path escapes artifacts root: ${artifactPath(result)}`);
+  }
+  writeJson(target, result.payload);
 }
 
 function artifactPath(result) {
@@ -87,4 +94,25 @@ function readJson(abs) {
 function writeJson(abs, value) {
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, JSON.stringify(value, null, 2) + '\n');
+}
+
+function assertAdapterResult(plugin, result) {
+  if (!result || typeof result !== 'object') throw new Error(`adapter ${plugin.id} returned a non-object result`);
+  if (!plugin.artifactTypes.includes(result.artifactType)) {
+    throw new Error(`adapter ${plugin.id} returned undeclared artifact type: ${result.artifactType}`);
+  }
+  assertSafeSegment(result.artifactType, `adapter ${plugin.id} artifact type`);
+
+  for (const key of ['id', 'framework', 'frameworkVersion', 'outputFormat']) {
+    if (result.plugin?.[key] !== plugin[key]) {
+      throw new Error(`adapter ${plugin.id} result plugin.${key} does not match registered plugin`);
+    }
+    assertSafeSegment(result.plugin[key], `adapter ${plugin.id} result plugin.${key}`);
+  }
+}
+
+function assertSafeSegment(value, label) {
+  if (typeof value !== 'string' || !SAFE_SEGMENT.test(value)) {
+    throw new Error(`${label} must be a safe path segment`);
+  }
 }

@@ -2,6 +2,8 @@
 
 ## 2026-06-16 - docs-code congruence
 
+- Ran repo-audit campaign round-0011 and remedied five concrete findings: local DPM SDK env drift, out-of-repo readiness evidence references, unsafe adapter output path segments, missing SVG asset overclaim scanning, and review package omission of the generated core DAR.
+- Added shared local DPM SDK helper sourcing, adapter/readiness path-boundary negative cases, SVG claim-scan coverage, core-DAR package inclusion checks, invariant-map source inventory updates, and hardening gate assertions for the remedies.
 - Exported `DPM_SDK_VERSION=3.4.11` in GitHub Actions and hardened the workflow gate to require it, after hosted CI showed `dpm version --active` could otherwise resolve a newer user-level SDK despite `dpm install 3.4.11`.
 - Derived interop report package metadata from the root package manifest and added a local gate check that fails when `artifacts/interop/report.json.version` drifts from `package.json`.
 - Updated Daml spine, readiness framework, adapter contract, release-note, README layout, and historical tracker docs to match the current Daml and JS implementation without expanding Passport scope or CDM readiness.

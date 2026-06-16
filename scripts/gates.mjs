@@ -202,7 +202,7 @@ function claimUnits(text) {
     }
     for (const part of clean
       .split(/(?<=[.!?])\s+|;\s*/)
-      .map(part => part.replace(/\|/g, ' ').trim())
+      .map(part => part.replace(/<[^>]+>/g, ' ').replace(/\|/g, ' ').trim())
       .filter(Boolean)) {
       units.push({ text: part, line: i + 1 });
     }
@@ -261,6 +261,7 @@ const docsScopeFiles = [
   ...walk('docs').filter(file => file.endsWith('.md')),
   ...walk('design').filter(file => file.endsWith('.md')),
   ...walk('hardening').filter(file => file.endsWith('.md')),
+  ...walk('assets').filter(file => file.endsWith('.svg')),
   'artifacts/demo_transcript.json',
   'artifacts/readiness_demo_transcript.json',
   'artifacts/venue_readiness_demo_transcript.json'

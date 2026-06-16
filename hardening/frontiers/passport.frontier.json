@@ -229,7 +229,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow install/cache/env/verification, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version.",
+      "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow install/cache/env/verification, docs, policy, local DPM helper sourcing, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],
@@ -361,7 +361,7 @@
         "architecture_drift": 15,
         "status": 10
       },
-      "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing proof-bearing evidence references, generic existing-file proof references for Level 3+, and unknown lastVerifiedBy commands.",
+      "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, absolute or parent-path evidence references, unsafe adapter output path segments, missing proof-bearing evidence references, generic existing-file proof references for Level 3+, and unknown lastVerifiedBy commands.",
       "evidence_needed": [
         "Keep the guard executable and fail-closed in CI."
       ],

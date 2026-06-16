@@ -17,6 +17,8 @@
         "package.json",
         "package-lock.json",
         "scripts/generated-time.mjs",
+        "scripts/dpm-sdk-env.sh",
+        "scripts/daml-build.sh",
         "interop/core/readiness.js",
         "interop/plugins/cdm/readiness.js",
         "docs/09_adapter_readiness_levels.md",

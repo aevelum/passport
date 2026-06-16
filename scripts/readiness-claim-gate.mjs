@@ -27,6 +27,7 @@ const claimArtifactFiles = [
   'artifacts/readiness_demo_transcript.json',
   'artifacts/venue_readiness_demo_transcript.json'
 ];
+const claimAssetFiles = walk('assets').filter(file => file.endsWith('.svg'));
 
 const files = [
   'README.md',
@@ -35,6 +36,7 @@ const files = [
   ...walk('docs').filter(file => file.endsWith('.md')),
   ...walk('hardening/rounds').filter(file => file.endsWith('.md')),
   'hardening/change-log.md',
+  ...claimAssetFiles,
   ...claimArtifactFiles
 ].filter(file => fs.existsSync(path.join(root, file)));
 
@@ -126,7 +128,7 @@ function claimUnits(text) {
     if (!clean || /^#/.test(clean)) continue;
     for (const part of clean
       .split(/(?<=[.!?])\s+|;\s*/)
-      .map(part => part.replace(/\|/g, ' ').trim())
+      .map(part => part.replace(/<[^>]+>/g, ' ').replace(/\|/g, ' ').trim())
       .filter(Boolean)) {
       units.push({ text: part, line: i + 1 });
     }
@@ -152,14 +154,16 @@ function unsafeClaimFixtures() {
     'Passport provides custody of assets if venue validation fails.',
     'Passport not only clears trades but also settles them.',
     'Passport should not only clear trades but also settle them.',
-    'Passport rejects failed venue checks and admits participants to a venue.'
+    'Passport rejects failed venue checks and admits participants to a venue.',
+    '<text>Passport grants licenses.</text>'
   ];
 }
 
 function safeClaimFixtures() {
   return [
     'Passport does not clear or settle trades.',
-    'The readiness claim gate rejects docs that imply Passport grants licenses.'
+    'The readiness claim gate rejects docs that imply Passport grants licenses.',
+    '<text>Passport does not grant licenses.</text>'
   ];
 }
 

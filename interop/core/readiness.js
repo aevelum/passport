@@ -437,8 +437,9 @@ export function isProductionProofReference(reference) {
 }
 
 function referenceExists(root, reference) {
-  if (!isPathLikeReference(reference)) return false;
-  return fs.existsSync(path.resolve(root, reference));
+  const normalized = normalizeReferencePath(reference);
+  if (!normalized) return false;
+  return fs.existsSync(path.join(root, normalized));
 }
 
 function isPathLikeReference(reference) {

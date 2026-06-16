@@ -1,14 +1,16 @@
 {
   "artifact": "readiness_claim_gate_report",
   "status": "passed",
-  "scannedFiles": 37,
+  "scannedFiles": 51,
   "pass": [
     "unsafe fixture rejected: clearing",
     "unsafe fixture rejected: custody",
     "unsafe fixture rejected: settlement, clearing",
     "unsafe fixture rejected: settlement, clearing",
     "unsafe fixture rejected: venue admission",
+    "unsafe fixture rejected: license grant",
     "safe fixture bounded: settlement, clearing",
+    "safe fixture bounded: license grant",
     "safe fixture bounded: license grant",
     "README.md:11 bounds license grant",
     "README.md:11 bounds venue admission",
@@ -107,8 +109,8 @@
     "hardening/rounds/round-0010.md:53 bounds legal compliance approval",
     "hardening/rounds/round-0010.md:53 bounds venue admission",
     "hardening/rounds/round-0010.md:53 bounds trade execution",
-    "hardening/change-log.md:63 bounds trade execution",
-    "hardening/change-log.md:63 bounds custody"
+    "hardening/change-log.md:65 bounds trade execution",
+    "hardening/change-log.md:65 bounds custody"
   ],
   "fail": []
 }

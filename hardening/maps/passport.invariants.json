@@ -380,6 +380,14 @@
         "notes": "Generic readiness credential expansion hardening round record."
       },
       {
+        "path": "hardening/rounds/round-0011.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Repo audit campaign round covering local DPM pinning, adapter path boundaries, SVG claim scanning, and package DAR inclusion."
+      },
+      {
         "path": "hardening/scripts/hardening-gate.mjs",
         "language": "javascript",
         "pin": "git:HEAD",
@@ -684,6 +692,14 @@
         "notes": "Default local CI command order, package check, and freshness diff gate."
       },
       {
+        "path": "scripts/daml-build.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "DPM build wrapper that sources the package-pinned SDK helper before invoking dpm."
+      },
+      {
         "path": "scripts/daml-coverage-gate.mjs",
         "language": "javascript",
         "pin": "git:HEAD",
@@ -722,6 +738,14 @@
         "primary_component_id": "cmp.ci.gates",
         "status": "breakdown",
         "notes": "Shared deterministic generated timestamp helper."
+      },
+      {
+        "path": "scripts/dpm-sdk-env.sh",
+        "language": "bash",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Shared local DPM SDK environment pin helper used by local build, test, smoke, and CI scripts."
       },
       {
         "path": "scripts/interop-generate.mjs",
@@ -1384,7 +1408,7 @@
                     "id": "prop.interop.adapter-level-evidence-bound",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "An adapter may not be registered, documented, reported, or marketed above the highest readiness level supported by committed category-appropriate tests, reports, proof-bearing paths, and gates; registered plugins cannot use concept-only Level 0.",
+                    "statement": "An adapter may not be registered, documented, reported, or marketed above the highest readiness level supported by committed category-appropriate tests, reports, proof-bearing repo-local paths, safe output path segments, and gates; registered plugins cannot use concept-only Level 0.",
                     "enforcing_functions": [
                       "fn.interop.assert-readiness-evidence-bound",
                       "fn.interop.define-plugin",
@@ -1679,6 +1703,8 @@
               "packages/passport-tests/daml.yaml",
               "scripts/generated-time.mjs",
               "scripts/gates.mjs",
+              "scripts/daml-build.sh",
+              "scripts/dpm-sdk-env.sh",
               "scripts/run-daml-tests.sh",
               "scripts/daml-coverage-gate.mjs",
               "scripts/canton-smoke.sh",
@@ -1775,7 +1801,7 @@
                     "id": "prop.ci.dpm-sdk-pins-consistent",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Package daml.yaml files, GitHub workflow install/cache/env/verification, README toolchain docs, run-daml-tests messaging and package-local test invocation, architecture policy, and gate report metadata must pin the same stable DPM SDK version with no RC or snapshot suffix.",
+                    "statement": "Package daml.yaml files, GitHub workflow install/cache/env/verification, README toolchain docs, local DPM helper sourcing, run-daml-tests messaging and package-local test invocation, architecture policy, and gate report metadata must pin the same stable DPM SDK version with no RC or snapshot suffix.",
                     "enforcing_functions": [
                       "fn.ci.dpm-sdk-pin-gate"
                     ]
@@ -1844,7 +1870,7 @@
                     "id": "prop.release.git-ls-files-only",
                     "type": "guarantee",
                     "severity": "medium",
-                    "statement": "Packaging must use tracked files and exclude Daml build coverage output.",
+                    "statement": "Packaging must use tracked files, include the generated core DAR release artifact, fail clearly if it is missing, and exclude Daml build coverage output.",
                     "enforcing_functions": [
                       "fn.release.package"
                     ]
@@ -2248,7 +2274,7 @@
         "attacker_control": "indirect",
         "severity": "high",
         "status": "guarded",
-        "description": "A future DPM SDK migration updates package daml.yaml files, GitHub Actions install/cache/env/verification, README docs, test runner behavior, architecture policy, or gate metadata inconsistently, pins an RC/snapshot as the default stable toolchain, or reintroduces a brittle DPM test invocation.",
+        "description": "A future DPM SDK migration updates package daml.yaml files, GitHub Actions install/cache/env/verification, README docs, local helper sourcing, test runner behavior, architecture policy, or gate metadata inconsistently, pins an RC/snapshot as the default stable toolchain, or reintroduces a brittle DPM test invocation.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -2256,7 +2282,7 @@
         "exploit_path_ids": [
           "xp.ci.dpm-sdk-pin-drift"
         ],
-        "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow install/cache/env/verification, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version."
+        "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow install/cache/env/verification, docs, policy, local DPM helper sourcing, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version."
       },
       {
         "id": "bd.ci.generated-artifact-staleness",
@@ -2281,7 +2307,7 @@
         "severity": "high",
         "attacker_control": "indirect",
         "status": "guarded",
-        "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, missing proof-bearing evidence references, generic existing-file proof references for Level 3+, and unknown lastVerifiedBy commands.",
+        "kill_gate": "hardening:gate rejects Level 0 registered plugins, missing readiness metadata, unknown levels, level/name mismatches, evidence-category gaps, absolute or parent-path evidence references, unsafe adapter output path segments, missing proof-bearing evidence references, generic existing-file proof references for Level 3+, and unknown lastVerifiedBy commands.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
