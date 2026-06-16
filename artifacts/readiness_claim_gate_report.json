@@ -111,8 +111,8 @@
     "hardening/rounds/round-0010.md:53 bounds legal compliance approval",
     "hardening/rounds/round-0010.md:53 bounds venue admission",
     "hardening/rounds/round-0010.md:53 bounds trade execution",
-    "hardening/change-log.md:66 bounds trade execution",
-    "hardening/change-log.md:66 bounds custody"
+    "hardening/change-log.md:67 bounds trade execution",
+    "hardening/change-log.md:67 bounds custody"
   ],
   "fail": []
 }

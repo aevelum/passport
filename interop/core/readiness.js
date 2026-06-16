@@ -443,15 +443,18 @@ function referenceExists(root, reference) {
 }
 
 function isPathLikeReference(reference) {
-  return /^\.{1,2}\//.test(reference)
+  return /^\.{1,2}$/.test(reference)
+    || /^\.{1,2}\//.test(reference)
     || reference.includes('/')
     || /\.(json|js|mjs|md|yaml|yml|sh|daml|dar|txt|csv|zip)$/i.test(reference);
 }
 
 function normalizeReferencePath(reference) {
   if (!isPathLikeReference(reference)) return null;
-  const normalized = path.posix.normalize(reference.replace(/\\/g, '/').replace(/^\.\//, ''));
-  if (normalized === '.' || normalized.startsWith('../') || normalized.startsWith('/')) return null;
+  const pathReference = reference.replace(/\\/g, '/');
+  if (pathReference.split('/').includes('..')) return null;
+  const normalized = path.posix.normalize(pathReference.replace(/^\.\//, ''));
+  if (normalized === '.' || normalized === '..' || normalized.startsWith('../') || normalized.startsWith('/')) return null;
   return normalized;
 }
 

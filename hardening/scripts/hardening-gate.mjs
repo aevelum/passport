@@ -769,14 +769,21 @@ function checkReadinessNegativeCases() {
         assertReadinessEvidenceReferences(readiness, { root: abs('.') });
       }
     },
-    {
-      id: 'readiness-evidence-parent-path-reference',
+    ...[
+      ['parent-path-reference-leading-dotdot', '../passport/package.json'],
+      ['parent-path-reference-current-dotdot', './..'],
+      ['parent-path-reference-trailing-slash', '../'],
+      ['parent-path-reference-normalized-dotdot', 'foo/../..'],
+      ['parent-path-reference-bare-dotdot', '..'],
+      ['parent-path-reference-bare-dot', '.']
+    ].map(([id, reference]) => ({
+      id: `readiness-evidence-${id}`,
       run: () => {
-        const readiness = fakeLevel3Readiness(['../passport/package.json', 'scripts/interop-validate.mjs']);
+        const readiness = fakeLevel3Readiness([reference, 'scripts/interop-validate.mjs']);
         assertReadinessEvidenceBound(readiness);
         assertReadinessEvidenceReferences(readiness, { root: abs('.') });
       }
-    },
+    })),
     {
       id: 'level-3-canonical-engine-package-json-only',
       run: () => {
