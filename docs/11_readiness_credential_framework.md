@@ -13,7 +13,7 @@ The generic readiness model covers:
 - settlement or clearing readiness evidence;
 - collateral capacity readiness.
 
-Passport records attested readiness and scoped evidence only. External legal, regulatory, licensing, custody, settlement, and clearing systems remain external.
+Passport records readiness attestations and scoped evidence only. External legal, regulatory, licensing, custody, settlement, and clearing systems remain external.
 
 ## Ledger Spine
 

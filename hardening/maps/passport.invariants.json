@@ -1126,7 +1126,7 @@
               },
               {
                 "id": "inv.daml.readiness-credential-core",
-                "statement": "Generic readiness credentials remain externally attested, scoped, time-bounded evidence records rather than legal permissions, venue operations, execution, clearing, settlement, custody, token, wallet, credit, or legal-title systems.",
+                "statement": "Generic readiness credentials remain external-attestation-backed, scoped, time-bounded evidence records rather than legal permissions, venue operations, execution, clearing, settlement, custody, token, wallet, credit, or legal-title systems.",
                 "properties": [
                   {
                     "id": "prop.daml.readiness-policy-issue-bounds",

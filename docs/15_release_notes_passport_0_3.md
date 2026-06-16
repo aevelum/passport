@@ -28,4 +28,4 @@ Collateral-capacity templates and tests remain in place. Existing repo pre-trade
 
 ## Boundary
 
-Passport records attested readiness and scoped evidence only. It does not grant licenses, determine legal compliance, admit participants to a venue, operate a venue, execute trades, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, determine legal title, provide production identity, or provide live external integration.
+Passport records readiness attestations and scoped evidence only. It does not grant licenses, determine legal compliance, admit participants to a venue, operate a venue, execute trades, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, determine legal title, provide production identity, or provide live external integration.

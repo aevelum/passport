@@ -1,8 +1,9 @@
 # Design Change Log
 
-## 2026-06-16 - Readiness-First Graphic Copy
+## 2026-06-16 - Readiness-Attested Graphic Copy
 
-- Updated README banners, repository social preview, and Passport logo lockups from repo/collateral-first language to attested-readiness and controlled-disclosure language.
+- Updated README banners, repository social preview, and Passport logo lockups from repo/collateral-first language to readiness-attested and controlled-disclosure language.
+- Changed README banner and repository social preview tagline copy to "Readiness attested."
 - Regenerated matching PNG derivatives from the SVG sources.
 
 ## 2026-05-15 - Aevelum Logo Lockups

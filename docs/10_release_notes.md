@@ -32,7 +32,7 @@ Passport 0.3.0 upgrades the public Canton/Daml foundation from collateral-readin
 
 ### Boundary
 
-Passport records attested readiness and scoped evidence only. Passport does not grant licenses, register participants, approve legal compliance, admit participants to a venue, operate a venue, execute trades, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, determine legal title, provide production identity, or provide live external integration.
+Passport records readiness attestations and scoped evidence only. Passport does not grant licenses, register participants, approve legal compliance, admit participants to a venue, operate a venue, execute trades, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, determine legal title, provide production identity, or provide live external integration.
 
 ## 0.2.0 - Typed Time Policy And Reservation Freshness
 

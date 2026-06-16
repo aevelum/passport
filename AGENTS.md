@@ -17,7 +17,7 @@
 
 ## Architecture Boundaries
 
-- Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family. Passport records attested readiness and scoped evidence only, and may record reservation handoff notices.
+- Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family. Passport records readiness attestations and scoped evidence only, and may record reservation handoff notices.
 - Keep Daml templates as the Canton ledger schema unless an explicit ADR and invariant-map update justify a change.
 - Keep interop framework-neutral: CDM is one static plugin, not repo-global special-case code.
 - Default PR CI should use standard GitHub-hosted runners with explicit Node, Java, DPM, and npm setup. Repo-authored validation and generation paths must not fetch schemas, plugin code, or mutable runtime inputs except through explicit vendoring commands.

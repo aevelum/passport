@@ -45,7 +45,7 @@ function checkPassportScopeBoundary() {
   const canonicalScope = 'Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.';
   const requiredScopeStatements = [
     canonicalScope,
-    'Passport records attested readiness and scoped evidence only.',
+    'Passport records readiness attestations and scoped evidence only.',
     'Passport may record a reservation handoff notice.',
     'Passport does not execute the downstream trade.',
     'Passport does not custody, transfer, settle, clear, or move collateral or assets.'
