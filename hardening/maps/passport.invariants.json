@@ -807,7 +807,7 @@
     "kill_gates": [
       "hardening:formal fails if typed temporal validity obligations lose invariant-map properties, source assertions, active evidence commands, or bounded model coverage.",
       "Daml temporal tests fail if policy validity, credential freshness, presentation validity, reservation validity, or legacy text timestamp metadata semantics stop using typed Time fields.",
-      "hardening:gate fails if package daml.yaml files, GitHub workflow install/cache/verification, README docs, run-daml-tests messaging or package-local test invocation, architecture policy, or gate report drift to different DPM SDK versions or brittle DPM test invocation.",
+      "hardening:gate fails if package daml.yaml files, GitHub workflow install/cache/env/verification, README docs, run-daml-tests messaging or package-local test invocation, architecture policy, or gate report drift to different DPM SDK versions or brittle DPM test invocation.",
       "interop:validate fails if a vendored CDM schema changes without a matching manifest update; the report must include the negative-cdm-schema-manifest-tamper case.",
       "npm run gate fails if artifacts/interop/report.json version does not match the root package.json version.",
       "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
@@ -1775,7 +1775,7 @@
                     "id": "prop.ci.dpm-sdk-pins-consistent",
                     "type": "guarantee",
                     "severity": "high",
-                    "statement": "Package daml.yaml files, GitHub workflow install/cache/verification, README toolchain docs, run-daml-tests messaging and package-local test invocation, architecture policy, and gate report metadata must pin the same stable DPM SDK version with no RC or snapshot suffix.",
+                    "statement": "Package daml.yaml files, GitHub workflow install/cache/env/verification, README toolchain docs, run-daml-tests messaging and package-local test invocation, architecture policy, and gate report metadata must pin the same stable DPM SDK version with no RC or snapshot suffix.",
                     "enforcing_functions": [
                       "fn.ci.dpm-sdk-pin-gate"
                     ]
@@ -2248,7 +2248,7 @@
         "attacker_control": "indirect",
         "severity": "high",
         "status": "guarded",
-        "description": "A future DPM SDK migration updates package daml.yaml files, GitHub Actions, README docs, test runner behavior, architecture policy, or gate metadata inconsistently, pins an RC/snapshot as the default stable toolchain, or reintroduces a brittle DPM test invocation.",
+        "description": "A future DPM SDK migration updates package daml.yaml files, GitHub Actions install/cache/env/verification, README docs, test runner behavior, architecture policy, or gate metadata inconsistently, pins an RC/snapshot as the default stable toolchain, or reintroduces a brittle DPM test invocation.",
         "evidence": [
           "test.hardening.architecture-gate",
           "test.ci.full"
@@ -2256,7 +2256,7 @@
         "exploit_path_ids": [
           "xp.ci.dpm-sdk-pin-drift"
         ],
-        "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version."
+        "kill_gate": "hardening:gate parses package sdk-version pins and requires workflow install/cache/env/verification, docs, policy, run-daml-tests messaging and package-local invocation, and gate metadata to match the same stable DPM SDK version."
       },
       {
         "id": "bd.ci.generated-artifact-staleness",

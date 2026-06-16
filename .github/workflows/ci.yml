@@ -10,6 +10,8 @@ permissions:
 jobs:
   local-gates:
     runs-on: ubuntu-latest
+    env:
+      DPM_SDK_VERSION: 3.4.11
     steps:
       - uses: actions/checkout@v6
         with:

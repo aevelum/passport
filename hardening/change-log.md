@@ -2,6 +2,7 @@
 
 ## 2026-06-16 - docs-code congruence
 
+- Exported `DPM_SDK_VERSION=3.4.11` in GitHub Actions and hardened the workflow gate to require it, after hosted CI showed `dpm version --active` could otherwise resolve a newer user-level SDK despite `dpm install 3.4.11`.
 - Derived interop report package metadata from the root package manifest and added a local gate check that fails when `artifacts/interop/report.json.version` drifts from `package.json`.
 - Updated Daml spine, readiness framework, adapter contract, release-note, README layout, and historical tracker docs to match the current Daml and JS implementation without expanding Passport scope or CDM readiness.
 - Added the docs/code congruence tracker and Daml-as-spec doc to the invariant-map source inventory, and mapped the interop report version congruence property to executable interop, gate, and CI evidence.

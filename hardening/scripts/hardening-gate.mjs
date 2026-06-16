@@ -521,6 +521,7 @@ function checkDpmSdkPins() {
   const installNeedle = ['dpm', 'install', expected].join(' ');
 
   ok(workflow.includes(`dpm-${'${{ runner.os }}'}-${expected}`), `.github workflow cache key pins DPM SDK ${expected}`);
+  ok(workflow.includes(`DPM_SDK_VERSION: ${expected}`), `.github workflow exports DPM_SDK_VERSION ${expected}`);
   ok(workflow.includes(installNeedle), `.github workflow installs DPM SDK ${expected}`);
   ok(workflow.includes(`expected DPM SDK ${expected}`), `.github workflow verifies DPM SDK ${expected}`);
   ok(readme.includes(`SDK \`${expected}\``), `README documents DPM SDK ${expected}`);
