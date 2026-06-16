@@ -27,6 +27,9 @@ Each plugin declares:
 - `readiness`
 - `generate(input, context)`
 - `validate(result, context)`
+- optional `validateNegativeCases(context, input)`
+
+`validateNegativeCases(context, input)` returns named validation falsifiers for malformed or semantically bounded cases. These cases are part of Level 2 Artifact Conformance evidence because they prove the offline validation lane rejects known-bad payloads or overclaiming adapter behavior.
 
 The initial registry contains one plugin:
 
@@ -80,3 +83,5 @@ npm run interop:validate
 Generated CDM payloads are written to `artifacts/interop/cdm/6.0/`. Adapter metadata, provenance, validation status, warnings, and negative-case results are written to `artifacts/interop/report.json`.
 
 This is Level 2 artifact conformance for generated Passport collateral eligibility artifacts. Readiness metadata, evidence, claims, non-claims, promotion criteria, and provenance stay in `artifacts/interop/report.json`; they are not embedded in generated CDM payloads.
+
+The negative cases in the report do not raise CDM above Level 2. They do not provide FINOS certification, Rosetta Engine execution, CDM eligibility-engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.

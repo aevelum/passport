@@ -1,5 +1,11 @@
 # Hardening Change Log
 
+## 2026-06-16 - docs-code congruence
+
+- Derived interop report package metadata from the root package manifest and added a local gate check that fails when `artifacts/interop/report.json.version` drifts from `package.json`.
+- Updated Daml spine, readiness framework, adapter contract, release-note, README layout, and historical tracker docs to match the current Daml and JS implementation without expanding Passport scope or CDM readiness.
+- Added the docs/code congruence tracker and Daml-as-spec doc to the invariant-map source inventory, and mapped the interop report version congruence property to executable interop, gate, and CI evidence.
+
 ## 2026-05-22 - phase-c.1
 
 - Added `readinessUseMatchesBindingPurpose` and `ValidateVenueReadinessEvidence` so venue-readiness evidence can be validated against the referenced `ReadinessBinding`.
@@ -16,7 +22,7 @@
 - Upgraded Passport scope from collateral-readiness-only to regulated-market readiness credentialing, with collateral capacity preserved as the first credential family.
 - Added generic readiness and venue-readiness Daml modules, including readiness accounts, policies, credential requests, credentials, presentations, bindings, revocations, audit disclosure grants, and venue-readiness evidence.
 - Added license or registration attestation-only enforcement through `LicenseAttestationScope.attestationOnly = True`, negative Daml tests, and a static readiness claim gate.
-- Added Daml Script tests `t100` through `t119` covering lifecycle, policy approval, typed-time freshness, scoped presentation/binding, privacy, revocation, audit disclosure, venue evidence, and non-executing binding boundaries.
+- Initial round-0010 added Daml Script tests `t100` through `t119` covering lifecycle, policy approval, typed-time freshness, scoped presentation/binding, privacy, revocation, audit disclosure, venue evidence, and non-executing binding boundaries; later C.1 review additions extended the current 0.3 inventory through `t131`.
 - Updated canonical docs, repo guidance, ADRs, demo transcripts, gate expectations, invariant-map coverage, and the hardening frontier for the Phase A readiness expansion.
 
 ## 2026-05-12 - round-0001

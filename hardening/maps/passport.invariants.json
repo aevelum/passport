@@ -84,6 +84,14 @@
         "notes": "Product thesis and Passport scope boundary."
       },
       {
+        "path": "docs/01_daml_as_spec.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.daml.ledger-schema",
+        "status": "semantics",
+        "notes": "Daml-as-spec source of truth and current contract spine documentation."
+      },
+      {
         "path": "docs/02_foundation_release_scope.md",
         "language": "markdown",
         "pin": "git:HEAD",
@@ -202,6 +210,14 @@
         "primary_component_id": "cmp.interop.adapter-core",
         "status": "semantics",
         "notes": "ADR for the Phase A readiness credential expansion."
+      },
+      {
+        "path": "docs/trackers/docs-code-congruence.md",
+        "language": "markdown",
+        "pin": "git:HEAD",
+        "primary_component_id": "cmp.ci.gates",
+        "status": "breakdown",
+        "notes": "Task tracker for documentation, generated artifact, gate, and implementation congruence work."
       },
       {
         "path": "docs/trackers/phase-a-readiness-credential-upgrade.md",
@@ -767,6 +783,7 @@
       "prop.daml.release-preserves-policy-publisher",
       "inv.cdm.schema-reproducibility",
       "prop.cdm.hashes-verified-before-validation",
+      "prop.interop.report-version-congruent",
       "cmp.agent.repo-guidance",
       "inv.interop.adapter-readiness-claims",
       "inv.scope.passport-public-core-boundary",
@@ -792,6 +809,7 @@
       "Daml temporal tests fail if policy validity, credential freshness, presentation validity, reservation validity, or legacy text timestamp metadata semantics stop using typed Time fields.",
       "hardening:gate fails if package daml.yaml files, GitHub workflow install/cache/verification, README docs, run-daml-tests messaging or package-local test invocation, architecture policy, or gate report drift to different DPM SDK versions or brittle DPM test invocation.",
       "interop:validate fails if a vendored CDM schema changes without a matching manifest update; the report must include the negative-cdm-schema-manifest-tamper case.",
+      "npm run gate fails if artifacts/interop/report.json version does not match the root package.json version.",
       "hardening:formal fails if proof obligations lose invariant-map properties, source references, active evidence commands, or bounded model coverage.",
       "Daml tests fail if ReleaseReservation does not preserve the original policy publisher when publisher and verifier differ.",
       "hardening:gate fails if Passport-owned Daml contains execution, custody, settlement, wallet, optimizer, credit-decision, or proof-system implementation language.",
@@ -800,7 +818,7 @@
       "Daml tests fail if reservation handoff metadata is not covered or if the handoff recipient sees the reservation through a reservation-level observer.",
       "default CI fails if generated artifacts, hardening maps, or hardening frontiers are stale.",
       "CDM remains Level 2 — Artifact Conformance and does not overclaim certification, engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.",
-      "Daml readiness tests t100-t130 must pass with 100% template and choice coverage.",
+      "Daml readiness tests t100-t131 must pass with 100% template and choice coverage.",
       "Daml venue-readiness tests fail if VenueReadinessEvidence validates with a wrong binding id, use, venue profile, evidence hash, stale binding, or revoked source credential.",
       "static gates fail if ValidateVenueReadinessEvidence, readinessUseMatchesBindingPurpose, active-status fetches, or consumer cross-check docs are removed.",
       "npm run readiness:claim-gate must reject license, venue, trade, clearing, settlement, custody, asset-transfer, token, and wallet overclaims."
@@ -1460,6 +1478,16 @@
                     "enforcing_functions": [
                       "fn.interop.generate-artifacts"
                     ]
+                  },
+                  {
+                    "id": "prop.interop.report-version-congruent",
+                    "type": "guarantee",
+                    "severity": "high",
+                    "statement": "The committed interop report version must match the root package version and be regenerated through the interop runner instead of hand-edited.",
+                    "enforcing_functions": [
+                      "fn.interop.generate-artifacts",
+                      "fn.ci.local-gate"
+                    ]
                   }
                 ]
               }
@@ -1889,6 +1917,7 @@
         "covers": [
           "inv.interop.provenance-separation",
           "prop.interop.payloads-clean",
+          "prop.interop.report-version-congruent",
           "inv.cdm.schema-conformance",
           "prop.cdm.three-root-artifacts",
           "prop.cdm.negative-case-fails",
@@ -1897,6 +1926,26 @@
           "prop.cdm.decision-mirror-warning",
           "inv.interop.adapter-readiness-claims",
           "prop.interop.readiness-reported"
+        ]
+      },
+      {
+        "id": "test.gate.local",
+        "kind": "node-script",
+        "command": "npm run gate",
+        "status": "active",
+        "covers": [
+          "inv.ci.default-green-bar",
+          "inv.interop.provenance-separation",
+          "prop.interop.report-version-congruent",
+          "inv.interop.adapter-readiness-claims",
+          "prop.interop.readiness-reported",
+          "inv.scope.passport-public-core-boundary",
+          "prop.scope.canonical-docs-required",
+          "prop.scope.no-out-of-scope-daml-language",
+          "prop.scope.reservation-handoff-covered",
+          "prop.scope.readiness-overclaim-gate",
+          "prop.daml.license-attestation-only",
+          "prop.daml.venue-readiness-evidence-canonical"
         ]
       },
       {
@@ -1968,6 +2017,7 @@
           "prop.interop.adapter-level-evidence-bound",
           "prop.interop.no-live-integration-overclaim",
           "prop.interop.readiness-reported",
+          "prop.interop.report-version-congruent",
           "inv.scope.passport-public-core-boundary",
           "prop.scope.canonical-docs-required",
           "prop.scope.no-out-of-scope-daml-language",

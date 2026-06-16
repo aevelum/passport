@@ -12,7 +12,7 @@ Passport records externally attested readiness and scoped evidence only. It must
 | --- | --- | --- | --- |
 | 0 | Inventory current `main`, hardening skill, gates, Daml package layout, and existing collateral behavior. | Done | Current repo is clean; old gates encode collateral-only wording that must move to readiness-boundary wording. |
 | 1 | Version/package wiring and new readiness Daml modules. | Done | Added `Readiness` and `VenueReadiness` modules in `passport-core`; bumped DPM packages to `0.3.0`; early `dpm build --all` passed. |
-| 2 | Daml Script tests and coverage map expansion. | Done | Added scripts `t100` through `t119`; `./scripts/run-daml-tests.sh` passed with 21/21 external templates and 25/25 external choices covered. |
+| 2 | Daml Script tests and coverage map expansion. | Done | Initial Phase A added scripts `t100` through `t119`; later C.1 review additions extended the current 0.3 test inventory through `t131`. |
 | 3 | Docs, guidance, claim gates, and demo artifacts. | Done | Updated canonical docs and guidance, added readiness transcripts and claim gate; `npm run gate` passed. |
 | 4 | Hardening map/frontier/round records and generated reports. | Done | Updated invariant map, added `round-0010`, regenerated frontier, and passed `hardening:map`, `hardening:frontier`, `hardening:formal`, and `hardening:gate`. |
 | 5 | Validation and package handoff. | Done | `daml:build`, `daml:test`, `canton:smoke`, `ci`, and `package` passed. `npm run ci` passed after regenerated artifacts were stabilized in the working tree. |

@@ -6,6 +6,7 @@ import { createDefaultAdapterContext } from './context.js';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const samplePath = path.join(root, 'interop', 'samples', 'repo-pretrade-passport-input.json');
 const artifactsRoot = path.join(root, 'artifacts', 'interop');
+const packageManifest = readJson(path.join(root, 'package.json'));
 
 export async function generateInteropArtifacts({ validate = false } = {}) {
   const input = readJson(samplePath);
@@ -35,8 +36,8 @@ export async function generateInteropArtifacts({ validate = false } = {}) {
   );
   const report = {
     artifact: 'interop_report',
-    package: 'aevelum-passport-foundation',
-    version: '0.2.0',
+    package: packageManifest.name,
+    version: packageManifest.version,
     status: validate ? (failed ? 'failed' : 'passed') : 'generated',
     generatedAt: context.now,
     sourceRef: context.sourceRef,

@@ -90,7 +90,11 @@ Auditor receives only scoped audit metadata.
 multi-package.yaml
 AGENTS.md
 .agents/
-  skills/passport-hardening-loop/SKILL.md
+  skills/
+    passport-hardening-loop/SKILL.md
+    passport-hardening-loop/agents/openai.yaml
+    passport-ui-design-system/SKILL.md
+    passport-ui-design-system/agents/openai.yaml
 packages/
   passport-core/
     daml.yaml
@@ -118,12 +122,15 @@ docs/
   13_license_registration_attestations.md
   14_passport_markets_boundary.md
   15_release_notes_passport_0_3.md
+  decisions/0002-readiness-credential-expansion.md
+  trackers/*.md
 design/
   tokens/colors.json
   change-log.md
 interop/
   core/adapter.js
   core/readiness.js
+  context.js
   registry.js
   runner.js
   samples/repo-pretrade-passport-input.json
@@ -132,11 +139,16 @@ hardening/
   maps/passport.invariants.json
   frontiers/passport.frontier.json
   policies/architecture-rules.json
-  rounds/round-0001.md
-  rounds/round-0005.md
+  formal/daml-ledger-core/
+    FORMAL_LADDER.md
+    obligations.json
+    reference-model.mjs
+    reservation-core.tla
+  rounds/round-*.md
   change-log.md
   scripts/*.mjs
 scripts/
+  generated-time.mjs
   gates.mjs
   daml-coverage-gate.mjs
   export-demo-transcript.mjs
@@ -157,6 +169,7 @@ artifacts/
   hardening_report.json
   hardening_map_report.json
   gate_report.json
+  readiness_claim_gate_report.json
 ```
 
 ## Local gates
