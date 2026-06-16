@@ -1,5 +1,10 @@
 # Design Change Log
 
+## 2026-06-16 - Readiness-First Graphic Copy
+
+- Updated README banners, repository social preview, and Passport logo lockups from repo/collateral-first language to attested-readiness and controlled-disclosure language.
+- Regenerated matching PNG derivatives from the SVG sources.
+
 ## 2026-05-15 - Aevelum Logo Lockups
 
 - Added light and dark horizontal Aevelum logo lockups with the overlapping arches icon plus the lowercase Aevelum wordmark.
@@ -12,7 +17,7 @@
 - Regenerated matching PNG derivatives from the SVG sources.
 - Added a Telegram-ready Aevelum profile icon with a 640px square source, opaque background, centered no-text mark, circular-crop safe area, no visible outer ring, and JPG/PNG derivatives.
 - Added light and dark README banner PNG derivatives generated from the SVG sources.
-- Revised the repository social preview and README banners around larger billboard-style text, the "Confidential collateral. Confident readiness." tagline, simplified account graphics, and regenerated 1280x640 PNGs.
+- Revised the repository social preview and README banners around larger billboard-style text, simplified account graphics, and regenerated 1280x640 PNGs.
 
 ## 2026-05-12 - Institutional Finance Palette
 
