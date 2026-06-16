@@ -23,7 +23,7 @@
     "README.md:11 bounds clearing",
     "README.md:11 bounds custody",
     "README.md:11 bounds asset transfer",
-    "README.md:192 bounds clearing",
+    "README.md:194 bounds clearing",
     "AGENTS.md:31 bounds license grant",
     "AGENTS.md:31 bounds venue admission",
     "AGENTS.md:31 bounds venue operation",
@@ -60,11 +60,11 @@
     "docs/09_adapter_readiness_levels.md:5 bounds settlement",
     "docs/09_adapter_readiness_levels.md:5 bounds custody",
     "docs/09_adapter_readiness_levels.md:5 bounds wallet operation",
-    "docs/10_release_notes.md:34 bounds license grant",
-    "docs/10_release_notes.md:34 bounds participant registration",
-    "docs/10_release_notes.md:34 bounds legal compliance approval",
-    "docs/10_release_notes.md:34 bounds venue admission",
-    "docs/10_release_notes.md:34 bounds venue operation",
+    "docs/10_release_notes.md:35 bounds license grant",
+    "docs/10_release_notes.md:35 bounds participant registration",
+    "docs/10_release_notes.md:35 bounds legal compliance approval",
+    "docs/10_release_notes.md:35 bounds venue admission",
+    "docs/10_release_notes.md:35 bounds venue operation",
     "docs/11_readiness_credential_framework.md:47 bounds license grant",
     "docs/11_readiness_credential_framework.md:47 bounds participant registration",
     "docs/11_readiness_credential_framework.md:47 bounds legal compliance approval",
@@ -111,8 +111,8 @@
     "hardening/rounds/round-0010.md:53 bounds legal compliance approval",
     "hardening/rounds/round-0010.md:53 bounds venue admission",
     "hardening/rounds/round-0010.md:53 bounds trade execution",
-    "hardening/change-log.md:65 bounds trade execution",
-    "hardening/change-log.md:65 bounds custody"
+    "hardening/change-log.md:66 bounds trade execution",
+    "hardening/change-log.md:66 bounds custody"
   ],
   "fail": []
 }

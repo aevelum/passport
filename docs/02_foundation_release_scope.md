@@ -8,7 +8,7 @@ Passport records attested readiness and scoped evidence only. It models readines
 
 Passport may record a reservation handoff notice. The notice is for downstream readiness metadata only. Passport does not grant licenses or legal permissions. Passport does not admit participants to a venue. Passport does not determine legal compliance. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, clear, or move collateral or assets.
 
-Passport 0.3.0 adds generic regulated-market readiness templates and keeps ledger-comparable Daml `Time` fields authoritative for policy validity, credential validity/freshness, presentation validity, binding freshness, audit validity, and event times. ISO timestamp text fields are retained as display and interop metadata only.
+Passport includes generic regulated-market readiness templates and keeps ledger-comparable Daml `Time` fields authoritative for policy validity, credential validity/freshness, presentation validity, binding freshness, audit validity, and event times. ISO timestamp text fields are retained as display and interop metadata only.
 
 ReadinessCredential is visible to holder and attester. ReadinessCredentialActiveStatus is visible to holder, attester, and approved verifiers as a minimal revocation liveness witness, not as a raw credential. ReadinessPresentation and ReadinessBinding are visible to holder, attester, and verifier. ReadinessAuditDisclosureGrant is visible to the auditor. VenueReadinessEvidence is visible to holder, attester, and verifier. CapacityReservation is visible to holder, attester, and verifier. ReservationHandoffInstruction is visible to the handoff recipient. AuditDisclosureGrant is visible to the auditor.
 

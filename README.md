@@ -10,7 +10,7 @@ It models readiness accounts, readiness policies, externally attested credential
 
 Passport records attested readiness and scoped evidence only. Passport may record a reservation handoff notice. Passport does not grant licenses or legal permissions. Passport does not admit participants to a venue. Passport does not determine legal compliance. Passport does not operate a venue, exchange, ATS, SEF, MTF, regulated market, matching engine, order book, clearinghouse, custodian, settlement system, wallet, token issuer, legal-title oracle, credit engine, or production identity system. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, clear, or move collateral or assets.
 
-Passport 0.3.0 adds generic readiness credential templates with typed Daml `Time` fields for policy validity, credential validity/freshness, presentation validity, binding freshness, revocation event time, audit grant validity, and venue-readiness evidence creation time. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
+Readiness and collateral-capacity contracts use typed Daml `Time` fields where ledger-time validation matters. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
 
 VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
@@ -151,6 +151,8 @@ scripts/
   generated-time.mjs
   gates.mjs
   daml-coverage-gate.mjs
+  daml-build.sh
+  dpm-sdk-env.sh
   export-demo-transcript.mjs
   export-readiness-demo-transcript.mjs
   readiness-claim-gate.mjs
@@ -225,7 +227,7 @@ This repo uses DPM, not the deprecated `daml` assistant. The package `sdk-versio
 
 ```bash
 dpm install 3.4.11
-dpm build --all
+npm run daml:build
 ./scripts/run-daml-tests.sh
 ```
 

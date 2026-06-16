@@ -4,7 +4,7 @@ Passport keeps its Daml templates as the Canton ledger schema and emits external
 
 Interop artifacts are bounded readiness artifacts. They do not make Passport a venue, exchange, ATS, SEF, MTF, regulated market, custody system, clearinghouse, settlement system, wallet, token-transfer system, token issuer, optimizer, credit decision engine, licensing authority, legal-compliance engine, production identity system, or live external integration.
 
-Passport 0.3.0 can produce regulated-market readiness evidence and collateral-capacity artifacts. Adapter outputs remain external-format views over attested readiness; they do not grant licenses, admit participants to a venue, execute trades, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
+Passport can produce regulated-market readiness evidence and collateral-capacity artifacts. Adapter outputs remain external-format views over attested readiness; they do not grant licenses, admit participants to a venue, execute trades, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
 
 The adapter surface is deliberately narrow:
 
