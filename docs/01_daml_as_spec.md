@@ -20,7 +20,7 @@ Daml spec -> Daml Script tests -> committee demo -> thin service wrapper -> UI
 
 The initial build contains no API, database, web dashboard, or external integration. Those can wrap ledger commands after the Daml model is accepted.
 
-Passport is now a regulated-market readiness credential foundation. The Daml templates record externally attested readiness and scoped evidence; they do not grant licenses, determine legal compliance, admit participants to a venue, operate a venue, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
+Passport is now a regulated-market readiness credential foundation. The Daml templates record external readiness attestations and scoped evidence; they do not grant licenses, determine legal compliance, admit participants to a venue, operate a venue, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
 
 ## Current Daml contract set
 

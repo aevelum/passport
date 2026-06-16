@@ -4,7 +4,7 @@
 
 Upgrade Passport from a collateral-capacity readiness credential account into a regulated-market readiness credential foundation, with collateral capacity remaining the first credential family.
 
-Passport records externally attested readiness and scoped evidence only. It must not grant licenses, determine legal compliance, admit participants to a venue, operate a venue, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, or determine legal title.
+Passport records external readiness attestations and scoped evidence only. It must not grant licenses, determine legal compliance, admit participants to a venue, operate a venue, form trades, match orders, clear, settle, custody, transfer assets, issue tokens, operate wallets, decide credit, or determine legal title.
 
 ## Round Status
 

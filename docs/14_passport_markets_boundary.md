@@ -1,6 +1,6 @@
 # 14 Passport Markets Boundary
 
-Passport records attested readiness. Markets governs workflows and venues.
+Passport records readiness attestations. Markets governs workflows and venues.
 
 External legal, regulatory, licensing, custody, settlement, and clearing systems remain external.
 

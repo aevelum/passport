@@ -2,15 +2,15 @@
 
 Aevelum Passport is the public Canton/Daml foundation for private regulated-market readiness credentials. Collateral capacity is the first credential family.
 
-The product lets institutions issue, hold, present, bind, revoke, and audit externally attested readiness credentials for regulated-market workflows. Supported readiness families include participant eligibility, license or registration attestations, venue access readiness, product eligibility, operational capability, disclosure consent, settlement or clearing readiness evidence, and collateral capacity readiness.
+The product lets institutions issue, hold, present, bind, revoke, and audit readiness-attested credentials backed by external evidence for regulated-market workflows. Supported readiness families include participant eligibility, license or registration attestations, venue access readiness, product eligibility, operational capability, disclosure consent, settlement or clearing readiness evidence, and collateral capacity readiness.
 
 ## One-sentence UVP
 
-Passport lets institutions present attested readiness on Canton without exposing underlying evidence, legal files, operational files, or collateral inventory.
+Passport lets institutions present readiness attestations on Canton without exposing underlying evidence, legal files, operational files, or collateral inventory.
 
 ## Wedge
 
-Passport occupies the attested readiness layer:
+Passport occupies the readiness-attested layer:
 
 ```text
 external legal, regulatory, operational, custody, settlement, clearing, or collateral evidence
@@ -37,4 +37,4 @@ external legal, regulatory, operational, custody, settlement, clearing, or colla
 
 ## Design boundary
 
-Passport records attested readiness and scoped evidence only. Passport does not grant licenses, register participants, approve legal compliance, admit participants to a venue, execute repo, execute securities-lending trades, form trades, match orders, operate a venue, run a margin engine, settle transactions, clear transactions, custody assets, transfer collateral, transfer assets, issue tokens, optimize collateral, make credit decisions, operate a wallet, integrate production identity, provide live external integration, implement ZK proofs, or prove legal title.
+Passport records readiness attestations and scoped evidence only. Passport does not grant licenses, register participants, approve legal compliance, admit participants to a venue, execute repo, execute securities-lending trades, form trades, match orders, operate a venue, run a margin engine, settle transactions, clear transactions, custody assets, transfer collateral, transfer assets, issue tokens, optimize collateral, make credit decisions, operate a wallet, integrate production identity, provide live external integration, implement ZK proofs, or prove legal title.

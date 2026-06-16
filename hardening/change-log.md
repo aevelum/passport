@@ -2,6 +2,7 @@
 
 ## 2026-06-16 - docs-code congruence
 
+- Renamed public copy to readiness-attested/readiness-attestation language across docs, gates, invariant-map claims, and README/OG assets without changing Passport's evidence-only boundary.
 - Moved versioned README/scope prose into release-note language and rewrote current-facing README and scope docs to describe present Passport behavior without changelog-style "0.3.0 adds" phrasing.
 - Tightened adapter readiness evidence path normalization so bare, explicit, and normalized parent-directory references are rejected even when another valid proof reference is present.
 - Ran repo-audit campaign round-0011 and remedied five concrete findings: local DPM SDK env drift, out-of-repo readiness evidence references, unsafe adapter output path segments, missing SVG asset overclaim scanning, and review package omission of the generated core DAR.

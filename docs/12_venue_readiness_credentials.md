@@ -1,6 +1,6 @@
 # 12 Venue Readiness Credentials
 
-Venue readiness in Passport means evidence that a holder, product, capability, or venue profile has externally attested readiness for a future Markets workflow.
+Venue readiness in Passport means evidence that a holder, product, capability, or venue profile has readiness attested by an external party for a future Markets workflow.
 
 `VenueReadinessEvidence` is a semantic wrapper over `ReadinessBinding`. It lets Markets fetch readiness evidence using venue terms without making Passport a venue.
 

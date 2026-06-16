@@ -7,7 +7,7 @@ Bring Passport docs, generated artifacts, gates, and implementation claims into 
 `chore/docs-code-congruence`
 
 ## Non-negotiable boundaries
-- Passport records externally attested readiness and scoped evidence only.
+- Passport records external readiness attestations and scoped evidence only.
 - Do not add custody, transfer, settlement, clearing, token issuance, wallet, venue operation, trade execution, legal-compliance determination, license granting, participant registration, production identity, live integration, dynamic plugin loading, `eval`, arbitrary plugin paths, or repo-authored network fetches in validation/generation paths.
 - Do not raise any adapter readiness level above current evidence.
 
