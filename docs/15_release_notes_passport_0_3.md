@@ -11,7 +11,7 @@ Passport 0.3.0 introduces generic regulated-market readiness credentials while p
 - `readinessUseMatchesBindingPurpose`
 - `ValidateVenueReadinessEvidence`
 - `ReadinessCredentialActiveStatus`
-- Daml Script tests `t100` through `t128`
+- Daml Script tests `t100` through `t131`, including `t129_reject_binding_after_readiness_credential_revocation`, `t130_reject_venue_readiness_evidence_after_credential_revocation`, and `t131_active_status_visibility_is_liveness_only`
 - readiness demo transcripts
 - static readiness claim gate
 - ADR `0002-readiness-credential-expansion`

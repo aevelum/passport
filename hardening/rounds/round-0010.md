@@ -7,7 +7,7 @@ Upgrade Passport from collateral-capacity readiness only to a regulated-market r
 ## Scope
 
 - Daml readiness and venue-readiness modules.
-- Daml Script tests `t100` through `t119`.
+- Initial Daml Script tests `t100` through `t119`; later C.1 review additions extended the current 0.3 inventory through `t131`.
 - License or registration attestation-only semantics.
 - Scoped readiness presentation, binding, audit disclosure, and venue evidence visibility.
 - Overclaim gates for license, venue, trade, clearing, settlement, custody, asset transfer, token, and wallet language.

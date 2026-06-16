@@ -202,7 +202,7 @@ function claimUnits(text) {
     }
     for (const part of clean
       .split(/(?<=[.!?])\s+|;\s*/)
-      .map(part => part.replace(/\|/g, ' ').trim())
+      .map(part => exposeMarkupAttributeText(part).replace(/\|/g, ' ').trim())
       .filter(Boolean)) {
       units.push({ text: part, line: i + 1 });
     }
@@ -234,6 +234,15 @@ function hasGateOrTestBoundary(text) {
     || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
 }
 
+function exposeMarkupAttributeText(text) {
+  return text.replace(/<[^>]+>/g, tag => {
+    const values = [...tag.matchAll(/\s[\w:-]+\s*=\s*(?:"([^"]*)"|'([^']*)')/g)]
+      .map(match => match[1] ?? match[2])
+      .filter(Boolean);
+    return ` ${values.join(' ')} `;
+  });
+}
+
 const coreFoundation = 'packages/passport-core/daml/Aevelum/Passport/Foundation.daml';
 const coreTypes = 'packages/passport-core/daml/Aevelum/Passport/Types.daml';
 const readinessTypes = 'packages/passport-core/daml/Aevelum/Passport/Readiness/Types.daml';
@@ -261,6 +270,7 @@ const docsScopeFiles = [
   ...walk('docs').filter(file => file.endsWith('.md')),
   ...walk('design').filter(file => file.endsWith('.md')),
   ...walk('hardening').filter(file => file.endsWith('.md')),
+  ...walk('assets').filter(file => file.endsWith('.svg')),
   'artifacts/demo_transcript.json',
   'artifacts/readiness_demo_transcript.json',
   'artifacts/venue_readiness_demo_transcript.json'
@@ -310,6 +320,7 @@ const requiredFiles = [
   'docs/14_passport_markets_boundary.md',
   'docs/15_release_notes_passport_0_3.md',
   'docs/decisions/0002-readiness-credential-expansion.md',
+  'docs/trackers/docs-code-congruence.md',
   'design/tokens/colors.json',
   'design/change-log.md',
   'AGENTS.md',
@@ -340,6 +351,7 @@ const requiredFiles = [
   'artifacts/interop/report.json',
   'artifacts/hardening_report.json',
   'artifacts/hardening_map_report.json',
+  'artifacts/readiness_claim_gate_report.json',
   'hardening/maps/passport.invariants.json',
   'hardening/frontiers/passport.frontier.json',
   'hardening/policies/architecture-rules.json',
@@ -356,6 +368,7 @@ const requiredFiles = [
   'hardening/rounds/round-0007.md',
   'hardening/rounds/round-0008.md',
   'hardening/rounds/round-0009.md',
+  'hardening/rounds/round-0010.md',
   'hardening/change-log.md',
   'hardening/scripts/lib.mjs',
   'hardening/scripts/validate-map.mjs',
@@ -797,7 +810,10 @@ try {
 }
 
 try {
+  const packageManifest = JSON.parse(read('package.json'));
   const report = JSON.parse(read('artifacts/interop/report.json'));
+  if (report.version !== packageManifest.version) fail.push(`interop report version ${report.version} does not match package.json ${packageManifest.version}`);
+  else pass.push(`interop report version matches package.json ${packageManifest.version}`);
   if (report.status !== 'passed') fail.push(`interop report status is ${report.status}`);
   else pass.push('interop report passed');
   if (!Array.isArray(report.adapterReadiness)) fail.push('interop report missing adapterReadiness');

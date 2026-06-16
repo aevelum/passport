@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+. "$ROOT/scripts/dpm-sdk-env.sh"
 
 CORE_DAR="$ROOT/packages/passport-core/.daml/dist/aevelum-passport-core-0.3.0.dar"
 TMP_DIR="$(mktemp -d)"

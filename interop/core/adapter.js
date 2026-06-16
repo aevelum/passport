@@ -3,6 +3,8 @@ import {
   assertReadinessShape
 } from './readiness.js';
 
+const SAFE_SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
 /**
  * @typedef {Object} AdapterPlugin
  * @property {string} id
@@ -77,10 +79,17 @@ export function assertPluginShape(plugin) {
     if (typeof plugin[key] !== 'string' || plugin[key].length === 0) {
       throw new Error(`adapter plugin missing string field: ${key}`);
     }
+    assertSafeSegment(plugin[key], `adapter plugin ${plugin.id ?? '<unknown>'} ${key}`);
   }
   if (!Array.isArray(plugin.artifactTypes) || plugin.artifactTypes.length === 0) {
     throw new Error(`adapter plugin ${plugin.id} must declare artifactTypes`);
   }
+  plugin.artifactTypes.forEach((artifactType, index) => {
+    if (typeof artifactType !== 'string' || artifactType.length === 0) {
+      throw new Error(`adapter plugin ${plugin.id} artifactTypes[${index}] must be a non-empty string`);
+    }
+    assertSafeSegment(artifactType, `adapter plugin ${plugin.id} artifactTypes[${index}]`);
+  });
   assertReadinessShape(plugin.readiness);
   if (plugin.readiness.level === 0) {
     throw new Error(`adapter plugin ${plugin.id} readiness level 0 is concept-only; registered adapters must be Level 1-5`);
@@ -114,4 +123,10 @@ function freezeReadiness(readiness) {
     nonClaims: Object.freeze([...readiness.nonClaims]),
     promotionCriteria: Object.freeze([...readiness.promotionCriteria])
   });
+}
+
+function assertSafeSegment(value, label) {
+  if (!SAFE_SEGMENT.test(value)) {
+    throw new Error(`${label} must be a safe path segment`);
+  }
 }

@@ -1,6 +1,6 @@
 # 03 Collateral Capacity Credential
 
-The `CapacityCredential` is the primary product object.
+The `CapacityCredential` is the primary object for the collateral-capacity credential family.
 
 It states:
 

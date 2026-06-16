@@ -6,7 +6,7 @@ The first pilot workflow is repo pre-trade collateral-capacity verification.
 
 A dealer wants to know whether a holder has at least USD 50 million in eligible collateral capacity under the dealer's policy before quote or downstream trade workflow. Passport records readiness only; it does not execute the downstream trade.
 
-For Passport 0.2.0, downstream Markets can compare typed Daml `Time` fields against ledger time during quote acceptance. The authoritative fields are `CollateralPolicy.validFromTime`/`validUntilTime`, `CapacityCredential.valuationTime`/`validFromTime`/`validUntilTime`/`freshUntilTime`, `CredentialPresentation.presentedAtTime`/`presentationValidUntilTime`, and `CapacityReservation.reservedAtTime`/`validUntilTime`.
+Downstream Markets can compare typed Daml `Time` fields against ledger time during quote acceptance. The authoritative fields are `CollateralPolicy.validFromTime`/`validUntilTime`, `CapacityCredential.valuationTime`/`validFromTime`/`validUntilTime`/`freshUntilTime`, `CredentialPresentation.presentedAtTime`/`presentationValidUntilTime`, and `CapacityReservation.reservedAtTime`/`validUntilTime`.
 
 ## Flow
 

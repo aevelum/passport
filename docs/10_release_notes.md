@@ -15,6 +15,7 @@ Passport 0.3.0 upgrades the public Canton/Daml foundation from collateral-readin
 ### Validation behavior
 
 - Readiness policies, credentials, presentations, bindings, revocations, audit grants, and venue-readiness evidence use typed Daml `Time` fields where ledger-time validation matters.
+- Passport 0.3.0 adds typed Daml `Time` fields for policy validity, credential validity/freshness, presentation validity, binding freshness, revocation event time, audit grant validity, and venue-readiness evidence creation time. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
 - Readiness credential issuance checks holder, attester, credential kind, jurisdiction, activity refs, policy validity, and credential validity.
 - Readiness presentation rejects expired or stale credentials.
 - Readiness binding is a non-executing evidence record tied to workflow, venue profile, or rulebook context.

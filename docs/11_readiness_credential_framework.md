@@ -17,6 +17,8 @@ Passport records attested readiness and scoped evidence only. External legal, re
 
 ## Ledger Spine
 
+The primary readiness spine is:
+
 ```text
 ReadinessAccount
 ReadinessPolicy
@@ -24,11 +26,21 @@ ReadinessCredentialRequest
 ReadinessCredential
 ReadinessPresentation
 ReadinessBinding
-ReadinessRevocation
-ReadinessAuditDisclosureGrant
 ```
 
-`ReadinessPolicy` controls approved holders, attesters, verifiers, credential kinds, jurisdictions, activity refs, policy validity, and freshness. `ReadinessCredentialRequest` captures the holder request. `ReadinessCredential` records the attester-backed result. `ReadinessPresentation` scopes fields to a verifier. `ReadinessBinding` ties a presentation to workflow, venue-profile, or rulebook context without executing that workflow.
+Support, liveness, and lifecycle contracts in the current Daml package are:
+
+```text
+ReadinessPolicyLifecycleEvent
+ReadinessCredentialActiveStatus
+ReadinessRevocation
+ReadinessAuditDisclosureGrant
+VenueReadinessEvidence
+```
+
+`ReadinessPolicy` controls approved holders, attesters, verifiers, credential kinds, jurisdictions, activity refs, policy validity, and freshness. `ReadinessCredentialRequest` captures the holder request. `ReadinessCredential` records the attester-backed result. `ReadinessCredentialActiveStatus` is a minimal liveness witness visible to the holder, attester, and approved verifiers; it is not a raw credential, venue right, license, registration, or legal-compliance determination. `ReadinessPresentation` scopes fields to a verifier. `ReadinessBinding` ties a presentation to workflow, venue-profile, or rulebook context without executing that workflow.
+
+Venue-readiness validation fetches the referenced `ReadinessBinding` and its live `ReadinessCredentialActiveStatus`, then rejects revoked, stale, or expired evidence before a verifier relies on `VenueReadinessEvidence`.
 
 ## Boundary
 

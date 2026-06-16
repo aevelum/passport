@@ -10,7 +10,7 @@ It models readiness accounts, readiness policies, externally attested credential
 
 Passport records attested readiness and scoped evidence only. Passport may record a reservation handoff notice. Passport does not grant licenses or legal permissions. Passport does not admit participants to a venue. Passport does not determine legal compliance. Passport does not operate a venue, exchange, ATS, SEF, MTF, regulated market, matching engine, order book, clearinghouse, custodian, settlement system, wallet, token issuer, legal-title oracle, credit engine, or production identity system. Passport does not execute the downstream trade. Passport does not custody, transfer, settle, clear, or move collateral or assets.
 
-Passport 0.3.0 adds generic readiness credential templates with typed Daml `Time` fields for policy validity, credential validity/freshness, presentation validity, binding freshness, revocation event time, audit grant validity, and venue-readiness evidence creation time. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
+Readiness and collateral-capacity contracts use typed Daml `Time` fields where ledger-time validation matters. Existing ISO timestamp text fields remain display and interop metadata; downstream Canton/Daml consumers should compare typed `Time` fields against ledger time.
 
 VenueReadinessEvidence is a wrapper around a ReadinessBinding. Consumers must validate or cross-check the underlying ReadinessBinding before relying on VenueReadinessEvidence. Markets Phase C must not trust string readiness refs or copied wrapper fields alone. VenueReadinessUse must match ReadinessBindingPurpose.
 
@@ -90,7 +90,11 @@ Auditor receives only scoped audit metadata.
 multi-package.yaml
 AGENTS.md
 .agents/
-  skills/passport-hardening-loop/SKILL.md
+  skills/
+    passport-hardening-loop/SKILL.md
+    passport-hardening-loop/agents/openai.yaml
+    passport-ui-design-system/SKILL.md
+    passport-ui-design-system/agents/openai.yaml
 packages/
   passport-core/
     daml.yaml
@@ -118,12 +122,15 @@ docs/
   13_license_registration_attestations.md
   14_passport_markets_boundary.md
   15_release_notes_passport_0_3.md
+  decisions/0002-readiness-credential-expansion.md
+  trackers/*.md
 design/
   tokens/colors.json
   change-log.md
 interop/
   core/adapter.js
   core/readiness.js
+  context.js
   registry.js
   runner.js
   samples/repo-pretrade-passport-input.json
@@ -132,13 +139,20 @@ hardening/
   maps/passport.invariants.json
   frontiers/passport.frontier.json
   policies/architecture-rules.json
-  rounds/round-0001.md
-  rounds/round-0005.md
+  formal/daml-ledger-core/
+    FORMAL_LADDER.md
+    obligations.json
+    reference-model.mjs
+    reservation-core.tla
+  rounds/round-*.md
   change-log.md
   scripts/*.mjs
 scripts/
+  generated-time.mjs
   gates.mjs
   daml-coverage-gate.mjs
+  daml-build.sh
+  dpm-sdk-env.sh
   export-demo-transcript.mjs
   export-readiness-demo-transcript.mjs
   readiness-claim-gate.mjs
@@ -157,6 +171,7 @@ artifacts/
   hardening_report.json
   hardening_map_report.json
   gate_report.json
+  readiness_claim_gate_report.json
 ```
 
 ## Local gates
@@ -204,7 +219,7 @@ npm run all
 
 `npm run all` is an alias for `npm run ci` because package creation and freshness checks are now part of the default gate. Networked supply-chain checks such as `npm audit --json` are manual checks, not part of default PR CI.
 
-Default GitHub PR CI runs on GitHub-hosted Ubuntu with Node 24.x, Temurin Java 17, cached DPM SDK components, and normal lockfile-based `npm ci --ignore-scripts --audit=false --fund=false`. Repo-authored validation and generation paths remain network-bounded: CDM schema refreshes are explicit vendoring commands, not part of the default gate.
+Default GitHub PR CI runs on GitHub-hosted Ubuntu with Node 24.x, Temurin Java 17, `DPM_SDK_VERSION=3.4.11`, cached DPM SDK components, and normal lockfile-based `npm ci --ignore-scripts --audit=false --fund=false`. Repo-authored validation and generation paths remain network-bounded: CDM schema refreshes are explicit vendoring commands, not part of the default gate.
 
 ## Daml/Canton toolchain
 
@@ -212,7 +227,7 @@ This repo uses DPM, not the deprecated `daml` assistant. The package `sdk-versio
 
 ```bash
 dpm install 3.4.11
-dpm build --all
+npm run daml:build
 ./scripts/run-daml-tests.sh
 ```
 

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" fill="none" role="img" aria-label="Aevelum Passport README banner">
   <title>Aevelum Passport README banner</title>
-  <desc>A light README banner for Aevelum Passport with large readable tagline text and a simplified credential account diagram.</desc>
+  <desc>A light README banner for Aevelum Passport with large readable readiness text and a simplified credential account diagram.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
       <stop stop-color="#F8FAFC"/>
@@ -46,13 +46,13 @@
   <text x="478" y="194" font-family="'SF Mono', Menlo, Monaco, Consolas, monospace" font-size="54" font-weight="700" fill="#BD9B6B">passport</text>
 
   <text x="96" y="316" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="58" font-weight="800" fill="#07111A">
-    Confidential collateral.
+    Attested readiness.
   </text>
   <text x="96" y="386" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="58" font-weight="800" fill="#07111A">
-    Confident readiness.
+    Controlled disclosure.
   </text>
   <text x="100" y="460" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif" font-size="30" font-weight="500" fill="#343741">
-    Canton-native repo collateral credentials.
+    Regulated-market readiness credentials.
   </text>
 
   <g transform="translate(810, 190) scale(0.88)">

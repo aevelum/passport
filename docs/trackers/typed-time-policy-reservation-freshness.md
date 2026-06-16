@@ -1,19 +1,23 @@
 # Typed Time Policy And Reservation Freshness Tracker
 
+## Historical status
+
+Completed for the Passport 0.2.0 typed-time upgrade. Current Passport 0.3.0 uses the target typed Daml `Time` schema described below; the original text timestamp model is preserved here only as upgrade history.
+
 ## Problem statement
 
 Aevelum Markets verifies typed Passport `CapacityReservation` and `CollateralPolicy` contracts during Repo RFQ quote acceptance, but Passport 0.1.0 models policy validity, credential valuation and validity, presentation time, and reservation validity primarily as ISO timestamp `Text`. Markets cannot compare those text fields against ledger time in Daml, so stale policies, credentials, presentations, or reservations require out-of-band parsing.
 
-## Current timestamp model
+## Original 0.1.0 timestamp model
 
-- `IsoTimestamp = Text` is the current timestamp alias.
+- `IsoTimestamp = Text` was the original timestamp alias.
 - `CollateralPolicy.validFrom` and `CollateralPolicy.validUntil` are text metadata only.
 - `CapacityCredential.valuationTime`, `validFrom`, and `validUntil` are text metadata only.
 - `CredentialPresentation.presentedAt` and `validUntil` are text metadata only.
 - `CapacityReservation.validUntil` is text metadata only.
 - Revocation, expiry, audit disclosure, handoff, and dispute timestamps are also text metadata.
 
-## Target timestamp model
+## Target 0.2.0 timestamp model, still current in 0.3.0
 
 - Add authoritative Daml `Time` fields alongside compatibility text metadata.
 - `CollateralPolicy` exposes `validFromTime` and `validUntilTime`.

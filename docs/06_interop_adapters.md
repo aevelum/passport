@@ -4,7 +4,7 @@ Passport keeps its Daml templates as the Canton ledger schema and emits external
 
 Interop artifacts are bounded readiness artifacts. They do not make Passport a venue, exchange, ATS, SEF, MTF, regulated market, custody system, clearinghouse, settlement system, wallet, token-transfer system, token issuer, optimizer, credit decision engine, licensing authority, legal-compliance engine, production identity system, or live external integration.
 
-Passport 0.3.0 can produce regulated-market readiness evidence and collateral-capacity artifacts. Adapter outputs remain external-format views over attested readiness; they do not grant licenses, admit participants to a venue, execute trades, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
+Passport can produce regulated-market readiness evidence and collateral-capacity artifacts. Adapter outputs remain external-format views over attested readiness; they do not grant licenses, admit participants to a venue, execute trades, clear, settle, custody, transfer assets, issue tokens, or operate wallets.
 
 The adapter surface is deliberately narrow:
 
@@ -27,6 +27,9 @@ Each plugin declares:
 - `readiness`
 - `generate(input, context)`
 - `validate(result, context)`
+- optional `validateNegativeCases(context, input)`
+
+`validateNegativeCases(context, input)` returns named validation falsifiers for malformed or semantically bounded cases. These cases are part of Level 2 Artifact Conformance evidence because they prove the offline validation lane rejects known-bad payloads or overclaiming adapter behavior.
 
 The initial registry contains one plugin:
 
@@ -80,3 +83,5 @@ npm run interop:validate
 Generated CDM payloads are written to `artifacts/interop/cdm/6.0/`. Adapter metadata, provenance, validation status, warnings, and negative-case results are written to `artifacts/interop/report.json`.
 
 This is Level 2 artifact conformance for generated Passport collateral eligibility artifacts. Readiness metadata, evidence, claims, non-claims, promotion criteria, and provenance stay in `artifacts/interop/report.json`; they are not embedded in generated CDM payloads.
+
+The negative cases in the report do not raise CDM above Level 2. They do not provide FINOS certification, Rosetta Engine execution, CDM eligibility-engine execution, repo execution, custody, settlement, live external integration, Canton Token Standard integration, or production partner integration.
