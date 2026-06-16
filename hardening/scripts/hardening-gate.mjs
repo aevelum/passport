@@ -1060,7 +1060,8 @@ function docsAndMarketingFiles() {
     'README.md',
     'AGENTS.md',
     ...walkFiles('docs', { extensions: ['.md'] }),
-    ...walkFiles('.agents/skills', { extensions: ['.md'] })
+    ...walkFiles('.agents/skills', { extensions: ['.md'] }),
+    ...walkFiles('assets', { extensions: ['.svg'] })
   ]);
 
   for (const file of gitTrackedFiles()) {
@@ -1097,11 +1098,20 @@ function claimUnits(text) {
     }
     const parts = clean
       .split(/(?<=[.!?])\s+|;\s*/)
-      .map(part => part.replace(/<[^>]+>/g, ' ').replace(/\|/g, ' ').trim())
+      .map(part => exposeMarkupAttributeText(part).replace(/\|/g, ' ').trim())
       .filter(Boolean);
     for (const part of parts) units.push({ text: part, line: i + 1 });
   }
   return units;
+}
+
+function exposeMarkupAttributeText(text) {
+  return text.replace(/<[^>]+>/g, tag => {
+    const values = [...tag.matchAll(/\s[\w:-]+\s*=\s*(?:"([^"]*)"|'([^']*)')/g)]
+      .map(match => match[1] ?? match[2])
+      .filter(Boolean);
+    return ` ${values.join(' ')} `;
+  });
 }
 
 function mentionsAdapterOrProduct(text) {
@@ -1140,6 +1150,7 @@ function overclaimNegativeFixtures() {
     'The adapter supports custody and settlement.',
     'The adapter not only supports custody but also settlement.',
     'The adapter should not only support custody but also settlement.',
-    '<text>Passport has live external integration.</text>'
+    '<text>Passport has live external integration.</text>',
+    '<svg aria-label="The current CDM adapter is certified"></svg>'
   ];
 }

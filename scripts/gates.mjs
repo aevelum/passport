@@ -202,7 +202,7 @@ function claimUnits(text) {
     }
     for (const part of clean
       .split(/(?<=[.!?])\s+|;\s*/)
-      .map(part => part.replace(/<[^>]+>/g, ' ').replace(/\|/g, ' ').trim())
+      .map(part => exposeMarkupAttributeText(part).replace(/\|/g, ' ').trim())
       .filter(Boolean)) {
       units.push({ text: part, line: i + 1 });
     }
@@ -232,6 +232,15 @@ function hasBoundaryScopePhrase(text) {
 function hasGateOrTestBoundary(text) {
   return /\b(?:claim gate|readiness claim gate|hardening gate|structural gate|static gates?|tests?)\b[^.\n|;]{0,120}\b(?:must\s+)?rejects?\b/i.test(text)
     || /\b(?:rejects?|rejected)\b[^.\n|;]{0,120}\b(?:overclaims?|claims?|prose|docs?|artifacts?|changes|language|sentences|gaps)\b/i.test(text);
+}
+
+function exposeMarkupAttributeText(text) {
+  return text.replace(/<[^>]+>/g, tag => {
+    const values = [...tag.matchAll(/\s[\w:-]+\s*=\s*(?:"([^"]*)"|'([^']*)')/g)]
+      .map(match => match[1] ?? match[2])
+      .filter(Boolean);
+    return ` ${values.join(' ')} `;
+  });
 }
 
 const coreFoundation = 'packages/passport-core/daml/Aevelum/Passport/Foundation.daml';
