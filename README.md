@@ -84,6 +84,10 @@ Auditor receives only scoped audit metadata.
 - Not a production identity system.
 - Not a live external integration.
 
+## Software license
+
+Apache-2.0. See [LICENSE](LICENSE).
+
 ## Project layout
 
 ```text
